@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 /// Splash page
-class MobileSplash extends StatefulWidget {
+class DesktopSplash extends StatefulWidget {
   /// Splash page constructor
-  const MobileSplash({super.key});
+  const DesktopSplash({super.key});
 
-  /// Route name [MobileSplash.routeName] for this page
+  /// Route name [DesktopSplash.routeName] for this page
   static const String routeName = '/';
 
   @override
-  State<MobileSplash> createState() => _MobileSplashState();
+  State<DesktopSplash> createState() => _DesktopSplashState();
 }
 
-class _MobileSplashState extends State<MobileSplash> {
+class _DesktopSplashState extends State<DesktopSplash> {
   @override
   void initState() {
     super.initState();
