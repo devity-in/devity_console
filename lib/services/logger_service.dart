@@ -1,11 +1,29 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+import 'dart:developer';
 
 /// Common service to log messages
 class LoggerService {
-
   /// Log message
-  void log(String message) {
+  static void commonLog(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    int level = 0,
+    String name = '',
+    Zone? zone,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
     // Log message to console, file, or a remote server
-    debugPrint(message);
+    log(
+      message,
+      time: time,
+      sequenceNumber: sequenceNumber,
+      level: level,
+      name: name,
+      zone: zone,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
