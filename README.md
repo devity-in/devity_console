@@ -1,4 +1,4 @@
-# Devity Flutter
+# Devity Flutter [ 3.29.0 ]
 flutter project to serve as starting point for apps.
 
 ![coverage][coverage_badge]
@@ -228,7 +228,7 @@ class User with _$User {
 After you define your model, you need to run the **code generator** to create the necessary files (`*.freezed.dart` and `*.g.dart`):
 
 ```bash
-flutter pub run build_runner build
+dart run build_runner build
 ```
 
 This command generates:
@@ -289,3 +289,7 @@ The `freezed` library significantly improves the way we manage data and applicat
 For more detailed usage, refer to the official [freezed documentation](https://pub.dev/packages/freezed).
 
 ---
+
+### To sort the pubsec.yml
+
+`dart run pubspec_dependency_sorter`
