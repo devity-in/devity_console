@@ -1,19 +1,19 @@
 import 'package:devity_console/modules/auth/view/login.dart';
 import 'package:devity_console/services/snackbar_service.dart';
-import 'package:devity_console/widgets/mobile_widgets.dart';
+import 'package:devity_console/widgets/desktop_basic_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Signup page
-class MobileSignup extends StatefulWidget {
+class DesktopSignup extends StatefulWidget {
   /// Signup page cons
-  const MobileSignup({super.key});
+  const DesktopSignup({super.key});
 
   @override
-  State<MobileSignup> createState() => _MobileSignupState();
+  State<DesktopSignup> createState() => _DesktopSignupState();
 }
 
-class _MobileSignupState extends State<MobileSignup> {
+class _DesktopSignupState extends State<DesktopSignup> {
   final TextEditingController userNameTextController = TextEditingController();
   final TextEditingController emailTextController = TextEditingController();
   final TextEditingController passwordTextController = TextEditingController();
@@ -46,22 +46,22 @@ class _MobileSignupState extends State<MobileSignup> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            MobileTextEditor(
+            DesktopTextEditor(
               title: 'User Name',
               textEditingController: userNameTextController,
               keyboardType: TextInputType.text,
             ),
-            MobileTextEditor(
+            DesktopTextEditor(
               title: 'Email',
               textEditingController: emailTextController,
               keyboardType: TextInputType.text,
             ),
-            MobileTextEditor(
+            DesktopTextEditor(
               title: 'Password',
               textEditingController: passwordTextController,
               keyboardType: TextInputType.text,
             ),
-            MobileTextEditor(
+            DesktopTextEditor(
               title: 'Conform Password',
               textEditingController: conformPasswordTextController,
               keyboardType: TextInputType.text,
@@ -132,8 +132,8 @@ class _MobileSignupState extends State<MobileSignup> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const MobileLogin(),
+                      MaterialPageRoute<DesktopLogin>(
+                        builder: (context) => const DesktopLogin(),
                       ),
                     );
                   },

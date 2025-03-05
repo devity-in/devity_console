@@ -6,17 +6,17 @@ import 'package:devity_console/services/token_storage_service.dart';
 
 /// Auth repository
 class AuthRepository {
-  /// Auth remote data source
-  final AuthRemoteDataSource remoteDataSource;
-
-  /// Auth local data source
-  final TokenStorageService localDataSource;
 
   /// Auth repository constructor
   AuthRepository({
     required this.remoteDataSource,
     required this.localDataSource,
   });
+  /// Auth remote data source
+  final AuthRemoteDataSource remoteDataSource;
+
+  /// Auth local data source
+  final TokenStorageService localDataSource;
 
   /// function to login to devity server
   Future<TokenResponse?> login(
@@ -44,10 +44,12 @@ class AuthRepository {
     await localDataSource.clearToken();
   }
 
+  /// Get token from local storage
   Future<TokenResponse?> getToken() async {
     return localDataSource.getToken();
   }
 
+  /// Check if user is logged in or not based on token
   Future<bool> isLoggedIn() async {
     final token = await localDataSource.getToken();
     return token != null;

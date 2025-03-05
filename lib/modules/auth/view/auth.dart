@@ -38,7 +38,7 @@ class AuthWrapper extends StatelessWidget {
         } else if (state is Authenticated) {
           return const SizedBox();
         } else if (state is Unauthenticated) {
-          return const MobileLogin();
+          return const DesktopLogin();
         }
         return Container();
       },

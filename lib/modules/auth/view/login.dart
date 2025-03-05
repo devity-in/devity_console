@@ -2,20 +2,20 @@ import 'package:devity_console/l10n/l10n.dart';
 import 'package:devity_console/modules/auth/cubit/cubit.dart';
 import 'package:devity_console/modules/auth/view/forgot_password.dart';
 import 'package:devity_console/modules/auth/view/signup.dart';
-import 'package:devity_console/widgets/mobile_widgets.dart';
+import 'package:devity_console/widgets/desktop_basic_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Mobile Login page
-class MobileLogin extends StatefulWidget {
+class DesktopLogin extends StatefulWidget {
   /// Constructor
-  const MobileLogin({super.key});
+  const DesktopLogin({super.key});
 
   @override
-  State<MobileLogin> createState() => _MobileLoginState();
+  State<DesktopLogin> createState() => _DesktopLoginState();
 }
 
-class _MobileLoginState extends State<MobileLogin> {
+class _DesktopLoginState extends State<DesktopLogin> {
   final TextEditingController emailTextController = TextEditingController();
   final TextEditingController passwordTextController = TextEditingController();
 
@@ -50,8 +50,8 @@ class _MobileLoginState extends State<MobileLogin> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            MobileTextEditor(
-              title: 'Email',
+            DesktopTextEditor(
+              title: l10n.email,
               textEditingController: emailTextController,
               keyboardType: TextInputType.emailAddress,
             ),
@@ -59,8 +59,8 @@ class _MobileLoginState extends State<MobileLogin> {
               padding: const EdgeInsets.symmetric(
                 vertical: 10,
               ),
-              child: MobileTextEditor(
-                title: 'Password',
+              child: DesktopTextEditor(
+                title: l10n.password,
                 textEditingController: passwordTextController,
                 keyboardType: TextInputType.text,
                 obscureText: true,
@@ -80,7 +80,7 @@ class _MobileLoginState extends State<MobileLogin> {
                   );
                 },
                 child: Text(
-                  'Forgot Password?',
+                  l10n.forgotPassword,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.bold,
@@ -179,7 +179,7 @@ class _MobileLoginState extends State<MobileLogin> {
                     Navigator.push(
                       context,
                       MaterialPageRoute<Widget>(
-                        builder: (context) => const MobileSignup(),
+                        builder: (context) => const DesktopSignup(),
                       ),
                     );
                   },

@@ -8,9 +8,11 @@ class AuthException extends BaseException {
   AuthException(this.message, {required this.code});
 
   /// Auth exception message
+  @override
   final String message;
 
   /// Auth exception code
+  @override
   final int code;
 }
 

@@ -20,10 +20,11 @@ class AuthCubit extends Cubit<AuthState> {
   final _authRemoteDataSource = AuthRemoteDataSource();
   late final AuthRepository _authRepository;
 
-  void appStarted() async {
+  /// App started
+  Future<void> appStarted() async {
     // Check if the user is authenticated (e.g., check token in storage)
     final token = await _authRepository.getToken();
-    final bool isLoggedIn = token != null;
+    final isLoggedIn = token != null;
 
     if (isLoggedIn) {
       emit(Authenticated(token));
@@ -32,7 +33,8 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void logIn(String email, String password) async {
+  /// Log in
+  Future<void> logIn(String email, String password) async {
     try {
       // Log in with email and password
       final token = await _authRepository.login(email, password);
@@ -50,7 +52,8 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void logOut() async {
+  /// Log out
+  Future<void> logOut() async {
     await _authRepository.logout();
     emit(Unauthenticated());
   }

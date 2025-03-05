@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Circular app logo
 class CircularAppLogo extends StatelessWidget {
+  /// Circular app logo constructor
   const CircularAppLogo({
     super.key,
     this.size = 40,
   });
 
+  /// Size of the logo
   final int size;
 
   @override

@@ -15,12 +15,14 @@ analyzer:
   exclude:
     - test/.test_coverage.dart
     - lib/generated_plugin_registrant.dart
+    - lib/generated/
+
 
 linter:
   rules:
+    - always_use_package_imports
     - always_declare_return_types
     - always_put_required_named_parameters_first
-    - always_use_package_imports
     - annotate_overrides
     - avoid_bool_literals_in_conditional_expressions
     - avoid_catching_errors

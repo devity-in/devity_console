@@ -1,7 +1,15 @@
 {
     "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
+    "email":"Email",
+    "@email":{
+        "description":"Text used to show while displaying Email word"
+    },
+    "password":"Password",
+    "@password":{
+        "description":"Text used to show while displaying Password word"
+    },
+    "forgotPassword":"Forgot Password?",
+    "@forgotPassword":{
+        "description":"Text used to show while displaying Forgot Password? word"
     }
 }

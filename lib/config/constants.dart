@@ -1,21 +1,25 @@
+/// Constants class to define the app name and base url based on the app flavor.
 class Constants {
   static String? get _appFlavor =>
       const String.fromEnvironment('FLUTTER_APP_FLAVOR') != ''
           ? const String.fromEnvironment('FLUTTER_APP_FLAVOR')
           : null;
+
+  /// App name based on the app flavor
   static String get appName {
     switch (Constants._appFlavor) {
       case 'development':
-        return 'Mobile App Dev';
+        return 'Dev';
       case 'production':
-        return 'Mobile App Prod';
+        return 'Prod';
       case 'staging':
-        return 'Mobile App UAT';
+        return 'UAT';
       default:
-        return 'Mobile App Dev';
+        return 'Dev';
     }
   }
 
+  /// Base url based on the app flavor
   static String get baseUrl {
     switch (Constants._appFlavor) {
       case 'development':

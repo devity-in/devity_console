@@ -4,7 +4,9 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 
+/// Implementation of [BlocObserver] that logs all [Bloc] transitions.
 class AppBlocObserver extends BlocObserver {
+  /// Default constructor
   const AppBlocObserver();
 
   @override
@@ -20,6 +22,7 @@ class AppBlocObserver extends BlocObserver {
   }
 }
 
+/// Bootstrap the application
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);

@@ -2,8 +2,10 @@ import 'package:devity_console/services/snackbar_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class MobileTextEditor extends StatelessWidget {
-  const MobileTextEditor({
+/// Desktop text editor widget
+class DesktopTextEditor extends StatelessWidget {
+  /// Desktop text editor constructor
+  const DesktopTextEditor({
     required this.title,
     super.key,
     this.textEditingController,
@@ -15,14 +17,32 @@ class MobileTextEditor extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
   });
+
+  /// title - Title of the text editor
   final String title;
+
+  /// textEditingController - Controller for the text editor
   final int? maxLines;
+
+  /// keyboardType - Keyboard type for the text editor
   final Widget? suffixIconWidget;
+
+  /// obscureText - Whether the text should be obscured
   final bool obscureText;
+
+  /// focusNode - Focus node for the text editor
   final TextEditingController? textEditingController;
+
+  /// onChanged - Function to be called when the text is changed
   final TextInputType? keyboardType;
+
+  /// onSubmitted - Function to be called when the text is submitted
   final FocusNode? focusNode;
+
+  /// onChanged - Function to be called when the text is changed
   final void Function(String)? onChanged;
+
+  /// onSubmitted - Function to be called when the text is submitted
   final void Function(String)? onSubmitted;
   @override
   Widget build(BuildContext context) {
@@ -73,17 +93,27 @@ class MobileTextEditor extends StatelessWidget {
   }
 }
 
-class MobilePopupMenuButton extends StatelessWidget {
-  const MobilePopupMenuButton({
+/// Desktop popup menu button widget
+class DesktopPopupMenuButton extends StatelessWidget {
+  /// Desktop popup menu button constructor
+  const DesktopPopupMenuButton({
     required this.title,
     required this.controller,
     required this.options,
     super.key,
     this.maxLines,
   });
+
+  /// title - Title of the popup menu button
   final String title;
+
+  /// controller - Controller for the popup menu button
   final TextEditingController controller;
+
+  /// options - Options for the popup menu button
   final List<dynamic> options;
+
+  /// maxLines - Maximum lines for the popup menu button
   final int? maxLines;
   @override
   Widget build(BuildContext context) {
@@ -152,15 +182,23 @@ class MobilePopupMenuButton extends StatelessWidget {
   }
 }
 
-class MobileDatePicker extends StatelessWidget {
-  const MobileDatePicker({
+/// Desktop date picker widget
+class DesktopDatePicker extends StatelessWidget {
+  /// Desktop date picker constructor
+  const DesktopDatePicker({
     required this.title,
     required this.onChanged,
     super.key,
     this.initialDate,
   });
+
+  /// title - Title of the date picker
   final String title;
+
+  /// initialDate - Initial date for the date picker
   final DateTime? initialDate;
+
+  /// onChanged - Function to be called when the date is changed
   final void Function(DateTime?)? onChanged;
 
   @override
@@ -218,7 +256,7 @@ class MobileDatePicker extends StatelessWidget {
                     if (picked != null && onChanged != null) {
                       onChanged!(picked);
                     } else if (onChanged != null) {
-                      onChanged!(null);
+                      onChanged?.call(null);
                     }
                   },
                   child: Icon(

@@ -1,13 +1,16 @@
 import 'package:devity_console/services/snackbar_service.dart';
-import 'package:devity_console/widgets/mobile_widgets.dart';
+import 'package:devity_console/widgets/desktop_basic_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Forgot password screen
 class ForgotPassword extends StatefulWidget {
+  /// Forgot password screen constructor
   const ForgotPassword({
-    super.key,
     required this.email,
+    super.key,
   });
+  /// Requires email to be passed
   final String email;
 
   @override
@@ -16,8 +19,9 @@ class ForgotPassword extends StatefulWidget {
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   late final TextEditingController emailController;
+  
   @override
-  initState() {
+  void initState() {
     super.initState();
     emailController = TextEditingController(text: widget.email);
   }
@@ -42,18 +46,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 40.0),
-        child: Column(children: [
-          MobileTextEditor(
-            title: "Email",
-            textEditingController: emailController,
-          ),
-          const Spacer(),
-          ElevatedButton(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+        child: Column(
+          children: [
+            DesktopTextEditor(
+              title: 'Email',
+              textEditingController: emailController,
+            ),
+            const Spacer(),
+            ElevatedButton(
               onPressed: () {
                 if (emailController.text.isEmpty) {
                   snackbarService
-                      .showNegativeSnackbar("Please enter registered email");
+                      .showNegativeSnackbar('Please enter registered email');
                 }
                 // authenticationBloc
                 //     .resetPassword(emailController.text)
@@ -63,8 +68,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 //   Navigator.pop(context);
                 // });
               },
-              child: const Text("Reset Password"))
-        ]),
+              child: const Text('Reset Password'),
+            ),
+          ],
+        ),
       ),
     );
   }
