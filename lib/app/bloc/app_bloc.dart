@@ -15,8 +15,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEvent>((event, emit) {
       switch (event) {
         case _Refresh():
+
           // Handle refresh event
-          break;
+          emit(const _Loading());
+          emit(const _Ready());
+
         case _Exit():
           // Handle exit event
           exit(0);

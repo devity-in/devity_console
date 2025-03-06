@@ -21,7 +21,7 @@ class AuthCubit extends Cubit<AuthState> {
   late final AuthRepository _authRepository;
 
   /// App started
-  Future<void> appStarted() async {
+  Future<void> checkAuthenticationState() async {
     // Check if the user is authenticated (e.g., check token in storage)
     final token = await _authRepository.getToken();
     final isLoggedIn = token != null;

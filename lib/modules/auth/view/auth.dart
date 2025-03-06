@@ -1,6 +1,6 @@
 import 'package:devity_console/modules/auth/cubit/cubit.dart';
 import 'package:devity_console/modules/auth/view/login.dart';
-import 'package:devity_console/modules/splash/view/splash.dart';
+import 'package:devity_console/modules/auth/view/splash.dart';
 import 'package:flutter/material.dart';
 
 /// Auth page
@@ -14,7 +14,7 @@ class Auth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<AuthCubit>(
-      create: (context) => AuthCubit()..appStarted(),
+      create: (context) => AuthCubit()..checkAuthenticationState(),
       child: const AuthWrapper(),
     );
   }
