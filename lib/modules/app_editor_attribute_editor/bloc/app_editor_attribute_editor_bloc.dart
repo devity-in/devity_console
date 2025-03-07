@@ -5,10 +5,15 @@ part 'app_editor_attribute_editor_event.dart';
 part 'app_editor_attribute_editor_state.dart';
 part 'app_editor_attribute_editor_bloc.freezed.dart';
 
-class AppEditorAttributeEditorBloc extends Bloc<AppEditorAttributeEditorEvent, AppEditorAttributeEditorState> {
-  AppEditorAttributeEditorBloc() : super(_Initial()) {
+/// [AppEditorAttributeEditorBloc] is a business logic component that manages
+///  the
+/// state of the AppEditorAttributeEditor widget.
+class AppEditorAttributeEditorBloc
+    extends Bloc<AppEditorAttributeEditorEvent, AppEditorAttributeEditorState> {
+  /// The default constructor for the [AppEditorAttributeEditorBloc].
+  AppEditorAttributeEditorBloc() : super(const _Initial()) {
     on<AppEditorAttributeEditorEvent>((event, emit) {
-      // TODO: implement event handler
+      // TODO(abhishekthakur0): implement event handler
     });
   }
 }

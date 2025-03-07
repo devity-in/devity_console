@@ -16,6 +16,7 @@ analyzer:
     invalid_annotation_target: ignore
     mixin_of_non_class: error
     redirect_to_non_class: error
+    flutter_style_todos: ignore
 
 
   exclude:

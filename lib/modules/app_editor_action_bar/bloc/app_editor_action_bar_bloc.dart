@@ -5,10 +5,14 @@ part 'app_editor_action_bar_event.dart';
 part 'app_editor_action_bar_state.dart';
 part 'app_editor_action_bar_bloc.freezed.dart';
 
-class AppEditorActionBarBloc extends Bloc<AppEditorActionBarEvent, AppEditorActionBarState> {
-  AppEditorActionBarBloc() : super(_Initial()) {
+/// [AppEditorActionBarBloc] is a business logic component that manages the
+/// state of the AppEditorActionBar widget.
+class AppEditorActionBarBloc
+    extends Bloc<AppEditorActionBarEvent, AppEditorActionBarState> {
+  /// The default constructor for the [AppEditorActionBarBloc].
+  AppEditorActionBarBloc() : super(const _Initial()) {
     on<AppEditorActionBarEvent>((event, emit) {
-      // TODO: implement event handler
+      // TODO(abhishekthakur0): implement event handler
     });
   }
 }

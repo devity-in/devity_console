@@ -10,7 +10,7 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   /// Creates a [ProjectListBloc] with [_Initial] state.
   ProjectListBloc() : super(const _Initial()) {
     on<ProjectListEvent>((event, emit) {
-      // TODO: implement event handler
+      // TODO(abhishekthakur0): implement event handler
     });
   }
 }

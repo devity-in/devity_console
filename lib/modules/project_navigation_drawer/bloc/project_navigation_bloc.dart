@@ -5,10 +5,14 @@ part 'project_navigation_event.dart';
 part 'project_navigation_state.dart';
 part 'project_navigation_bloc.freezed.dart';
 
-class ProjectNavigationBloc extends Bloc<ProjectNavigationEvent, ProjectNavigationState> {
-  ProjectNavigationBloc() : super(_Initial()) {
+/// [ProjectNavigationBloc] is a business logic component that manages the state
+/// of the ProjectNavigation widget.
+class ProjectNavigationBloc
+    extends Bloc<ProjectNavigationEvent, ProjectNavigationState> {
+  /// The default constructor for the [ProjectNavigationBloc].
+  ProjectNavigationBloc() : super(const _Initial()) {
     on<ProjectNavigationEvent>((event, emit) {
-      // TODO: implement event handler
+      // TODO(abhishekthakur0): implement event handler
     });
   }
 }
