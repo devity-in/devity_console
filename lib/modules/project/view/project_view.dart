@@ -1,3 +1,5 @@
+import 'package:devity_console/modules/app_editor/app_editor.dart';
+import 'package:devity_console/modules/project_navigation_drawer/project_navigation_drawer.dart';
 import 'package:flutter/material.dart';
 
 /// [ProjectView] is a StatelessWidget that displays a project.
@@ -11,6 +13,13 @@ class ProjectView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// It will consist of ProjectDrawer and AppEditorView.
-    return const Placeholder();
+    return const Row(
+      children: [
+        ProjectNavigationDrawer(),
+        Expanded(
+          child: AppEditor(),
+        ),
+      ],
+    );
   }
 }
