@@ -14,7 +14,12 @@ part of 'project_navigation_bloc.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$ProjectNavigationEvent {
+mixin _$ProjectNavigationEvent implements DiagnosticableTreeMixin {
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties..add(DiagnosticsProperty('type', 'ProjectNavigationEvent'));
+  }
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -25,7 +30,7 @@ mixin _$ProjectNavigationEvent {
   int get hashCode => runtimeType.hashCode;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'ProjectNavigationEvent()';
   }
 }
@@ -38,8 +43,14 @@ class $ProjectNavigationEventCopyWith<$Res> {
 
 /// @nodoc
 
-class _Started implements ProjectNavigationEvent {
+class _Started with DiagnosticableTreeMixin implements ProjectNavigationEvent {
   const _Started();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'ProjectNavigationEvent.started'));
+  }
 
   @override
   bool operator ==(Object other) {
@@ -51,13 +62,44 @@ class _Started implements ProjectNavigationEvent {
   int get hashCode => runtimeType.hashCode;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'ProjectNavigationEvent.started()';
   }
 }
 
 /// @nodoc
-mixin _$ProjectNavigationState {
+
+class _Reload with DiagnosticableTreeMixin implements ProjectNavigationEvent {
+  const _Reload();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'ProjectNavigationEvent.reload'));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _Reload);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ProjectNavigationEvent.reload()';
+  }
+}
+
+/// @nodoc
+mixin _$ProjectNavigationState implements DiagnosticableTreeMixin {
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties..add(DiagnosticsProperty('type', 'ProjectNavigationState'));
+  }
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -68,7 +110,7 @@ mixin _$ProjectNavigationState {
   int get hashCode => runtimeType.hashCode;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'ProjectNavigationState()';
   }
 }
@@ -81,8 +123,14 @@ class $ProjectNavigationStateCopyWith<$Res> {
 
 /// @nodoc
 
-class _Initial implements ProjectNavigationState {
+class _Initial with DiagnosticableTreeMixin implements ProjectNavigationState {
   const _Initial();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'ProjectNavigationState.initial'));
+  }
 
   @override
   bool operator ==(Object other) {
@@ -94,8 +142,113 @@ class _Initial implements ProjectNavigationState {
   int get hashCode => runtimeType.hashCode;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'ProjectNavigationState.initial()';
+  }
+}
+
+/// @nodoc
+
+class Loaded with DiagnosticableTreeMixin implements ProjectNavigationState {
+  const Loaded(final List<ProjectNavigationDrawerItem> items, this.selectedItem)
+      : _items = items;
+
+  final List<ProjectNavigationDrawerItem> _items;
+  List<ProjectNavigationDrawerItem> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  final ProjectNavigationDrawerItem? selectedItem;
+
+  /// Create a copy of ProjectNavigationState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $LoadedCopyWith<Loaded> get copyWith =>
+      _$LoadedCopyWithImpl<Loaded>(this, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'ProjectNavigationState.loaded'))
+      ..add(DiagnosticsProperty('items', items))
+      ..add(DiagnosticsProperty('selectedItem', selectedItem));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Loaded &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.selectedItem, selectedItem) ||
+                other.selectedItem == selectedItem));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_items), selectedItem);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ProjectNavigationState.loaded(items: $items, selectedItem: $selectedItem)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $LoadedCopyWith<$Res>
+    implements $ProjectNavigationStateCopyWith<$Res> {
+  factory $LoadedCopyWith(Loaded value, $Res Function(Loaded) _then) =
+      _$LoadedCopyWithImpl;
+  @useResult
+  $Res call(
+      {List<ProjectNavigationDrawerItem> items,
+      ProjectNavigationDrawerItem? selectedItem});
+
+  $ProjectNavigationDrawerItemCopyWith<$Res>? get selectedItem;
+}
+
+/// @nodoc
+class _$LoadedCopyWithImpl<$Res> implements $LoadedCopyWith<$Res> {
+  _$LoadedCopyWithImpl(this._self, this._then);
+
+  final Loaded _self;
+  final $Res Function(Loaded) _then;
+
+  /// Create a copy of ProjectNavigationState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+    Object? selectedItem = freezed,
+  }) {
+    return _then(Loaded(
+      null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<ProjectNavigationDrawerItem>,
+      freezed == selectedItem
+          ? _self.selectedItem
+          : selectedItem // ignore: cast_nullable_to_non_nullable
+              as ProjectNavigationDrawerItem?,
+    ));
+  }
+
+  /// Create a copy of ProjectNavigationState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ProjectNavigationDrawerItemCopyWith<$Res>? get selectedItem {
+    if (_self.selectedItem == null) {
+      return null;
+    }
+
+    return $ProjectNavigationDrawerItemCopyWith<$Res>(_self.selectedItem!,
+        (value) {
+      return _then(_self.copyWith(selectedItem: value));
+    });
   }
 }
 
