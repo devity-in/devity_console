@@ -150,7 +150,8 @@ class _Initial with DiagnosticableTreeMixin implements ProjectNavigationState {
 /// @nodoc
 
 class Loaded with DiagnosticableTreeMixin implements ProjectNavigationState {
-  const Loaded(final List<ProjectNavigationDrawerItem> items, this.selectedItem)
+  const Loaded(final List<ProjectNavigationDrawerItem> items, this.selectedItem,
+      {this.isExpanded = false})
       : _items = items;
 
   final List<ProjectNavigationDrawerItem> _items;
@@ -161,6 +162,8 @@ class Loaded with DiagnosticableTreeMixin implements ProjectNavigationState {
   }
 
   final ProjectNavigationDrawerItem? selectedItem;
+  @JsonKey()
+  final bool isExpanded;
 
   /// Create a copy of ProjectNavigationState
   /// with the given fields replaced by the non-null parameter values.
@@ -174,7 +177,8 @@ class Loaded with DiagnosticableTreeMixin implements ProjectNavigationState {
     properties
       ..add(DiagnosticsProperty('type', 'ProjectNavigationState.loaded'))
       ..add(DiagnosticsProperty('items', items))
-      ..add(DiagnosticsProperty('selectedItem', selectedItem));
+      ..add(DiagnosticsProperty('selectedItem', selectedItem))
+      ..add(DiagnosticsProperty('isExpanded', isExpanded));
   }
 
   @override
@@ -184,16 +188,18 @@ class Loaded with DiagnosticableTreeMixin implements ProjectNavigationState {
             other is Loaded &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.selectedItem, selectedItem) ||
-                other.selectedItem == selectedItem));
+                other.selectedItem == selectedItem) &&
+            (identical(other.isExpanded, isExpanded) ||
+                other.isExpanded == isExpanded));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_items), selectedItem);
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(_items), selectedItem, isExpanded);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ProjectNavigationState.loaded(items: $items, selectedItem: $selectedItem)';
+    return 'ProjectNavigationState.loaded(items: $items, selectedItem: $selectedItem, isExpanded: $isExpanded)';
   }
 }
 
@@ -205,7 +211,8 @@ abstract mixin class $LoadedCopyWith<$Res>
   @useResult
   $Res call(
       {List<ProjectNavigationDrawerItem> items,
-      ProjectNavigationDrawerItem? selectedItem});
+      ProjectNavigationDrawerItem? selectedItem,
+      bool isExpanded});
 
   $ProjectNavigationDrawerItemCopyWith<$Res>? get selectedItem;
 }
@@ -223,6 +230,7 @@ class _$LoadedCopyWithImpl<$Res> implements $LoadedCopyWith<$Res> {
   $Res call({
     Object? items = null,
     Object? selectedItem = freezed,
+    Object? isExpanded = null,
   }) {
     return _then(Loaded(
       null == items
@@ -233,6 +241,10 @@ class _$LoadedCopyWithImpl<$Res> implements $LoadedCopyWith<$Res> {
           ? _self.selectedItem
           : selectedItem // ignore: cast_nullable_to_non_nullable
               as ProjectNavigationDrawerItem?,
+      isExpanded: null == isExpanded
+          ? _self.isExpanded
+          : isExpanded // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 

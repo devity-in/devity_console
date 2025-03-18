@@ -10,6 +10,7 @@ abstract class ProjectNavigationState with _$ProjectNavigationState {
   /// The loaded state of the navigation drawer.
   const factory ProjectNavigationState.loaded(
     List<ProjectNavigationDrawerItem> items,
-    ProjectNavigationDrawerItem? selectedItem,
-  ) = Loaded;
+    ProjectNavigationDrawerItem? selectedItem, {
+    @Default(false) bool isExpanded,
+  }) = Loaded;
 }

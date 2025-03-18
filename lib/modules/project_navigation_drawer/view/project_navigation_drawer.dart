@@ -1,4 +1,6 @@
 import 'package:devity_console/modules/project_navigation_drawer/bloc/project_navigation_bloc.dart';
+import 'package:devity_console/modules/project_navigation_drawer/widgets/project_navigation_drawer_collapsed_item.dart';
+import 'package:devity_console/modules/project_navigation_drawer/widgets/project_navigation_drawer_expanded_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,11 +18,20 @@ class ProjectNavigationDrawer extends StatelessWidget {
         builder: (context, state) {
           if (state is Loaded) {
             final items = state.items;
+            final selectedItem = state.selectedItem;
+            final isExpanded = state.isExpanded;
+
             return AnimatedContainer(
               duration: Duration.zero,
-              child: Column(
-                children: items.map((item) => Icon(item.icon)).toList(),
-              ),
+              child: isExpanded
+                  ? ProjectNavigationDrawerExpandedWidget(
+                      items: items,
+                      selectedItem: selectedItem,
+                    )
+                  : ProjectNavigationDrawerCollapsedWidget(
+                      items: items,
+                      selectedItem: selectedItem,
+                    ),
             );
           }
           return const SizedBox.shrink();
