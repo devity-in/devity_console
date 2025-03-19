@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart' show BouncingScrollPhysics, Color, Colors, ScrollPhysics;
+
 /// Constants class to define the app name and base url based on the app flavor.
 class Constants {
   static String? get _appFlavor =>
@@ -32,4 +34,12 @@ class Constants {
         return 'https://dev.devity.in';
     }
   }
+
+  /// App scroll physics
+  static ScrollPhysics get appScrollPhysics => const BouncingScrollPhysics();
+
+  static double get appDividerWidth => 0.5;
+
+  static Color get appDividerColor => Colors.black;
+
 }

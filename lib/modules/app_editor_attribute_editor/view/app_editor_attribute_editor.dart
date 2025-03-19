@@ -1,3 +1,4 @@
+import 'package:devity_console/config/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -10,7 +11,15 @@ class AppEditorAttributeEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 4.w,
+      width: 20.w,
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: Constants.appDividerColor,
+            width: Constants.appDividerWidth,
+          ),
+        ),
+      ),
     );
   }
 }

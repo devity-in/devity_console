@@ -13,7 +13,8 @@ class ProjectNavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProjectNavigationBloc(),
+      create: (context) =>
+          ProjectNavigationBloc()..add(const ProjectNavigationEvent.started()),
       child: BlocBuilder<ProjectNavigationBloc, ProjectNavigationState>(
         builder: (context, state) {
           if (state is Loaded) {

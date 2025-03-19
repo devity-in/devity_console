@@ -272,3 +272,56 @@ class DesktopDatePicker extends StatelessWidget {
     );
   }
 }
+
+/// Desktop outlined button widget
+class DesktopOutlinedButton extends StatelessWidget {
+  /// Desktop outlined button constructor
+  const DesktopOutlinedButton({
+    required this.title,
+    required this.onPressed,
+    super.key,
+  });
+
+  /// title - Title of the button
+  final String title;
+
+  /// onPressed - Function to be called when the button is pressed
+  final void Function()? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(
+          color: Colors.white,
+        ),
+      ),
+      onPressed: onPressed,
+      child: Text(title),
+    );
+  }
+}
+
+/// Desktop elevated button widget
+class DesktopElevatedButton extends StatelessWidget {
+  /// Desktop elevated button constructor
+  const DesktopElevatedButton({
+    required this.title,
+    required this.onPressed,
+    super.key,
+  });
+
+  /// title - Title of the button
+  final String title;
+
+  /// onPressed - Function to be called when the button is pressed
+  final void Function()? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Text(title),
+    );
+  }
+}
