@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart' show BouncingScrollPhysics, Color, Colors, ScrollPhysics;
+import 'package:flutter/material.dart'
+    show BouncingScrollPhysics, Color, Colors, ScrollPhysics;
 
 /// Constants class to define the app name and base url based on the app flavor.
 class Constants {
@@ -38,8 +39,9 @@ class Constants {
   /// App scroll physics
   static ScrollPhysics get appScrollPhysics => const BouncingScrollPhysics();
 
+  /// App divider width
   static double get appDividerWidth => 0.5;
 
+  /// App divider color
   static Color get appDividerColor => Colors.black;
-
 }

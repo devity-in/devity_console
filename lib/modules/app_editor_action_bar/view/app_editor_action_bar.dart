@@ -27,7 +27,7 @@ class AppEditorActionBar extends StatelessWidget {
           Row(
             children: [
               Text(
-                "My App",
+                'My App',
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -51,14 +51,14 @@ class AppEditorActionBar extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Size",
+                        'Size',
                         style: TextStyle(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "375 x 667",
+                        '375 x 667',
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
@@ -71,30 +71,30 @@ class AppEditorActionBar extends StatelessWidget {
               const SizedBox(width: 10),
               Row(
                 children: [
-                  Icon(Icons.cloud_sync),
+                  const Icon(Icons.cloud_sync),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Last saved",
+                        'Last saved',
                         style: TextStyle(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "2 days ago",
+                        '2 days ago',
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           ),
           Row(
@@ -103,7 +103,7 @@ class AppEditorActionBar extends StatelessWidget {
               const SizedBox(width: 10),
               DesktopElevatedButton(title: 'PUBLISH', onPressed: () {}),
             ],
-          )
+          ),
         ],
       ),
     );

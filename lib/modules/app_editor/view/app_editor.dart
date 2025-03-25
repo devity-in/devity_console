@@ -15,9 +15,9 @@ class AppEditor extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(10.h),
-        child: AppEditorActionBar(),
+        child: const AppEditorActionBar(),
       ),
-      body: Row(
+      body: const Row(
         children: [
           AppEditorNavigationDrawer(),
           Expanded(
