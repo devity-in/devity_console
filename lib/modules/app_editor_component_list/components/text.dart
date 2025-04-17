@@ -1,43 +1,43 @@
 import 'package:flutter/material.dart';
 
-/// This [DevityCardWidget] is a equivalent to [Card] widget.
-class DevityCardWidget extends StatelessWidget {
-  /// Creates a [DevityCardWidget] for component view.
+/// This [DevityTextWidget] is a equivalent to [Text] widget.
+class DevityTextWidget extends StatelessWidget {
+  /// Creates a [DevityTextWidget] for component view.
   /// This view is used in the component list and editor.
-  const DevityCardWidget.component({
+  const DevityTextWidget.component({
     super.key,
-    required this.child,
-    this.color,
-    this.elevation,
-    this.shape,
-    this.margin,
+    required this.text,
+    this.style,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
   }) : _viewType = ViewType.component;
 
-  /// Creates a [DevityCardWidget] for preview view.
+  /// Creates a [DevityTextWidget] for preview view.
   /// This view is used in the preview area.
-  const DevityCardWidget.preview({
+  const DevityTextWidget.preview({
     super.key,
-    required this.child,
-    this.color,
-    this.elevation,
-    this.shape,
-    this.margin,
+    required this.text,
+    this.style,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
   }) : _viewType = ViewType.preview;
 
-  /// The widget below this widget in the tree.
-  final Widget child;
+  /// The text to display.
+  final String text;
 
-  /// The color to paint the card.
-  final Color? color;
+  /// The style to apply to the text.
+  final TextStyle? style;
 
-  /// The z-coordinate at which to place this card.
-  final double? elevation;
+  /// How the text should be aligned horizontally.
+  final TextAlign? textAlign;
 
-  /// The shape of the card's [Material].
-  final ShapeBorder? shape;
+  /// An optional maximum number of lines for the text to span.
+  final int? maxLines;
 
-  /// The empty space that surrounds the card.
-  final EdgeInsetsGeometry? margin;
+  /// How visual overflow should be handled.
+  final TextOverflow? overflow;
 
   /// The type of view to display.
   final ViewType _viewType;
@@ -65,10 +65,10 @@ class DevityCardWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.card_giftcard, size: 16),
+              const Icon(Icons.text_fields, size: 16),
               const SizedBox(width: 8),
               Text(
-                'Card Component',
+                'Text Component',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -77,12 +77,12 @@ class DevityCardWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Card(
-            color: color,
-            elevation: elevation,
-            shape: shape,
-            margin: margin,
-            child: child,
+          Text(
+            text,
+            style: style,
+            textAlign: textAlign,
+            maxLines: maxLines,
+            overflow: overflow,
           ),
         ],
       ),
@@ -90,12 +90,15 @@ class DevityCardWidget extends StatelessWidget {
   }
 
   Widget _buildPreviewView() {
-    return Card(
-      color: color,
-      elevation: elevation,
-      shape: shape,
-      margin: margin,
-      child: child,
+    return Container(
+      padding: const EdgeInsets.all(8),
+      child: Text(
+        text,
+        style: style,
+        textAlign: textAlign,
+        maxLines: maxLines,
+        overflow: overflow,
+      ),
     );
   }
 }
