@@ -13,14 +13,14 @@ class AppEditorPageList extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => editor_page.AppEditorPageListBloc()
-        ..add(const editor_page.AppEditorPageListEvent.started()),
+        ..add(const editor_page.AppEditorPageListStartedEvent()),
       child: BlocBuilder<editor_page.AppEditorPageListBloc,
           editor_page.AppEditorPageListState>(
         builder: (context, state) {
-          if (state is editor_page.Loading) {
+          if (state is editor_page.AppEditorPageListLoadingState) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (state is editor_page.Loaded) {
+          if (state is editor_page.AppEditorPageListLoadedState) {
             return Column(
               children: [
                 _buildHeader(context),
@@ -30,7 +30,7 @@ class AppEditorPageList extends StatelessWidget {
               ],
             );
           }
-          if (state is editor_page.Error) {
+          if (state is editor_page.AppEditorPageListErrorState) {
             return Center(
               child: Text(
                 'Error: ${state.message}',
@@ -94,7 +94,7 @@ class AppEditorPageList extends StatelessWidget {
               icon: const Icon(Icons.delete),
               onPressed: () {
                 context.read<editor_page.AppEditorPageListBloc>().add(
-                      editor_page.AppEditorPageListEvent.deletePage(
+                      editor_page.AppEditorPageListDeletePageEvent(
                         pageId: page.id,
                       ),
                     );
@@ -182,7 +182,7 @@ class _AddPageDialogState extends State<_AddPageDialog> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               context.read<editor_page.AppEditorPageListBloc>().add(
-                    editor_page.AppEditorPageListEvent.addPage(
+                    editor_page.AppEditorPageListAddPageEvent(
                       name: _nameController.text,
                       description: _descriptionController.text,
                     ),

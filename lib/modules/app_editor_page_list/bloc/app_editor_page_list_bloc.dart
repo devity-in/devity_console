@@ -1,10 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'app_editor_page_list_event.dart';
 part 'app_editor_page_list_state.dart';
-part 'app_editor_page_list_bloc.freezed.dart';
 
 /// [AppEditorPageListBloc] is a business logic component that manages the
 /// state of the AppEditorPageList widget.
@@ -15,23 +13,29 @@ class AppEditorPageListBloc
   final List<Page> _pages = [];
 
   /// The default constructor for the [AppEditorPageListBloc].
-  AppEditorPageListBloc() : super(const AppEditorPageListState.initial()) {
-    on<_Started>(_onStarted);
-    on<_AddPage>(_onAddPage);
-    on<_DeletePage>(_onDeletePage);
+  AppEditorPageListBloc() : super(const AppEditorPageListInitialState()) {
+    on<AppEditorPageListStartedEvent>(_onStarted);
+    on<AppEditorPageListAddPageEvent>(_onAddPage);
+    on<AppEditorPageListDeletePageEvent>(_onDeletePage);
   }
 
-  void _onStarted(_Started event, Emitter<AppEditorPageListState> emit) {
-    emit(const AppEditorPageListState.loading());
+  Future<void> _onStarted(
+    AppEditorPageListStartedEvent event,
+    Emitter<AppEditorPageListState> emit,
+  ) async {
+    emit(const AppEditorPageListLoadingState());
     try {
-      emit(AppEditorPageListState.loaded(pages: List.from(_pages)));
+      emit(AppEditorPageListLoadedState(pages: List.from(_pages)));
     } catch (e) {
-      emit(AppEditorPageListState.error(message: 'Failed to load pages: $e'));
+      emit(AppEditorPageListErrorState(message: 'Failed to load pages: $e'));
     }
   }
 
-  void _onAddPage(_AddPage event, Emitter<AppEditorPageListState> emit) {
-    emit(const AppEditorPageListState.loading());
+  Future<void> _onAddPage(
+    AppEditorPageListAddPageEvent event,
+    Emitter<AppEditorPageListState> emit,
+  ) async {
+    emit(const AppEditorPageListLoadingState());
     try {
       final newPage = Page(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -40,19 +44,22 @@ class AppEditorPageListBloc
         createdAt: DateTime.now(),
       );
       _pages.add(newPage);
-      emit(AppEditorPageListState.loaded(pages: List.from(_pages)));
+      emit(AppEditorPageListLoadedState(pages: List.from(_pages)));
     } catch (e) {
-      emit(AppEditorPageListState.error(message: 'Failed to add page: $e'));
+      emit(AppEditorPageListErrorState(message: 'Failed to add page: $e'));
     }
   }
 
-  void _onDeletePage(_DeletePage event, Emitter<AppEditorPageListState> emit) {
-    emit(const AppEditorPageListState.loading());
+  Future<void> _onDeletePage(
+    AppEditorPageListDeletePageEvent event,
+    Emitter<AppEditorPageListState> emit,
+  ) async {
+    emit(const AppEditorPageListLoadingState());
     try {
       _pages.removeWhere((page) => page.id == event.pageId);
-      emit(AppEditorPageListState.loaded(pages: List.from(_pages)));
+      emit(AppEditorPageListLoadedState(pages: List.from(_pages)));
     } catch (e) {
-      emit(AppEditorPageListState.error(message: 'Failed to delete page: $e'));
+      emit(AppEditorPageListErrorState(message: 'Failed to delete page: $e'));
     }
   }
 }

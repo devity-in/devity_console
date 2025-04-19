@@ -1,4 +1,4 @@
-import 'package:devity_console/modules/auth/models/token_response.dart';
+import 'package:devity_console/models/token_response.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Token storage service

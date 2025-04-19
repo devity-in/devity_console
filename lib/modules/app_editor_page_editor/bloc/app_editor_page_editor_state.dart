@@ -1,9 +1,30 @@
 part of 'app_editor_page_editor_bloc.dart';
 
-/// [AppEditorPageEditorState] is a state of the [AppEditorPageEditorBloc].
-@freezed
-class AppEditorPageEditorState with _$AppEditorPageEditorState {
-  /// [AppEditorPageEditorState.initial] is one of the states of the
-  /// [AppEditorPageEditorBloc].
-  const factory AppEditorPageEditorState.initial() = _Initial;
+/// States for the [AppEditorPageEditorBloc]
+sealed class AppEditorPageEditorState {
+  const AppEditorPageEditorState();
+}
+
+/// Initial state
+class AppEditorPageEditorInitialState extends AppEditorPageEditorState {
+  const AppEditorPageEditorInitialState();
+}
+
+/// Loading state
+class AppEditorPageEditorLoadingState extends AppEditorPageEditorState {
+  const AppEditorPageEditorLoadingState();
+}
+
+/// Loaded state
+class AppEditorPageEditorLoadedState extends AppEditorPageEditorState {
+  const AppEditorPageEditorLoadedState();
+}
+
+/// Error state
+class AppEditorPageEditorErrorState extends AppEditorPageEditorState {
+  const AppEditorPageEditorErrorState({
+    required this.message,
+  });
+
+  final String message;
 }

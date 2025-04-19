@@ -1,17 +1,36 @@
 part of 'app_bloc.dart';
 
-/// [AppState] is the state class for [AppBloc].
-@freezed
-class AppState with _$AppState {
-  /// Initial state of the app
-  const factory AppState.initial() = _Initial;
+/// States for the [AppBloc]
+sealed class AppState {
+  const AppState();
+}
 
-  /// Loading state of the app
-  const factory AppState.loading() = _Loading;
+/// Initial state
+class AppInitialState extends AppState {
+  const AppInitialState();
+}
 
-  /// Ready state of the app
-  const factory AppState.ready() = _Ready;
+/// Loading state
+class AppLoadingState extends AppState {
+  const AppLoadingState();
+}
 
-  /// Error state of the app
-  const factory AppState.error() = _Error;
+/// Loaded state
+class AppLoadedState extends AppState {
+  const AppLoadedState({
+    this.themeMode = ThemeMode.system,
+    this.locale = const Locale('en'),
+  });
+
+  final ThemeMode themeMode;
+  final Locale locale;
+}
+
+/// Error state
+class AppErrorState extends AppState {
+  const AppErrorState({
+    required this.message,
+  });
+
+  final String message;
 }

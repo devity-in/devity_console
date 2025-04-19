@@ -2,6 +2,10 @@ import 'package:devity_console/config/constants.dart';
 import 'package:devity_console/widgets/desktop_basic_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/app_editor_action_bar_bloc.dart';
+import '../bloc/app_editor_action_bar_event.dart';
+import '../bloc/app_editor_action_bar_state.dart';
 
 /// [AppEditorActionBar] is a StatelessWidget that displays
 /// the app editor action bar.
@@ -11,101 +15,59 @@ class AppEditorActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Constants.appDividerColor,
-            width: Constants.appDividerWidth,
+    return BlocBuilder<AppEditorActionBarBloc, AppEditorActionBarState>(
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).dividerColor,
+              ),
+            ),
           ),
-        ),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+          child: Row(
             children: [
-              Text(
-                'My App',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
+              // Left side actions
+              Expanded(
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        // TODO: Handle back navigation
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'App Editor',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.app_settings_alt),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+              // Right side actions
               Row(
                 children: [
-                  const Icon(Icons.mobile_friendly),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Size',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '375 x 667',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    icon: const Icon(Icons.save),
+                    onPressed: () {
+                      // TODO: Handle save action
+                    },
                   ),
-                ],
-              ),
-              const SizedBox(width: 10),
-              Row(
-                children: [
-                  const Icon(Icons.cloud_sync),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Last saved',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '2 days ago',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    icon: const Icon(Icons.settings),
+                    onPressed: () {
+                      // TODO: Handle settings action
+                    },
                   ),
                 ],
               ),
             ],
           ),
-          Row(
-            children: [
-              DesktopOutlinedButton(title: 'SAVE', onPressed: () {}),
-              const SizedBox(width: 10),
-              DesktopElevatedButton(title: 'PUBLISH', onPressed: () {}),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

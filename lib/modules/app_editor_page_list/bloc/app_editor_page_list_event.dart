@@ -1,20 +1,31 @@
 part of 'app_editor_page_list_bloc.dart';
 
-/// [AppEditorPageListEvent] is a class that describes the different events
-/// that can be triggered by the AppEditorPageList widget.
-@freezed
-abstract class AppEditorPageListEvent with _$AppEditorPageListEvent {
-  /// The event that is triggered when the AppEditorPageList widget is started.
-  const factory AppEditorPageListEvent.started() = _Started;
+/// Events for the [AppEditorPageListBloc]
+sealed class AppEditorPageListEvent {
+  const AppEditorPageListEvent();
+}
 
-  /// The event that is triggered when a new page is added.
-  const factory AppEditorPageListEvent.addPage({
-    required String name,
-    required String description,
-  }) = _AddPage;
+/// Initial event when the app editor page list is started
+class AppEditorPageListStartedEvent extends AppEditorPageListEvent {
+  const AppEditorPageListStartedEvent();
+}
 
-  /// The event that is triggered when a page is deleted.
-  const factory AppEditorPageListEvent.deletePage({
-    required String pageId,
-  }) = _DeletePage;
+/// Event to add a new page
+class AppEditorPageListAddPageEvent extends AppEditorPageListEvent {
+  const AppEditorPageListAddPageEvent({
+    required this.name,
+    required this.description,
+  });
+
+  final String name;
+  final String description;
+}
+
+/// Event to delete a page
+class AppEditorPageListDeletePageEvent extends AppEditorPageListEvent {
+  const AppEditorPageListDeletePageEvent({
+    required this.pageId,
+  });
+
+  final String pageId;
 }

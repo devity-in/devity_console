@@ -1,9 +1,29 @@
-part of 'app_editor_action_bar_bloc.dart';
+import 'package:equatable/equatable.dart';
 
-/// The [AppEditorActionBarEvent] is a class that describes the different events
-/// that can be triggered by the AppEditorActionBar widget.
-@freezed
-class AppEditorActionBarEvent with _$AppEditorActionBarEvent {
-  /// The event that is triggered when the AppEditorActionBar widget is started.
-  const factory AppEditorActionBarEvent.started() = _Started;
+/// Events for the [AppEditorActionBarBloc]
+abstract class AppEditorActionBarEvent extends Equatable {
+  const AppEditorActionBarEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+/// Event to initialize the action bar
+class AppEditorActionBarInitializeEvent extends AppEditorActionBarEvent {
+  const AppEditorActionBarInitializeEvent();
+}
+
+/// Event to save the app
+class AppEditorActionBarSaveEvent extends AppEditorActionBarEvent {
+  const AppEditorActionBarSaveEvent();
+}
+
+/// Event to open settings
+class AppEditorActionBarSettingsEvent extends AppEditorActionBarEvent {
+  const AppEditorActionBarSettingsEvent();
+}
+
+/// Event to navigate back
+class AppEditorActionBarBackEvent extends AppEditorActionBarEvent {
+  const AppEditorActionBarBackEvent();
 }

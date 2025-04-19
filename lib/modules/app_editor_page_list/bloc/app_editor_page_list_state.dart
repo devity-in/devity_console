@@ -1,34 +1,50 @@
 part of 'app_editor_page_list_bloc.dart';
 
-/// [AppEditorPageListState] is a class that describes the state of the
-/// AppEditorPageList widget.
-@freezed
-abstract class AppEditorPageListState with _$AppEditorPageListState {
-  /// The initial state of the AppEditorPageList widget.
-  const factory AppEditorPageListState.initial() = _Initial;
+/// States for the [AppEditorPageListBloc]
+sealed class AppEditorPageListState {
+  const AppEditorPageListState();
+}
 
-  /// The loading state of the AppEditorPageList widget.
-  const factory AppEditorPageListState.loading() = Loading;
+/// Initial state
+class AppEditorPageListInitialState extends AppEditorPageListState {
+  const AppEditorPageListInitialState();
+}
 
-  /// The loaded state of the AppEditorPageList widget.
-  const factory AppEditorPageListState.loaded({
-    required List<Page> pages,
-  }) = Loaded;
+/// Loading state
+class AppEditorPageListLoadingState extends AppEditorPageListState {
+  const AppEditorPageListLoadingState();
+}
 
-  /// The error state of the AppEditorPageList widget.
-  const factory AppEditorPageListState.error({
-    required String message,
-  }) = Error;
+/// Loaded state with pages
+class AppEditorPageListLoadedState extends AppEditorPageListState {
+  const AppEditorPageListLoadedState({
+    required this.pages,
+  });
+
+  final List<Page> pages;
+}
+
+/// Error state
+class AppEditorPageListErrorState extends AppEditorPageListState {
+  const AppEditorPageListErrorState({
+    required this.message,
+  });
+
+  final String message;
 }
 
 /// [Page] is a class that represents a page in the AppEditorPageList widget.
-@freezed
-abstract class Page with _$Page {
+class Page {
   /// Creates a new instance of [Page].
-  const factory Page({
-    required String id,
-    required String name,
-    required String description,
-    required DateTime createdAt,
-  }) = _Page;
+  const Page({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String name;
+  final String description;
+  final DateTime createdAt;
 }

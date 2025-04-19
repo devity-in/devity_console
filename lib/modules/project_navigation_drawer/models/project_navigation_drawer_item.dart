@@ -1,17 +1,14 @@
 import 'package:flutter/widgets.dart' show IconData;
-import 'package:freezed_annotation/freezed_annotation.dart';
-part 'project_navigation_drawer_item.freezed.dart';
 
 /// [ProjectNavigationDrawerItem] is a class that represents a
 /// project navigation drawer item.
-@freezed
-abstract class ProjectNavigationDrawerItem with _$ProjectNavigationDrawerItem {
+class ProjectNavigationDrawerItem {
   /// Creates a new instance of [ProjectNavigationDrawerItem].
-  const factory ProjectNavigationDrawerItem({
-    required String title,
-    required String route,
-    required IconData? icon,
-  }) = _ProjectNavigationDrawerItem;
+  const ProjectNavigationDrawerItem({
+    required this.title,
+    required this.route,
+    required this.icon,
+  });
 
   /// Creates an empty instance of [ProjectNavigationDrawerItem].
   factory ProjectNavigationDrawerItem.empty() =>
@@ -20,4 +17,8 @@ abstract class ProjectNavigationDrawerItem with _$ProjectNavigationDrawerItem {
         route: '',
         icon: null,
       );
+
+  final String title;
+  final String route;
+  final IconData? icon;
 }
