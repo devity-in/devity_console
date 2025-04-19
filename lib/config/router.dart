@@ -5,12 +5,42 @@ import 'package:devity_console/modules/login/login.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
+import 'package:devity_console/repositories/repositories.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 /// The router configuration for the application
 final router = GoRouter(
   initialLocation: '/splash',
+  debugLogDiagnostics: true, // Enable debug logging
+  errorBuilder: (context, state) => Scaffold(
+    body: Center(
+      child: Text('Error: ${state.error}'),
+    ),
+  ),
+  redirect: (context, state) async {
+    // Get auth repository from context
+    final authRepository = context.read<AuthRepository>();
+    final isAuthenticated = await authRepository.getCurrentUser() != null;
+
+    // Define public routes
+    final isPublicRoute = [
+      '/splash',
+      '/login',
+      '/signup',
+      '/forgot-password',
+    ].contains(state.matchedLocation);
+
+    // Redirect logic
+    if (!isAuthenticated && !isPublicRoute) {
+      return '/login';
+    }
+    if (isAuthenticated && isPublicRoute) {
+      return '/project';
+    }
+    return null;
+  },
   routes: [
     // Splash route
     GoRoute(
@@ -19,25 +49,33 @@ final router = GoRouter(
       builder: (context, state) => const SplashScreen(),
     ),
 
-    // Login route
+    // Auth routes group
     GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+      path: '/auth',
+      name: 'auth',
+      redirect: (context, state) => '/login',
+      routes: [
+        // Login route
+        GoRoute(
+          path: 'login',
+          name: 'login',
+          builder: (context, state) => const LoginScreen(),
+        ),
 
-    // Signup route
-    GoRoute(
-      path: '/signup',
-      name: 'signup',
-      builder: (context, state) => const SignupScreen(),
-    ),
+        // Signup route
+        GoRoute(
+          path: 'signup',
+          name: 'signup',
+          builder: (context, state) => const SignupScreen(),
+        ),
 
-    // Forgot Password route
-    GoRoute(
-      path: '/forgot-password',
-      name: 'forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
+        // Forgot Password route
+        GoRoute(
+          path: 'forgot-password',
+          name: 'forgot-password',
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+      ],
     ),
 
     // Main app shell with navigation drawer
@@ -58,11 +96,32 @@ final router = GoRouter(
           builder: (context, state) => const ProjectView(),
         ),
 
+        // Project detail route with parameter
+        GoRoute(
+          path: '/project/:id',
+          name: 'project-detail',
+          builder: (context, state) {
+            final id = state.pathParameters['id'];
+            // TODO: Pass project ID to ProjectView when implemented
+            return const ProjectView();
+          },
+        ),
+
         // App Editor routes
         GoRoute(
           path: '/app-editor',
           name: 'app-editor',
           builder: (context, state) => const AppEditor(),
+        ),
+
+        // App Editor with query parameters
+        GoRoute(
+          path: '/app-editor/edit',
+          name: 'app-editor-edit',
+          builder: (context, state) {
+            // TODO: Pass mode and id to AppEditor when implemented
+            return const AppEditor();
+          },
         ),
       ],
     ),

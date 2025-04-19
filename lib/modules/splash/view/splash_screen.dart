@@ -4,9 +4,9 @@ import 'package:devity_console/repositories/repositories.dart';
 import 'package:devity_console/modules/login/login.dart';
 import 'package:devity_console/modules/project_list/project_list_screen.dart';
 
-import 'bloc/splash_event.dart';
-import 'bloc/splash_bloc.dart';
-import 'bloc/splash_state.dart';
+import '../bloc/splash_event.dart';
+import '../bloc/splash_bloc.dart';
+import '../bloc/splash_state.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
