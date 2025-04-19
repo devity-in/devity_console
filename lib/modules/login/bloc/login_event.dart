@@ -26,28 +26,6 @@ class LoginWithEmailAndPassword extends LoginEvent {
   List<Object?> get props => [email, password];
 }
 
-/// Event to register a new user.
-class RegisterWithEmailAndPassword extends LoginEvent {
-  /// The email to register with.
-  final String email;
-
-  /// The password to register with.
-  final String password;
-
-  /// The name of the user.
-  final String? name;
-
-  /// Creates a new [RegisterWithEmailAndPassword].
-  const RegisterWithEmailAndPassword({
-    required this.email,
-    required this.password,
-    this.name,
-  });
-
-  @override
-  List<Object?> get props => [email, password, name];
-}
-
 /// Event to send password reset email.
 class SendPasswordResetEmail extends LoginEvent {
   /// The email to send the reset link to.

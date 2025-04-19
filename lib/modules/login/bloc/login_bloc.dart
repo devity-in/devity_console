@@ -12,7 +12,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   /// The default constructor for the [LoginBloc].
   LoginBloc(this._authRepository) : super(LoginInitial()) {
     on<LoginWithEmailAndPassword>(_onLoginWithEmailAndPassword);
-    on<RegisterWithEmailAndPassword>(_onRegisterWithEmailAndPassword);
     on<SendPasswordResetEmail>(_onSendPasswordResetEmail);
   }
 
@@ -25,23 +24,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final user = await _authRepository.login(
         event.email,
         event.password,
-      );
-      emit(LoginSuccess(user));
-    } catch (e) {
-      emit(LoginError(e.toString()));
-    }
-  }
-
-  Future<void> _onRegisterWithEmailAndPassword(
-    RegisterWithEmailAndPassword event,
-    Emitter<LoginState> emit,
-  ) async {
-    emit(LoginLoading());
-    try {
-      final user = await _authRepository.register(
-        event.email,
-        event.password,
-        event.name,
       );
       emit(LoginSuccess(user));
     } catch (e) {
