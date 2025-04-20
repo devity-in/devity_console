@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart'
     show BouncingScrollPhysics, Color, Colors, ScrollPhysics;
-import 'package:devity_console/config/environment.dart';
 
 /// UI-related constants
 class UIConstants {

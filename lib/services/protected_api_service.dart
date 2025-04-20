@@ -1,4 +1,3 @@
-import 'package:devity_console/config/constants.dart';
 import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/exceptions/app_exception.dart';
 import 'package:devity_console/models/token_response.dart';
@@ -39,7 +38,6 @@ class ProtectedApiService {
 
     return _networkService.request(
       '${Environment.apiBaseUrl}$path',
-      method: 'GET',
       queryParameters: queryParameters,
       useCache: useCache,
       cacheDuration: cacheDuration,

@@ -14,9 +14,8 @@ class ForgotPasswordLoading extends ForgotPasswordState {}
 class ForgotPasswordSuccess extends ForgotPasswordState {}
 
 class ForgotPasswordError extends ForgotPasswordState {
-  final String message;
-
   const ForgotPasswordError(this.message);
+  final String message;
 
   @override
   List<Object?> get props => [message];

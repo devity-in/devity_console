@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/services/logger_service.dart';
 import 'package:flutter/widgets.dart';
 

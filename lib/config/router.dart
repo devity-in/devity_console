@@ -1,14 +1,14 @@
-import 'package:devity_console/modules/project/view/project_view.dart';
+import 'package:devity_console/app/bloc/app_bloc.dart';
 import 'package:devity_console/modules/app_editor/view/app_editor.dart';
 import 'package:devity_console/modules/app_editor_navigation_drawer/view/app_editor_navigation_drawer.dart';
+import 'package:devity_console/modules/forgot_password/forgot_password.dart';
 import 'package:devity_console/modules/login/login.dart';
+import 'package:devity_console/modules/project/view/project_view.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
-import 'package:devity_console/modules/forgot_password/forgot_password.dart';
-import 'package:devity_console/app/bloc/app_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 /// The router configuration for the application
 final router = GoRouter(

@@ -114,7 +114,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
           ),
           const SizedBox(height: 16),
           Text(
-            _errorHandler.handleError(_error!, _stackTrace),
+            _errorHandler.handleError(_error, _stackTrace),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 16,

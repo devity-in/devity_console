@@ -16,11 +16,11 @@ class SplashLoading extends SplashState {}
 
 /// The state when the user is authenticated.
 class SplashAuthenticated extends SplashState {
-  /// The ID of the authenticated user.
-  final String userId;
-
   /// Creates a new [SplashAuthenticated].
   const SplashAuthenticated(this.userId);
+
+  /// The ID of the authenticated user.
+  final String userId;
 
   @override
   List<Object?> get props => [userId];
@@ -31,11 +31,11 @@ class SplashUnauthenticated extends SplashState {}
 
 /// The state when there was an error.
 class SplashError extends SplashState {
-  /// The error message.
-  final String message;
-
   /// Creates a new [SplashError].
   const SplashError(this.message);
+
+  /// The error message.
+  final String message;
 
   @override
   List<Object?> get props => [message];

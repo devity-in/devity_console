@@ -1,4 +1,3 @@
-import 'package:devity_console/config/constants.dart';
 import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/models/token_response.dart';
 import 'package:devity_console/models/user.dart';
@@ -10,9 +9,6 @@ import 'package:flutter/material.dart';
 
 /// Authentication Service
 class AuthService {
-  final UnprotectedApiService _apiService;
-  final TokenStorageService _tokenStorageService;
-
   /// Constructor
   AuthService({
     UnprotectedApiService? apiService,
@@ -25,6 +21,8 @@ class AuthService {
               baseUrl: Environment.apiBaseUrl,
             ),
         _tokenStorageService = tokenStorageService ?? TokenStorageService();
+  final UnprotectedApiService _apiService;
+  final TokenStorageService _tokenStorageService;
 
   /// Login with email and password
   Future<User> login({

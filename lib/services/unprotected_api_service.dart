@@ -1,15 +1,14 @@
-import 'package:dio/dio.dart';
 import 'package:devity_console/services/network_service.dart';
+import 'package:dio/dio.dart';
 
 class UnprotectedApiService {
-  final NetworkService _networkService;
-  final String _baseUrl;
-
   UnprotectedApiService({
     required NetworkService networkService,
     required String baseUrl,
   })  : _networkService = networkService,
         _baseUrl = baseUrl;
+  final NetworkService _networkService;
+  final String _baseUrl;
 
   Future<Response> get(
     String path, {
@@ -19,7 +18,6 @@ class UnprotectedApiService {
   }) async {
     return _networkService.request(
       '$_baseUrl$path',
-      method: 'GET',
       queryParameters: queryParameters,
       useCache: useCache,
       cacheDuration: cacheDuration,

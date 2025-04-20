@@ -44,10 +44,12 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
       final currentState = state;
       if (currentState is AppEditorLoadedState) {
         final updatedPages = [...currentState.pages, newPage];
-        emit(AppEditorLoadedState(
-          pages: updatedPages,
-          selectedPageId: currentState.selectedPageId,
-        ));
+        emit(
+          AppEditorLoadedState(
+            pages: updatedPages,
+            selectedPageId: currentState.selectedPageId,
+          ),
+        );
       }
     } catch (e) {
       emit(AppEditorErrorState(message: e.toString()));
@@ -73,10 +75,12 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
           }
           return page;
         }).toList();
-        emit(AppEditorLoadedState(
-          pages: updatedPages,
-          selectedPageId: currentState.selectedPageId,
-        ));
+        emit(
+          AppEditorLoadedState(
+            pages: updatedPages,
+            selectedPageId: currentState.selectedPageId,
+          ),
+        );
       }
     } catch (e) {
       emit(AppEditorErrorState(message: e.toString()));
@@ -94,12 +98,14 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
       if (currentState is AppEditorLoadedState) {
         final updatedPages =
             currentState.pages.where((page) => page.id != event.id).toList();
-        emit(AppEditorLoadedState(
-          pages: updatedPages,
-          selectedPageId: currentState.selectedPageId == event.id
-              ? null
-              : currentState.selectedPageId,
-        ));
+        emit(
+          AppEditorLoadedState(
+            pages: updatedPages,
+            selectedPageId: currentState.selectedPageId == event.id
+                ? null
+                : currentState.selectedPageId,
+          ),
+        );
       }
     } catch (e) {
       emit(AppEditorErrorState(message: e.toString()));
@@ -112,10 +118,12 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
   ) async {
     final currentState = state;
     if (currentState is AppEditorLoadedState) {
-      emit(AppEditorLoadedState(
-        pages: currentState.pages,
-        selectedPageId: event.id,
-      ));
+      emit(
+        AppEditorLoadedState(
+          pages: currentState.pages,
+          selectedPageId: event.id,
+        ),
+      );
     }
   }
 }

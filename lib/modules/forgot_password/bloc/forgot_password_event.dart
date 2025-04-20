@@ -8,9 +8,8 @@ abstract class ForgotPasswordEvent extends Equatable {
 }
 
 class SendPasswordResetEmail extends ForgotPasswordEvent {
-  final String email;
-
   const SendPasswordResetEmail(this.email);
+  final String email;
 
   @override
   List<Object?> get props => [email];

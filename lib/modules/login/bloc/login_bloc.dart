@@ -1,16 +1,12 @@
+import 'package:devity_console/modules/login/bloc/login_event.dart';
+import 'package:devity_console/modules/login/bloc/login_state.dart';
 import 'package:devity_console/repositories/analytics_repository.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:devity_console/repositories/auth_repository.dart';
-
-import 'login_event.dart';
-import 'login_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// [LoginBloc] is a business logic component that manages the state of the
 /// login screen.
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  final AuthRepository _authRepository;
-  final AnalyticsRepository _analyticsRepository;
-
   /// The default constructor for the [LoginBloc].
   LoginBloc({
     required AuthRepository authRepository,
@@ -21,6 +17,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginWithEmailAndPassword>(_onLoginWithEmailAndPassword);
     on<SendPasswordResetEmail>(_onSendPasswordResetEmail);
   }
+  final AuthRepository _authRepository;
+  final AnalyticsRepository _analyticsRepository;
 
   Future<void> _onLoginWithEmailAndPassword(
     LoginWithEmailAndPassword event,

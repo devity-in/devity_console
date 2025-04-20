@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:devity_console/config/environment.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:devity_console/exceptions/app_exception.dart';
-import 'package:devity_console/config/constants.dart';
 import 'package:devity_console/services/error_handler_service.dart';
+import 'package:dio/dio.dart';
 
 /// Custom options class that extends Dio's Options to include cancelToken
 ///
@@ -33,36 +30,21 @@ class NetworkOptions extends Options {
   /// [listFormat] - Format for list parameters
   NetworkOptions({
     this.cancelToken,
-    String? method,
-    Duration? sendTimeout,
-    Duration? receiveTimeout,
-    Map<String, dynamic>? extra,
-    Map<String, dynamic>? headers,
-    ResponseType? responseType,
-    String? contentType,
-    ValidateStatus? validateStatus,
-    bool? receiveDataWhenStatusError,
-    bool? followRedirects,
-    int? maxRedirects,
-    RequestEncoder? requestEncoder,
-    ResponseDecoder? responseDecoder,
-    ListFormat? listFormat,
-  }) : super(
-          method: method,
-          sendTimeout: sendTimeout,
-          receiveTimeout: receiveTimeout,
-          extra: extra,
-          headers: headers,
-          responseType: responseType,
-          contentType: contentType,
-          validateStatus: validateStatus,
-          receiveDataWhenStatusError: receiveDataWhenStatusError,
-          followRedirects: followRedirects,
-          maxRedirects: maxRedirects,
-          requestEncoder: requestEncoder,
-          responseDecoder: responseDecoder,
-          listFormat: listFormat,
-        );
+    super.method,
+    super.sendTimeout,
+    super.receiveTimeout,
+    super.extra,
+    super.headers,
+    super.responseType,
+    super.contentType,
+    super.validateStatus,
+    super.receiveDataWhenStatusError,
+    super.followRedirects,
+    super.maxRedirects,
+    super.requestEncoder,
+    super.responseDecoder,
+    super.listFormat,
+  });
 
   /// Token used to cancel the request
   final CancelToken? cancelToken;
@@ -380,7 +362,7 @@ class NetworkService {
     int maxRetries = 3,
     Duration debounceDuration = const Duration(milliseconds: 500),
   }) async {
-    final key = '$method:$path:${queryParameters?.toString()}';
+    final key = '$method:$path:$queryParameters';
     final timer = _debounceTimers[key];
 
     if (timer != null) {

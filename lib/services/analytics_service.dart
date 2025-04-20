@@ -33,10 +33,6 @@ class AnalyticsService {
     _queueService = AnalyticsQueueService();
   }
 
-  /// Enable or disable analytics tracking
-  void setEnabled(bool enabled) {
-    _enabled = enabled;
-  }
 
   /// Send an event
   Future<void> sendEvent(AnalyticsEvent event) async {

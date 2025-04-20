@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/foundation.dart';
 
 part 'app_editor_page_list_event.dart';
 part 'app_editor_page_list_state.dart';
@@ -9,15 +8,14 @@ part 'app_editor_page_list_state.dart';
 ///
 class AppEditorPageListBloc
     extends Bloc<AppEditorPageListEvent, AppEditorPageListState> {
-  // In-memory storage for pages
-  final List<Page> _pages = [];
-
   /// The default constructor for the [AppEditorPageListBloc].
   AppEditorPageListBloc() : super(const AppEditorPageListInitialState()) {
     on<AppEditorPageListStartedEvent>(_onStarted);
     on<AppEditorPageListAddPageEvent>(_onAddPage);
     on<AppEditorPageListDeletePageEvent>(_onDeletePage);
   }
+  // In-memory storage for pages
+  final List<Page> _pages = [];
 
   Future<void> _onStarted(
     AppEditorPageListStartedEvent event,

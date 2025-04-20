@@ -1,6 +1,6 @@
+import 'package:devity_console/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:devity_console/widgets/custom_button.dart';
 
 void main() {
   testWidgets('CustomButton displays correctly', (WidgetTester tester) async {
@@ -26,7 +26,7 @@ void main() {
 
   testWidgets('CustomButton handles onPressed callback',
       (WidgetTester tester) async {
-    bool wasPressed = false;
+    var wasPressed = false;
 
     await tester.pumpWidget(
       MaterialApp(

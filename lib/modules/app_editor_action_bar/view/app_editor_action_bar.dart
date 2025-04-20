@@ -1,11 +1,7 @@
-import 'package:devity_console/config/constants.dart';
-import 'package:devity_console/widgets/desktop_basic_widgets.dart';
+import 'package:devity_console/modules/app_editor_action_bar/bloc/app_editor_action_bar_bloc.dart';
+import 'package:devity_console/modules/app_editor_action_bar/bloc/app_editor_action_bar_state.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/app_editor_action_bar_bloc.dart';
-import '../bloc/app_editor_action_bar_event.dart';
-import '../bloc/app_editor_action_bar_state.dart';
 
 /// [AppEditorActionBar] is a StatelessWidget that displays
 /// the app editor action bar.

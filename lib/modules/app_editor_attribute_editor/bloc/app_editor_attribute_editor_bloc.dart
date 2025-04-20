@@ -1,8 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:devity_console/models/attribute.dart';
 import 'package:devity_console/models/project.dart';
-import 'app_editor_attribute_editor_event.dart';
-import 'app_editor_attribute_editor_state.dart';
+import 'package:devity_console/modules/app_editor_attribute_editor/bloc/app_editor_attribute_editor_event.dart';
+import 'package:devity_console/modules/app_editor_attribute_editor/bloc/app_editor_attribute_editor_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Bloc for managing the app editor attribute editor
 class AppEditorAttributeEditorBloc
@@ -21,15 +20,18 @@ class AppEditorAttributeEditorBloc
     try {
       emit(AppEditorAttributeEditorLoading());
       // TODO: Load initial data
-      emit(AppEditorAttributeEditorLoaded(
-        attributes: [],
-        project: Project(
+      emit(
+        AppEditorAttributeEditorLoaded(
+          attributes: const [],
+          project: Project(
             id: '',
             name: '',
             description: '',
             createdAt: DateTime.now(),
-            updatedAt: DateTime.now()),
-      ));
+            updatedAt: DateTime.now(),
+          ),
+        ),
+      );
     } catch (e) {
       emit(AppEditorAttributeEditorError(e.toString()));
     }
@@ -42,15 +44,18 @@ class AppEditorAttributeEditorBloc
     try {
       emit(AppEditorAttributeEditorLoading());
       // TODO: Update attribute
-      emit(AppEditorAttributeEditorLoaded(
-        attributes: [],
-        project: Project(
+      emit(
+        AppEditorAttributeEditorLoaded(
+          attributes: const [],
+          project: Project(
             id: '',
             name: '',
             description: '',
             createdAt: DateTime.now(),
-            updatedAt: DateTime.now()),
-      ));
+            updatedAt: DateTime.now(),
+          ),
+        ),
+      );
     } catch (e) {
       emit(AppEditorAttributeEditorError(e.toString()));
     }
@@ -63,15 +68,18 @@ class AppEditorAttributeEditorBloc
     try {
       emit(AppEditorAttributeEditorLoading());
       // TODO: Delete attribute
-      emit(AppEditorAttributeEditorLoaded(
-        attributes: [],
-        project: Project(
+      emit(
+        AppEditorAttributeEditorLoaded(
+          attributes: const [],
+          project: Project(
             id: '',
             name: '',
             description: '',
             createdAt: DateTime.now(),
-            updatedAt: DateTime.now()),
-      ));
+            updatedAt: DateTime.now(),
+          ),
+        ),
+      );
     } catch (e) {
       emit(AppEditorAttributeEditorError(e.toString()));
     }
@@ -84,15 +92,18 @@ class AppEditorAttributeEditorBloc
     try {
       emit(AppEditorAttributeEditorLoading());
       // TODO: Add attribute
-      emit(AppEditorAttributeEditorLoaded(
-        attributes: [],
-        project: Project(
+      emit(
+        AppEditorAttributeEditorLoaded(
+          attributes: const [],
+          project: Project(
             id: '',
             name: '',
             description: '',
             createdAt: DateTime.now(),
-            updatedAt: DateTime.now()),
-      ));
+            updatedAt: DateTime.now(),
+          ),
+        ),
+      );
     } catch (e) {
       emit(AppEditorAttributeEditorError(e.toString()));
     }

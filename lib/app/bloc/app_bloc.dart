@@ -23,7 +23,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
         _preferencesRepository = preferencesRepository ??
             PreferencesRepository(
-                SharedPreferences.getInstance() as SharedPreferences),
+              SharedPreferences.getInstance() as SharedPreferences,
+            ),
         _connectivity = connectivity ?? Connectivity(),
         super(const AppInitialState()) {
     on<AppStartedEvent>(_onStarted);
@@ -34,8 +35,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // Listen to connectivity changes
     _connectivity.onConnectivityChanged.listen((result) {
-      add(AppConnectivityChangedEvent(
-          isOnline: result != ConnectivityResult.none));
+      add(
+        AppConnectivityChangedEvent(
+          isOnline: result != ConnectivityResult.none,
+        ),
+      );
     });
   }
   final AuthRepository _authRepository;
@@ -54,18 +58,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final locale = await _preferencesRepository.getLocale();
       final connectivityResult = await _connectivity.checkConnectivity();
 
-      emit(AppLoadedState(
-        user: user,
-        themeMode: themeMode,
-        locale: locale,
-        isOffline: connectivityResult == ConnectivityResult.none,
-      ));
+      emit(
+        AppLoadedState(
+          user: user,
+          themeMode: themeMode,
+          locale: locale,
+          isOffline: connectivityResult == ConnectivityResult.none,
+        ),
+      );
     } catch (e) {
-      emit(AppErrorState(
-        message: e.toString(),
-        recoveryAction: () => add(const AppStartedEvent()),
-        canRetry: true,
-      ));
+      emit(
+        AppErrorState(
+          message: e.toString(),
+          recoveryAction: () => add(const AppStartedEvent()),
+        ),
+      );
     }
   }
 
@@ -80,19 +87,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       try {
         await _preferencesRepository.saveThemeMode(event.themeMode);
-        emit(AppLoadedState(
-          themeMode: event.themeMode,
-          locale: currentState.locale,
-          user: currentState.user,
-          isOffline: currentState.isOffline,
-        ));
+        emit(
+          AppLoadedState(
+            themeMode: event.themeMode,
+            locale: currentState.locale,
+            user: currentState.user,
+            isOffline: currentState.isOffline,
+          ),
+        );
       } catch (e) {
-        emit(AppErrorState(
-          message: 'Failed to change theme: $e',
-          recoveryAction: () =>
-              add(AppThemeModeChangedEvent(themeMode: currentState.themeMode)),
-          canRetry: true,
-        ));
+        emit(
+          AppErrorState(
+            message: 'Failed to change theme: $e',
+            recoveryAction: () => add(
+                AppThemeModeChangedEvent(themeMode: currentState.themeMode)),
+          ),
+        );
       }
     }
   }
@@ -106,19 +116,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppLocaleChangeLoadingState(currentLocale: currentState.locale));
       try {
         await _preferencesRepository.saveLocale(event.locale);
-        emit(AppLoadedState(
-          themeMode: currentState.themeMode,
-          locale: event.locale,
-          user: currentState.user,
-          isOffline: currentState.isOffline,
-        ));
+        emit(
+          AppLoadedState(
+            themeMode: currentState.themeMode,
+            locale: event.locale,
+            user: currentState.user,
+            isOffline: currentState.isOffline,
+          ),
+        );
       } catch (e) {
-        emit(AppErrorState(
-          message: 'Failed to change locale: $e',
-          recoveryAction: () =>
-              add(AppLocaleChangedEvent(locale: currentState.locale)),
-          canRetry: true,
-        ));
+        emit(
+          AppErrorState(
+            message: 'Failed to change locale: $e',
+            recoveryAction: () =>
+                add(AppLocaleChangedEvent(locale: currentState.locale)),
+          ),
+        );
       }
     }
   }
@@ -129,12 +142,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     final currentState = state;
     if (currentState is AppLoadedState) {
-      emit(AppLoadedState(
-        themeMode: currentState.themeMode,
-        locale: currentState.locale,
-        user: currentState.user,
-        isOffline: !event.isOnline,
-      ));
+      emit(
+        AppLoadedState(
+          themeMode: currentState.themeMode,
+          locale: currentState.locale,
+          user: currentState.user,
+          isOffline: !event.isOnline,
+        ),
+      );
     }
   }
 

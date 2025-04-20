@@ -1,8 +1,7 @@
+import 'package:devity_console/modules/forgot_password/bloc/bloc.dart';
+import 'package:devity_console/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:devity_console/repositories/repositories.dart';
-
-import '../bloc/bloc.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -64,7 +63,7 @@ class ForgotPasswordForm extends StatelessWidget {
     final emailController = TextEditingController();
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

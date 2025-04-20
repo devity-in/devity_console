@@ -1,14 +1,10 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:devity_console/modules/forgot_password/bloc/forgot_password_event.dart';
+import 'package:devity_console/modules/forgot_password/bloc/forgot_password_state.dart';
 import 'package:devity_console/repositories/repositories.dart';
-
-import 'forgot_password_event.dart';
-import 'forgot_password_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ForgotPasswordBloc
     extends Bloc<ForgotPasswordEvent, ForgotPasswordState> {
-  final AuthRepository _authRepository;
-  final AnalyticsRepository _analyticsRepository;
-
   ForgotPasswordBloc({
     required AuthRepository authRepository,
     required AnalyticsRepository analyticsRepository,
@@ -17,6 +13,8 @@ class ForgotPasswordBloc
         super(ForgotPasswordInitial()) {
     on<SendPasswordResetEmail>(_onSendPasswordResetEmail);
   }
+  final AuthRepository _authRepository;
+  final AnalyticsRepository _analyticsRepository;
 
   Future<void> _onSendPasswordResetEmail(
     SendPasswordResetEmail event,

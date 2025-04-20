@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'dart:convert';
 
 /// Analytics event types
@@ -39,6 +38,27 @@ class AnalyticsEvent {
     int? timestamp,
   }) : timestamp = timestamp ?? DateTime.now().millisecondsSinceEpoch;
 
+  /// Create from JSON
+  factory AnalyticsEvent.fromJson(Map<String, dynamic> json) {
+    return AnalyticsEvent(
+      eventType: AnalyticsEventType.values.firstWhere(
+        (e) => e.name == json['event_type'] as String,
+        orElse: () => AnalyticsEventType.custom,
+      ),
+      eventName: json['event_name'] as String,
+      parameters: json['parameters'] as Map<String, dynamic>,
+      retryCount: json['retry_count'] as int? ?? 0,
+      timestamp: json['timestamp'] as int?,
+    );
+  }
+
+  /// Create event from string
+  factory AnalyticsEvent.fromString(String jsonString) {
+    return AnalyticsEvent.fromJson(
+      jsonDecode(jsonString) as Map<String, dynamic>,
+    );
+  }
+
   /// Event type
   final AnalyticsEventType eventType;
 
@@ -76,26 +96,6 @@ class AnalyticsEvent {
     };
   }
 
-  /// Create from JSON
-  factory AnalyticsEvent.fromJson(Map<String, dynamic> json) {
-    return AnalyticsEvent(
-      eventType: AnalyticsEventType.values.firstWhere(
-        (e) => e.name == json['event_type'] as String,
-        orElse: () => AnalyticsEventType.custom,
-      ),
-      eventName: json['event_name'] as String,
-      parameters: json['parameters'] as Map<String, dynamic>,
-      retryCount: json['retry_count'] as int? ?? 0,
-      timestamp: json['timestamp'] as int?,
-    );
-  }
-
   /// Convert event to string
   String encode() => jsonEncode(toJson());
-
-  /// Create event from string
-  factory AnalyticsEvent.fromString(String jsonString) {
-    return AnalyticsEvent.fromJson(
-        jsonDecode(jsonString) as Map<String, dynamic>);
-  }
 }

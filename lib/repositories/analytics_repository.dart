@@ -2,17 +2,11 @@ import 'package:devity_console/services/analytics_service.dart';
 
 /// Analytics Repository
 class AnalyticsRepository {
-  final AnalyticsService _analyticsService;
-
   /// Constructor
   AnalyticsRepository({
     AnalyticsService? analyticsService,
   }) : _analyticsService = analyticsService ?? AnalyticsService();
-
-  /// Enable or disable analytics tracking
-  void setEnabled(bool enabled) {
-    _analyticsService.setEnabled(enabled);
-  }
+  final AnalyticsService _analyticsService;
 
   /// Track a screen view
   Future<void> trackScreenView({
