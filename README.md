@@ -1,5 +1,7 @@
 # Devity Console [ 3.29.0 ]
 
+[![codecov](https://codecov.io/gh/your-username/devity_console/branch/main/graph/badge.svg?token=YOUR_CODECOV_TOKEN)](https://codecov.io/gh/your-username/devity_console)
+
 ![coverage][coverage_badge]
 
 A Flutter application with a robust API service implementation.
@@ -162,21 +164,20 @@ The application defines specific error types for different scenarios:
 
 ### Running Tests 🧪
 
-To run all unit and widget tests use the following command:
+To run all unit and widget tests with coverage:
 
 ```sh
-$ flutter test --coverage --test-randomize-ordering-seed random
+# Run tests with coverage
+$ flutter test --coverage
+
+# Generate HTML coverage report
+$ genhtml coverage/lcov.info -o coverage/html
+
+# Open coverage report in browser
+$ open coverage/html/index.html
 ```
 
-To view the generated coverage report you can use [lcov](https://github.com/linux-test-project/lcov).
-
-```sh
-# Generate Coverage Report
-$ genhtml coverage/lcov.info -o coverage/
-
-# Open Coverage Report
-$ open coverage/index.html
-```
+The project maintains a minimum of 80% test coverage. Coverage reports are automatically generated on each pull request and can be viewed in the GitHub Actions artifacts.
 
 ### Managing Dependencies
 

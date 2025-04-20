@@ -67,11 +67,46 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) in all your int
 
 ## Testing
 
-- Write unit tests for new features
-- Write widget tests for UI components
-- Write integration tests for critical flows
-- Ensure all tests pass before submitting PR
-- Maintain or improve test coverage
+### Test Coverage Requirements
+- Maintain a minimum of 80% test coverage for all new code
+- All critical paths must be covered by tests
+- UI components must have widget tests
+- Business logic must have unit tests
+- Integration tests for key user flows
+
+### Running Tests
+```bash
+# Run all tests
+flutter test
+
+# Run tests with coverage
+flutter test --coverage
+
+# Generate coverage report
+genhtml coverage/lcov.info -o coverage/html
+```
+
+### Test Types
+1. **Unit Tests**
+   - Test individual functions and classes
+   - Focus on business logic
+   - Use mock objects for dependencies
+
+2. **Widget Tests**
+   - Test UI components in isolation
+   - Verify widget rendering and interactions
+   - Test different states and configurations
+
+3. **Integration Tests**
+   - Test complete user flows
+   - Verify app behavior across screens
+   - Test real-world scenarios
+
+### Continuous Integration
+- All tests must pass before merging
+- Coverage reports are generated automatically
+- PRs with coverage below 80% will be rejected
+- Code quality checks are run on every PR
 
 ## Documentation
 
