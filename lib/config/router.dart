@@ -13,37 +13,9 @@ import 'package:provider/provider.dart';
 /// The router configuration for the application
 final router = GoRouter(
   initialLocation: '/splash',
-  debugLogDiagnostics: true, // Enable debug logging
-  errorBuilder: (context, state) => Scaffold(
-    body: Center(
-      child: Text('Error: ${state.error}'),
-    ),
-  ),
-  redirect: (context, state) async {
-    // Get app bloc from context
-    final appBloc = context.read<AppBloc>();
-    final appState = appBloc.state;
-
-    // Check if app is loaded and user is authenticated
-    final isAuthenticated = appState is AppLoadedState && appState.user != null;
-
-    // Define public routes
-    final isPublicRoute = [
-      '/splash',
-      '/login',
-      '/signup',
-      '/forgot-password',
-    ].contains(state.matchedLocation);
-
-    // Redirect logic
-    if (!isAuthenticated && !isPublicRoute) {
-      return '/login';
-    }
-    if (isAuthenticated && isPublicRoute) {
-      return '/project';
-    }
-    return null;
-  },
+  debugLogDiagnostics: true,
+  // Enable state restoration for web
+  restorationScopeId: 'app_router',
   routes: [
     // Splash route
     GoRoute(
@@ -56,7 +28,7 @@ final router = GoRouter(
     GoRoute(
       path: '/auth',
       name: 'auth',
-      redirect: (context, state) => '/login',
+      redirect: (context, state) => '/auth/login',
       routes: [
         // Login route
         GoRoute(
@@ -129,4 +101,45 @@ final router = GoRouter(
       ],
     ),
   ],
+  // Error page for invalid routes
+  errorBuilder: (context, state) => Scaffold(
+    body: Center(
+      child: Text('Error: ${state.error}'),
+    ),
+  ),
+  // Global redirect logic for protected routes
+  redirect: (context, state) async {
+    // Get app bloc from context
+    final appBloc = context.read<AppBloc>();
+    final appState = appBloc.state;
+
+    // Check if app is loaded and user is authenticated
+    final isAuthenticated = appState is AppLoadedState && appState.user != null;
+
+    // Define public routes that don't require authentication
+    final isPublicRoute = [
+      '/splash',
+      '/auth/login',
+      '/auth/signup',
+      '/auth/forgot-password',
+    ].contains(state.matchedLocation);
+
+    // Redirect logic
+    if (!isAuthenticated && !isPublicRoute) {
+      // Store the intended destination for after login
+      final redirectPath = state.matchedLocation;
+      return '/auth/login?redirect=$redirectPath';
+    }
+
+    if (isAuthenticated && isPublicRoute) {
+      return '/project';
+    }
+
+    // Handle post-login redirect
+    if (isAuthenticated && state.uri.queryParameters.containsKey('redirect')) {
+      return state.uri.queryParameters['redirect'];
+    }
+
+    return null;
+  },
 );

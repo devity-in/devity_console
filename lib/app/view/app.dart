@@ -32,6 +32,8 @@ class App extends StatelessWidget {
               scaffoldMessengerKey: CustomKey.scaffoldMessengerKey,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
+              // Enable state restoration
+              restorationScopeId: 'app',
             ),
           ),
         );
