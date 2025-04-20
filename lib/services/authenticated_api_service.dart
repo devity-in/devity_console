@@ -1,4 +1,5 @@
 import 'package:devity_console/config/constants.dart';
+import 'package:devity_console/models/token_response.dart';
 import 'package:devity_console/services/token_storage_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,9 @@ class AuthenticatedApiService {
   /// Base URL of your API
   final String baseUrl = Constants.baseUrl;
 
+  /// Token storage service
+  final _tokenStorageService = TokenStorageService();
+
   /// GET Request
   Future<dynamic> get(
     String endpoint, {
@@ -48,7 +52,15 @@ class AuthenticatedApiService {
       );
       return response.data;
     } on DioException catch (e) {
-      // DioException replaces DioError in Dio 5.x
+      if (e.response?.statusCode == 401) {
+        // Token might be expired, try to refresh
+        final refreshed = await _refreshToken();
+        if (refreshed) {
+          // Retry the request with new token
+          return get(endpoint,
+              queryParams: queryParams, cancelToken: cancelToken);
+        }
+      }
       final errorMessage = _handleError(e);
       debugPrint('DioException: $errorMessage');
       rethrow;
@@ -70,6 +82,14 @@ class AuthenticatedApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        // Token might be expired, try to refresh
+        final refreshed = await _refreshToken();
+        if (refreshed) {
+          // Retry the request with new token
+          return post(endpoint, data: data, cancelToken: cancelToken);
+        }
+      }
       final errorMessage = _handleError(e);
       debugPrint('DioException: $errorMessage');
       rethrow;
@@ -91,6 +111,14 @@ class AuthenticatedApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        // Token might be expired, try to refresh
+        final refreshed = await _refreshToken();
+        if (refreshed) {
+          // Retry the request with new token
+          return put(endpoint, data: data, cancelToken: cancelToken);
+        }
+      }
       final errorMessage = _handleError(e);
       debugPrint('DioException: $errorMessage');
       rethrow;
@@ -112,6 +140,14 @@ class AuthenticatedApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        // Token might be expired, try to refresh
+        final refreshed = await _refreshToken();
+        if (refreshed) {
+          // Retry the request with new token
+          return delete(endpoint, data: data, cancelToken: cancelToken);
+        }
+      }
       final errorMessage = _handleError(e);
       debugPrint('DioException: $errorMessage');
       rethrow;
@@ -123,25 +159,55 @@ class AuthenticatedApiService {
     return CancelToken();
   }
 
+  /// Refresh the access token
+  Future<bool> _refreshToken() async {
+    try {
+      final token = await _tokenStorageService.getToken();
+      if (token == null) {
+        return false;
+      }
+
+      // Check if token is about to expire (within 5 minutes)
+      if (!token.willExpireIn(const Duration(minutes: 5))) {
+        return true;
+      }
+
+      final response = await _dio.post(
+        '/auth/refresh',
+        data: {
+          'refreshToken': token.refreshToken,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final newToken =
+            TokenResponse.fromJson(response.data as Map<String, dynamic>);
+        await _tokenStorageService.saveToken(newToken);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Token refresh error: $e');
+      return false;
+    }
+  }
+
   // Interceptor for modifying requests
   Interceptor _getRequestInterceptor() {
     return InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final tokenStorageService = TokenStorageService();
-        final token = await tokenStorageService.getToken();
-
-        // Add headers or tokens dynamically
-        options.headers['Authorization'] = 'Bearer ${token?.accessToken}';
-        return handler.next(options); // Continue with the request
+        final token = await _tokenStorageService.getToken();
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer ${token.accessToken}';
+        }
+        return handler.next(options);
       },
       onResponse: (response, handler) {
-        // Global handling of responses (optional)
-        return handler.next(response); // Continue with the response
+        return handler.next(response);
       },
       onError: (DioException error, handler) {
-        // Global error handling (log or modify error if needed)
         debugPrint('Error occurred: ${error.message}');
-        return handler.next(error); // Continue with the error
+        return handler.next(error);
       },
     );
   }
