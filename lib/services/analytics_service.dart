@@ -1,26 +1,37 @@
 import 'dart:async';
+import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/models/analytics_event.dart';
 import 'package:devity_console/services/analytics_queue_service.dart';
-import 'package:http/http.dart' as http;
+import 'package:devity_console/services/error_handler_service.dart';
+import 'package:devity_console/services/network_service.dart';
+import 'package:dio/dio.dart';
 
 /// Analytics Service
 class AnalyticsService {
   /// Constructor
-  AnalyticsService() {
-    _queueService = AnalyticsQueueService();
-  }
+  AnalyticsService({
+    NetworkService? networkService,
+    ErrorHandlerService? errorHandler,
+  })  : _networkService = networkService ??
+            NetworkService(errorHandler: ErrorHandlerService()),
+        _errorHandler = errorHandler ?? ErrorHandlerService();
+
+  /// Network service instance
+  final NetworkService _networkService;
+
+  /// Error handler service
+  final ErrorHandlerService _errorHandler;
 
   /// Queue service instance
   late AnalyticsQueueService _queueService;
 
-  /// HTTP client
-  final _client = http.Client();
-
-  /// Analytics endpoint
-  static const String _endpoint = 'https://api.example.com/analytics';
-
   /// Whether analytics is enabled
-  bool _enabled = true;
+  bool _enabled = Environment.isAnalyticsEnabled;
+
+  /// Initialize the service
+  void initialize() {
+    _queueService = AnalyticsQueueService();
+  }
 
   /// Enable or disable analytics tracking
   void setEnabled(bool enabled) {
@@ -44,10 +55,12 @@ class AnalyticsService {
 
     for (final event in batch) {
       try {
-        final response = await _client.post(
-          Uri.parse(_endpoint),
+        final response = await _networkService.request(
+          Environment.analyticsEndpoint,
+          method: 'POST',
+          data: event.toJson(),
           headers: {'Content-Type': 'application/json'},
-          body: event.toJson(),
+          useCache: false,
         );
 
         if (response.statusCode == 200) {
@@ -56,6 +69,7 @@ class AnalyticsService {
           failedEvents.add(event);
         }
       } catch (e) {
+        _errorHandler.handleError(e);
         failedEvents.add(event);
       }
     }
@@ -82,8 +96,7 @@ class AnalyticsService {
 
   /// Dispose the service
   void dispose() {
-    _queueService.dispose();
-    _client.close();
+    _networkService.dispose();
   }
 
   /// Track a screen view
