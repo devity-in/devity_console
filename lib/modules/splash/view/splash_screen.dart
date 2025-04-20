@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:devity_console/repositories/repositories.dart';
+import 'package:devity_console/repositories/auth_repository.dart';
+import 'package:devity_console/repositories/analytics_repository.dart';
 import 'package:devity_console/modules/login/login.dart';
 import 'package:devity_console/modules/project_list/project_list_screen.dart';
 
@@ -14,8 +15,10 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          SplashBloc(context.read<AuthRepository>())..add(CheckAuthStatus()),
+      create: (context) => SplashBloc(
+        context.read<AuthRepository>(),
+        context.read<AnalyticsRepository>(),
+      )..add(CheckAuthStatus()),
       child: const SplashView(),
     );
   }

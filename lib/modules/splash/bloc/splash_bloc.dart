@@ -1,5 +1,6 @@
+import 'package:devity_console/repositories/analytics_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:devity_console/repositories/repositories.dart';
+import 'package:devity_console/repositories/auth_repository.dart';
 
 import 'splash_event.dart';
 import 'splash_state.dart';
@@ -8,9 +9,11 @@ import 'splash_state.dart';
 /// splash screen.
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
   final AuthRepository _authRepository;
+  final AnalyticsRepository _analyticsRepository;
 
   /// The default constructor for the [SplashBloc].
-  SplashBloc(this._authRepository) : super(SplashInitial()) {
+  SplashBloc(this._authRepository, this._analyticsRepository)
+      : super(SplashInitial()) {
     on<CheckAuthStatus>(_onCheckAuthStatus);
   }
 

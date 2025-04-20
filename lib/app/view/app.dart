@@ -17,17 +17,17 @@ class App extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, screenType) {
         return BlocProvider<AppBloc>(
-          create: (context) => AppBloc(),
-          child: MaterialApp.router(
-            routerConfig: router,
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: currentThemeMode,
-            scaffoldMessengerKey: CustomKey.scaffoldMessengerKey,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-          ),
-        );
+            create: (context) => AppBloc(),
+            child: MaterialApp.router(
+              routerConfig: router,
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: currentThemeMode,
+              scaffoldMessengerKey: CustomKey.scaffoldMessengerKey,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+            ),
+          );
       },
     );
   }

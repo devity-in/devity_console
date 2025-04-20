@@ -1,16 +1,26 @@
 import 'dart:io' show exit;
 
 import 'package:bloc/bloc.dart';
+import 'package:devity_console/repositories/analytics_repository.dart';
+import 'package:devity_console/repositories/auth_repository.dart';
+import 'package:devity_console/models/user.dart';
 import 'package:flutter/material.dart' show ThemeMode, Locale;
-
 part 'app_event.dart';
 part 'app_state.dart';
 
 /// [AppBloc] is a business logic component that manages the state of the
 /// application.
 class AppBloc extends Bloc<AppEvent, AppState> {
+  final AuthRepository _authRepository;
+  final AnalyticsRepository _analyticsRepository;
+
   /// The default constructor for the [AppBloc].
-  AppBloc() : super(const AppInitialState()) {
+  AppBloc({
+    AuthRepository? authRepository,
+    AnalyticsRepository? analyticsRepository,
+  })  : _authRepository = authRepository ?? AuthRepository(),
+        _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
+        super(const AppInitialState()) {
     on<AppStartedEvent>(_onStarted);
     on<AppThemeModeChangedEvent>(_onThemeModeChanged);
     on<AppLocaleChangedEvent>(_onLocaleChanged);
@@ -22,8 +32,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     emit(const AppLoadingState());
     try {
-      // TODO: Load initial app state
-      emit(const AppLoadedState());
+      final user = await _authRepository.getCurrentUser();
+      emit(AppLoadedState(user: user));
     } catch (e) {
       emit(AppErrorState(message: e.toString()));
     }
@@ -38,6 +48,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppLoadedState(
         themeMode: event.themeMode,
         locale: currentState.locale,
+        user: currentState.user,
       ));
     }
   }
@@ -51,6 +62,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppLoadedState(
         themeMode: currentState.themeMode,
         locale: event.locale,
+        user: currentState.user,
       ));
     }
   }

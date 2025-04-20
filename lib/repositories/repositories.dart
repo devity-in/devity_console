@@ -1,2 +1,2 @@
 export 'auth_repository.dart';
-export 'auth_data_source.dart';
+export 'analytics_repository.dart';

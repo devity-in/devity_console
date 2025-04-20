@@ -20,10 +20,12 @@ class AppLoadedState extends AppState {
   const AppLoadedState({
     this.themeMode = ThemeMode.system,
     this.locale = const Locale('en'),
+    this.user,
   });
 
   final ThemeMode themeMode;
   final Locale locale;
+  final User? user;
 }
 
 /// Error state

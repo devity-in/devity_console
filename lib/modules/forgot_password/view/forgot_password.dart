@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:devity_console/repositories/repositories.dart';
 
-import '../bloc/forgot_password_bloc.dart';
-import '../bloc/forgot_password_event.dart';
-import '../bloc/forgot_password_state.dart';
+import '../bloc/bloc.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -12,7 +10,10 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ForgotPasswordBloc(context.read<AuthRepository>()),
+      create: (context) => ForgotPasswordBloc(
+        authRepository: context.read<AuthRepository>(),
+        analyticsRepository: context.read<AnalyticsRepository>(),
+      ),
       child: const ForgotPasswordView(),
     );
   }

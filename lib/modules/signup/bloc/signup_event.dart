@@ -10,12 +10,12 @@ abstract class SignupEvent extends Equatable {
 class SignupWithEmailAndPassword extends SignupEvent {
   final String email;
   final String password;
-  final String? name;
+  final String name;
 
   const SignupWithEmailAndPassword({
     required this.email,
     required this.password,
-    this.name,
+    required this.name,
   });
 
   @override

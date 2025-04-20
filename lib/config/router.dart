@@ -5,7 +5,7 @@ import 'package:devity_console/modules/login/login.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
-import 'package:devity_console/repositories/repositories.dart';
+import 'package:devity_console/app/bloc/app_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +20,12 @@ final router = GoRouter(
     ),
   ),
   redirect: (context, state) async {
-    // Get auth repository from context
-    final authRepository = context.read<AuthRepository>();
-    final isAuthenticated = await authRepository.getCurrentUser() != null;
+    // Get app bloc from context
+    final appBloc = context.read<AppBloc>();
+    final appState = appBloc.state;
+
+    // Check if app is loaded and user is authenticated
+    final isAuthenticated = appState is AppLoadedState && appState.user != null;
 
     // Define public routes
     final isPublicRoute = [

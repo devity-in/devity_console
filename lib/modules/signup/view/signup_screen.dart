@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:devity_console/repositories/repositories.dart';
+import 'package:devity_console/repositories/auth_repository.dart';
+import 'package:devity_console/repositories/analytics_repository.dart';
 import 'package:devity_console/modules/project_list/project_list_screen.dart';
 
 import '../bloc/signup_bloc.dart';
@@ -13,7 +14,10 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SignupBloc(context.read<AuthRepository>()),
+      create: (context) => SignupBloc(
+        authRepository: context.read<AuthRepository>(),
+        analyticsRepository: context.read<AnalyticsRepository>(),
+      ),
       child: const SignupView(),
     );
   }
@@ -96,11 +100,22 @@ class SignupForm extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
+              final email = emailController.text;
+              final password = passwordController.text;
+              final name = nameController.text;
+
+              if (email.isEmpty || password.isEmpty || name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please fill in all fields')),
+                );
+                return;
+              }
+
               context.read<SignupBloc>().add(
                     SignupWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text,
-                      name: nameController.text,
+                      email: email,
+                      password: password,
+                      name: name,
                     ),
                   );
             },
