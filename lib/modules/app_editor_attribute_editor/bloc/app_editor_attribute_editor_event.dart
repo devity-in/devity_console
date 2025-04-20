@@ -1,10 +1,53 @@
-part of 'app_editor_attribute_editor_bloc.dart';
+import 'package:equatable/equatable.dart';
 
-/// The [AppEditorAttributeEditorEvent] is a class that describes the different
-/// events that can be triggered by the AppEditorAttributeEditor widget.
-@freezed
-class AppEditorAttributeEditorEvent with _$AppEditorAttributeEditorEvent {
-  /// The event that is triggered when the AppEditorAttributeEditor widget is
-  /// started.
-  const factory AppEditorAttributeEditorEvent.started() = _Started;
+/// Events for the [AppEditorAttributeEditorBloc]
+abstract class AppEditorAttributeEditorEvent extends Equatable {
+  const AppEditorAttributeEditorEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+/// Event to initialize the editor
+class AppEditorAttributeEditorInitializeEvent
+    extends AppEditorAttributeEditorEvent {
+  const AppEditorAttributeEditorInitializeEvent();
+}
+
+/// Event to update an attribute
+class AppEditorAttributeEditorUpdateEvent
+    extends AppEditorAttributeEditorEvent {
+  const AppEditorAttributeEditorUpdateEvent({
+    required this.attribute,
+  });
+
+  final Map<String, dynamic> attribute;
+
+  @override
+  List<Object> get props => [attribute];
+}
+
+/// Event to delete an attribute
+class AppEditorAttributeEditorDeleteEvent
+    extends AppEditorAttributeEditorEvent {
+  const AppEditorAttributeEditorDeleteEvent({
+    required this.attributeId,
+  });
+
+  final String attributeId;
+
+  @override
+  List<Object> get props => [attributeId];
+}
+
+/// Event to add a new attribute
+class AppEditorAttributeEditorAddEvent extends AppEditorAttributeEditorEvent {
+  const AppEditorAttributeEditorAddEvent({
+    required this.attribute,
+  });
+
+  final Map<String, dynamic> attribute;
+
+  @override
+  List<Object> get props => [attribute];
 }

@@ -1,9 +1,34 @@
-part of 'app_editor_action_bar_bloc.dart';
+import 'package:equatable/equatable.dart';
 
-/// The [AppEditorActionBarState] is a class that describes the different states
-/// that the AppEditorActionBar widget can be in.
-@freezed
-class AppEditorActionBarState with _$AppEditorActionBarState {
-  /// The initial state of the AppEditorActionBar widget.
-  const factory AppEditorActionBarState.initial() = _Initial;
+abstract class AppEditorActionBarState extends Equatable {
+  const AppEditorActionBarState();
+
+  @override
+  List<Object> get props => [];
+}
+
+class AppEditorActionBarInitial extends AppEditorActionBarState {}
+
+class AppEditorActionBarLoading extends AppEditorActionBarState {}
+
+class AppEditorActionBarLoaded extends AppEditorActionBarState {
+  final String lastSaved;
+  final bool isDirty;
+
+  const AppEditorActionBarLoaded({
+    required this.lastSaved,
+    required this.isDirty,
+  });
+
+  @override
+  List<Object> get props => [lastSaved, isDirty];
+}
+
+class AppEditorActionBarError extends AppEditorActionBarState {
+  final String message;
+
+  const AppEditorActionBarError(this.message);
+
+  @override
+  List<Object> get props => [message];
 }

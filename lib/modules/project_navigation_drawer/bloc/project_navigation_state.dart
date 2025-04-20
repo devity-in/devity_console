@@ -1,16 +1,36 @@
 part of 'project_navigation_bloc.dart';
 
-/// [ProjectNavigationState] is a class that describes the state of the
-/// [ProjectNavigationBloc].
-@freezed
-abstract class ProjectNavigationState with _$ProjectNavigationState {
-  /// The initial state of the [ProjectNavigationBloc].
-  const factory ProjectNavigationState.initial() = _Initial;
+/// States for the [ProjectNavigationBloc]
+sealed class ProjectNavigationState {
+  const ProjectNavigationState();
+}
 
-  /// The loaded state of the navigation drawer.
-  const factory ProjectNavigationState.loaded(
-    List<ProjectNavigationDrawerItem> items,
-    ProjectNavigationDrawerItem? selectedItem, {
-    @Default(false) bool isExpanded,
-  }) = Loaded;
+/// Initial state
+class ProjectNavigationInitialState extends ProjectNavigationState {
+  const ProjectNavigationInitialState();
+}
+
+/// Loading state
+class ProjectNavigationLoadingState extends ProjectNavigationState {
+  const ProjectNavigationLoadingState();
+}
+
+/// Loaded state with navigation items
+class ProjectNavigationLoadedState extends ProjectNavigationState {
+  const ProjectNavigationLoadedState({
+    required this.items,
+    this.selectedItem,
+  });
+
+  final List<ProjectNavigationDrawerItem> items;
+  final ProjectNavigationDrawerItem? selectedItem;
+}
+
+/// Error state
+class ProjectNavigationErrorState extends ProjectNavigationState {
+  const ProjectNavigationErrorState({
+    required this.message,
+  });
+
+  final String message;
 }

@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'app_editor_navigation_drawer_event.dart';
 part 'app_editor_navigation_drawer_state.dart';

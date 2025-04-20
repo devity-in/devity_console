@@ -1,12 +1,43 @@
 part of 'app_bloc.dart';
 
-/// [AppEvent] is the event class for [AppBloc].
-@freezed
-class AppEvent with _$AppEvent {
-  /// Event to restart the app
-  const factory AppEvent.refresh() = _Refresh;
+/// Events for the [AppBloc]
+sealed class AppEvent {
+  const AppEvent();
+}
 
-  /// Event to exit the app.
-  /// This event will close the app. system.exit(0)
-  const factory AppEvent.exit() = _Exit;
+/// Initial event when the app is started
+class AppStartedEvent extends AppEvent {
+  const AppStartedEvent();
+}
+
+/// Event to change theme mode
+class AppThemeModeChangedEvent extends AppEvent {
+  const AppThemeModeChangedEvent({
+    required this.themeMode,
+  });
+
+  final ThemeMode themeMode;
+}
+
+/// Event to change locale
+class AppLocaleChangedEvent extends AppEvent {
+  const AppLocaleChangedEvent({
+    required this.locale,
+  });
+
+  final Locale locale;
+}
+
+/// Event for connectivity changes
+class AppConnectivityChangedEvent extends AppEvent {
+  const AppConnectivityChangedEvent({
+    required this.isOnline,
+  });
+
+  final bool isOnline;
+}
+
+/// Event to retry failed operations
+class AppRetryEvent extends AppEvent {
+  const AppRetryEvent();
 }

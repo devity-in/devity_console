@@ -13,13 +13,14 @@ class ProjectNavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProjectNavigationBloc(),
+      create: (context) =>
+          ProjectNavigationBloc()..add(const ProjectNavigationStartedEvent()),
       child: BlocBuilder<ProjectNavigationBloc, ProjectNavigationState>(
         builder: (context, state) {
-          if (state is Loaded) {
+          if (state is ProjectNavigationLoadedState) {
             final items = state.items;
             final selectedItem = state.selectedItem;
-            final isExpanded = state.isExpanded;
+            final isExpanded = false; // TODO: Add isExpanded to state
 
             return AnimatedContainer(
               duration: Duration.zero,

@@ -1,35 +1,21 @@
-/// Constants class to define the app name and base url based on the app flavor.
-class Constants {
-  static String? get _appFlavor =>
-      const String.fromEnvironment('FLUTTER_APP_FLAVOR') != ''
-          ? const String.fromEnvironment('FLUTTER_APP_FLAVOR')
-          : null;
+import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/material.dart'
+    show BouncingScrollPhysics, Color, Colors, ScrollPhysics;
+import 'package:devity_console/config/environment.dart';
 
-  /// App name based on the app flavor
-  static String get appName {
-    switch (Constants._appFlavor) {
-      case 'development':
-        return 'Dev';
-      case 'production':
-        return 'Prod';
-      case 'staging':
-        return 'UAT';
-      default:
-        return 'Dev';
-    }
-  }
+/// UI-related constants
+class UIConstants {
+  /// App scroll physics
+  static const ScrollPhysics appScrollPhysics = BouncingScrollPhysics();
 
-  /// Base url based on the app flavor
-  static String get baseUrl {
-    switch (Constants._appFlavor) {
-      case 'development':
-        return 'https://api.devity.in';
-      case 'production':
-        return 'https://api.devity.in';
-      case 'staging':
-        return 'https://uat.devity.in';
-      default:
-        return 'https://dev.devity.in';
-    }
-  }
+  /// App divider width
+  static const double appDividerWidth = 0.5;
+
+  /// App divider color
+  static const Color appDividerColor = Colors.black;
+}
+
+/// Base class for application constants
+class AppConstants {
+  static const appName = 'Devity Console';
 }
