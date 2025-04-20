@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:devity_console/config/environment.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,15 +76,15 @@ class NetworkService {
   void _initDio() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: constants.baseUrl,
+        baseUrl: Environment.apiBaseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-API-Version': constants.apiVersion,
-          'X-App-Version': constants.appVersion,
+          'X-API-Version': Environment.apiVersion,
+          'X-App-Version': Environment.appVersion,
         },
       ),
     );

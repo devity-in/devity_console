@@ -1,4 +1,5 @@
 import 'package:devity_console/config/constants.dart';
+import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/exceptions/app_exception.dart';
 import 'package:devity_console/models/token_response.dart';
 import 'package:devity_console/services/error_handler_service.dart';
@@ -37,7 +38,7 @@ class ProtectedApiService {
     }
 
     return _networkService.request(
-      '${constants.baseUrl}$path',
+      '${Environment.apiBaseUrl}$path',
       method: 'GET',
       queryParameters: queryParameters,
       useCache: useCache,
@@ -58,7 +59,7 @@ class ProtectedApiService {
     }
 
     return _networkService.request(
-      '${constants.baseUrl}$path',
+      '${Environment.apiBaseUrl}$path',
       method: 'POST',
       data: data,
       queryParameters: queryParameters,
@@ -78,7 +79,7 @@ class ProtectedApiService {
     }
 
     return _networkService.request(
-      '${constants.baseUrl}$path',
+      '${Environment.apiBaseUrl}$path',
       method: 'PUT',
       data: data,
       queryParameters: queryParameters,
@@ -97,7 +98,7 @@ class ProtectedApiService {
     }
 
     return _networkService.request(
-      '${constants.baseUrl}$path',
+      '${Environment.apiBaseUrl}$path',
       method: 'DELETE',
       queryParameters: queryParameters,
       headers: {'Authorization': 'Bearer $token'},
@@ -116,7 +117,7 @@ class ProtectedApiService {
     }
 
     return _networkService.request(
-      '${constants.baseUrl}$path',
+      '${Environment.apiBaseUrl}$path',
       method: 'PATCH',
       data: data,
       queryParameters: queryParameters,
@@ -138,7 +139,7 @@ class ProtectedApiService {
       }
 
       final response = await _networkService.request(
-        constants.endpoints['refresh']!,
+        '/refresh',
         method: 'POST',
         data: {
           'refreshToken': token.refreshToken,

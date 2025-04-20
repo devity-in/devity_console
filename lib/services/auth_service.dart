@@ -1,7 +1,7 @@
 import 'package:devity_console/config/constants.dart';
+import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/models/token_response.dart';
 import 'package:devity_console/models/user.dart';
-import 'package:devity_console/services/authenticated_api_service.dart';
 import 'package:devity_console/services/error_handler_service.dart';
 import 'package:devity_console/services/network_service.dart';
 import 'package:devity_console/services/token_storage_service.dart';
@@ -22,7 +22,7 @@ class AuthService {
               networkService: NetworkService(
                 errorHandler: ErrorHandlerService(),
               ),
-              baseUrl: constants.baseUrl,
+              baseUrl: Environment.apiBaseUrl,
             ),
         _tokenStorageService = tokenStorageService ?? TokenStorageService();
 
