@@ -1,24 +1,18 @@
-import 'dart:io' show exit;
-
 import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:devity_console/models/user.dart';
 import 'package:devity_console/repositories/analytics_repository.dart';
 import 'package:devity_console/repositories/auth_repository.dart';
 import 'package:devity_console/repositories/preferences_repository.dart';
-import 'package:devity_console/models/user.dart';
-import 'package:flutter/material.dart' show ThemeMode, Locale, VoidCallback;
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart' show Locale, ThemeMode, VoidCallback;
 import 'package:shared_preferences/shared_preferences.dart';
+
 part 'app_event.dart';
 part 'app_state.dart';
 
 /// [AppBloc] is a business logic component that manages the state of the
 /// application.
 class AppBloc extends Bloc<AppEvent, AppState> {
-  final AuthRepository _authRepository;
-  final AnalyticsRepository _analyticsRepository;
-  final PreferencesRepository _preferencesRepository;
-  final Connectivity _connectivity;
-
   /// The default constructor for the [AppBloc].
   AppBloc({
     AuthRepository? authRepository,
@@ -44,6 +38,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isOnline: result != ConnectivityResult.none));
     });
   }
+  final AuthRepository _authRepository;
+  final AnalyticsRepository _analyticsRepository;
+  final PreferencesRepository _preferencesRepository;
+  final Connectivity _connectivity;
 
   Future<void> _onStarted(
     AppStartedEvent event,

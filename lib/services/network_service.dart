@@ -9,8 +9,28 @@ import 'package:devity_console/exceptions/app_exception.dart';
 import 'package:devity_console/config/constants.dart';
 import 'package:devity_console/services/error_handler_service.dart';
 
-/// Custom options class that includes cancelToken
+/// Custom options class that extends Dio's Options to include cancelToken
+///
+/// This class provides additional configuration options for network requests,
+/// including the ability to cancel requests in progress.
 class NetworkOptions extends Options {
+  /// Creates a new instance of NetworkOptions
+  ///
+  /// [cancelToken] - Optional token to cancel the request
+  /// [method] - HTTP method (GET, POST, etc.)
+  /// [sendTimeout] - Timeout for sending data
+  /// [receiveTimeout] - Timeout for receiving data
+  /// [extra] - Additional request options
+  /// [headers] - HTTP headers
+  /// [responseType] - Expected response type
+  /// [contentType] - Content type of the request
+  /// [validateStatus] - Function to validate response status
+  /// [receiveDataWhenStatusError] - Whether to receive data on error status
+  /// [followRedirects] - Whether to follow redirects
+  /// [maxRedirects] - Maximum number of redirects to follow
+  /// [requestEncoder] - Custom request encoder
+  /// [responseDecoder] - Custom response decoder
+  /// [listFormat] - Format for list parameters
   NetworkOptions({
     this.cancelToken,
     String? method,
@@ -44,12 +64,28 @@ class NetworkOptions extends Options {
           listFormat: listFormat,
         );
 
+  /// Token used to cancel the request
   final CancelToken? cancelToken;
 }
 
-/// Network service for handling API requests
+/// A comprehensive network service that handles all API communications
+///
+/// This service provides a robust implementation for making HTTP requests with
+/// features like caching, retry mechanism, debouncing, and error handling.
+///
+/// Example usage:
+/// ```dart
+/// final networkService = NetworkService(errorHandler: errorHandler);
+/// final response = await networkService.get(
+///   '/endpoint',
+///   useCache: true,
+///   cacheDuration: Duration(minutes: 5),
+/// );
+/// ```
 class NetworkService {
-  /// Constructor
+  /// Creates a new instance of NetworkService
+  ///
+  /// [errorHandler] - Service for handling errors and exceptions
   NetworkService({
     required ErrorHandlerService errorHandler,
   }) : _errorHandler = errorHandler {
@@ -57,22 +93,35 @@ class NetworkService {
     _initConnectivity();
   }
 
-  /// Error handler service
+  /// Service for handling errors and exceptions
   final ErrorHandlerService _errorHandler;
 
-  /// Dio instance
+  /// Dio instance for making HTTP requests
   late final Dio _dio;
 
-  /// Connectivity instance
+  /// Connectivity instance for monitoring network status
   final _connectivity = Connectivity();
 
-  /// Cache for storing responses
+  /// Cache for storing API responses
+  ///
+  /// The cache uses a map where the key is a combination of the request method,
+  /// path, and query parameters, and the value is a CacheEntry containing the
+  /// response data and expiry time.
   final _cache = <String, CacheEntry>{};
 
-  /// Debounce timers
+  /// Timers for debouncing requests
+  ///
+  /// This map stores timers for each debounced request, allowing cancellation
+  /// of pending requests when new ones are made.
   final _debounceTimers = <String, Timer>{};
 
-  /// Initialize Dio with default configuration
+  /// Initializes the Dio instance with default configuration
+  ///
+  /// Sets up:
+  /// - Base URL from environment
+  /// - Timeout configurations
+  /// - Default headers
+  /// - Interceptors for caching, retry, and error handling
   void _initDio() {
     _dio = Dio(
       BaseOptions(
@@ -97,7 +146,10 @@ class NetworkService {
     ]);
   }
 
-  /// Initialize connectivity monitoring
+  /// Initializes network connectivity monitoring
+  ///
+  /// Listens for connectivity changes and handles offline/online transitions.
+  /// When offline, it triggers error handling for network-related issues.
   void _initConnectivity() {
     _connectivity.onConnectivityChanged.listen((result) {
       if (result == ConnectivityResult.none) {
@@ -111,7 +163,14 @@ class NetworkService {
     });
   }
 
-  /// Get cache interceptor
+  /// Creates and returns a cache interceptor
+  ///
+  /// The interceptor handles:
+  /// - Checking cache for existing responses
+  /// - Storing responses in cache
+  /// - Managing cache expiration
+  ///
+  /// Returns an Interceptor instance configured for caching
   Interceptor _getCacheInterceptor() {
     return InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -149,7 +208,15 @@ class NetworkService {
     );
   }
 
-  /// Get retry interceptor
+  /// Creates and returns a retry interceptor
+  ///
+  /// The interceptor handles:
+  /// - Automatic retry for failed requests
+  /// - Configurable retry count
+  /// - Exponential backoff delay
+  /// - Network error detection
+  ///
+  /// Returns an Interceptor instance configured for retry logic
   Interceptor _getRetryInterceptor() {
     return InterceptorsWrapper(
       onError: (error, handler) async {
@@ -174,7 +241,14 @@ class NetworkService {
     );
   }
 
-  /// Get error interceptor
+  /// Creates and returns an error interceptor
+  ///
+  /// The interceptor handles:
+  /// - Converting Dio errors to application exceptions
+  /// - Logging errors
+  /// - Providing user-friendly error messages
+  ///
+  /// Returns an Interceptor instance configured for error handling
   Interceptor _getErrorInterceptor() {
     return InterceptorsWrapper(
       onError: (error, handler) {
@@ -185,12 +259,32 @@ class NetworkService {
     );
   }
 
-  /// Get cache key for request
+  /// Generates a unique cache key for a request
+  ///
+  /// The key is based on:
+  /// - HTTP method
+  /// - Request path
+  /// - Query parameters
+  ///
+  /// [options] - The request options
+  /// Returns a string representing the cache key
   String _getCacheKey(RequestOptions options) {
     return '${options.method}:${options.path}:${options.queryParameters}';
   }
 
-  /// Handle Dio errors
+  /// Converts Dio errors to application-specific exceptions
+  ///
+  /// Handles various types of network and server errors:
+  /// - Connection timeouts
+  /// - Response timeouts
+  /// - Bad responses
+  /// - Cancelled requests
+  /// - Unknown errors
+  /// - Bad certificates
+  /// - Connection errors
+  ///
+  /// [error] - The Dio error to handle
+  /// Returns an AppException instance
   AppException _handleDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
@@ -225,7 +319,17 @@ class NetworkService {
     }
   }
 
-  /// Handle Dio response errors
+  /// Handles specific HTTP response errors
+  ///
+  /// Converts HTTP status codes to appropriate exceptions:
+  /// - 400: Validation errors
+  /// - 401: Authentication errors
+  /// - 403: Authorization errors
+  /// - 404: Resource not found
+  /// - 500: Server errors
+  ///
+  /// [error] - The Dio error containing the response
+  /// Returns an AppException instance
   AppException _handleDioResponseError(DioException error) {
     final statusCode = error.response?.statusCode;
     final message = error.response?.data?['message'] as String?;
@@ -253,12 +357,12 @@ class NetworkService {
         );
       case 500:
         return ServerException(
-          message: message ?? 'Server error. Please try again later.',
+          message: message ?? 'Internal server error. Please try again later.',
           stackTrace: error.stackTrace,
         );
       default:
         return ServerException(
-          message: message ?? 'An error occurred. Please try again later.',
+          message: message ?? 'An unexpected error occurred.',
           stackTrace: error.stackTrace,
         );
     }
