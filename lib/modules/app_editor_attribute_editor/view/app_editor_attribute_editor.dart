@@ -15,8 +15,8 @@ class AppEditorAttributeEditor extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
-            color: Constants.appDividerColor,
-            width: Constants.appDividerWidth,
+            color: UIConstants.appDividerColor,
+            width: UIConstants.appDividerWidth,
           ),
         ),
       ),

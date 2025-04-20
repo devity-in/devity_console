@@ -1,9 +1,15 @@
-# Devity Flutter [ 3.29.0 ]
-flutter project to serve as starting point for apps.
+# Devity Console [ 3.29.0 ]
 
 ![coverage][coverage_badge]
 
----
+A Flutter application with a robust API service implementation.
+
+## Table of Contents
+- [Getting Started](#getting-started-)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Development Workflow](#development-workflow)
+- [Internationalization](#working-with-translations-)
 
 ## Getting Started 🚀
 
@@ -28,9 +34,133 @@ $ flutter run --flavor production --target lib/main_production.dart
 
 _\*Devity Flutter works on iOS, Android, Web, and Windows._
 
----
+## Features
 
-## Running Tests 🧪
+### API Service Implementation
+
+The application includes a comprehensive API service implementation with the following features:
+
+#### 1. Request Caching
+- In-memory caching for GET requests
+- Configurable cache duration
+- Automatic cache invalidation
+- Methods to clear cache for specific endpoints or entire cache
+- Cache key generation based on URL and query parameters
+
+#### 2. Retry Mechanism
+- Automatic retry for failed requests
+- Configurable maximum retry attempts
+- Exponential backoff delay between retries
+- Network connectivity check before each retry
+- Comprehensive error handling
+
+#### 3. Request Debouncing
+- Prevents multiple rapid requests to the same endpoint
+- Configurable debounce duration
+- Ability to cancel debounced requests
+- Automatic cleanup of debounce timers
+
+#### 4. Network Connectivity Monitoring
+- Real-time network status monitoring
+- Automatic handling of offline/online transitions
+- Network-aware request handling
+- Proper error handling for network-related issues
+
+#### 5. Authentication
+- JWT token-based authentication
+- Automatic token refresh
+- Token expiration handling
+- Secure token storage
+- Authorization header management
+
+#### 6. Error Handling
+- Comprehensive error types
+- User-friendly error messages
+- Stack trace preservation
+- Error logging
+- Network-specific error handling
+
+### Usage Examples
+
+#### Cached GET Request
+```dart
+final response = await apiService.get(
+  '/endpoint',
+  useCache: true,
+  cacheDuration: const Duration(minutes: 5),
+);
+```
+
+#### Debounced Request
+```dart
+networkService.debounce(
+  'search',
+  const Duration(milliseconds: 500),
+  () => apiService.get('/search?q=$query'),
+);
+```
+
+#### Network Connectivity Monitoring
+```dart
+networkService.connectivityStream.listen((result) {
+  if (result == ConnectivityResult.none) {
+    // Handle offline state
+  } else {
+    // Handle online state
+  }
+});
+```
+
+#### Cache Management
+```dart
+// Clear specific endpoint cache
+apiService.clearCacheForEndpoint('/endpoint');
+
+// Clear all cache
+apiService.clearCache();
+```
+
+## Architecture
+
+The API service implementation follows a layered architecture:
+
+1. **NetworkService**: Core network operations, caching, and connectivity
+2. **AuthenticatedApiService**: Authentication and API-specific operations
+3. **TokenStorageService**: Secure token storage
+4. **ErrorHandlerService**: Error handling and user feedback
+
+### Error Types
+
+The application defines specific error types for different scenarios:
+
+- `NetworkException`: Network-related errors
+- `AuthenticationException`: Authentication failures
+- `AuthorizationException`: Permission issues
+- `ValidationException`: Invalid request data
+- `ServerException`: Server-side errors
+- `CacheException`: Caching-related errors
+- `TokenException`: Token-related issues
+
+### Dependencies
+
+- dio: ^5.8.0+1
+- connectivity_plus: ^5.0.2
+- flutter_secure_storage: ^4.2.1
+- shared_preferences: ^2.2.2
+- equatable: ^2.0.5
+
+### Best Practices
+
+1. Always use the API service for network requests
+2. Implement proper error handling
+3. Use caching for frequently accessed data
+4. Monitor network connectivity
+5. Handle token expiration gracefully
+6. Clean up resources when done
+
+## Development Workflow
+
+### Running Tests 🧪
 
 To run all unit and widget tests use the following command:
 
@@ -48,7 +178,13 @@ $ genhtml coverage/lcov.info -o coverage/
 $ open coverage/index.html
 ```
 
----
+### Managing Dependencies
+
+To sort the pubspec.yml:
+
+```sh
+dart run pubspec_dependency_sorter
+```
 
 ## Working with Translations 🌐
 
@@ -166,130 +302,3 @@ Alternatively, run `flutter run` and code generation will take place automatical
 [internationalization_link]: https://flutter.dev/docs/development/accessibility-and-localization/internationalization
 [license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license_link]: https://opensource.org/licenses/MIT
-
----
-
-## Data Modeling Using `freezed`
-
-### Overview
-
-In this project, we use the **`freezed`** library to generate immutable data classes, ensuring that our data models are safe, robust, and easy to work with. By leveraging code generation, we simplify the creation of models that handle equality, serialization, and state management efficiently.
-
-### Why Use `freezed`?
-
-- **Immutability**: Ensures data classes are immutable, making them safer and less prone to unintended mutations.
-- **Automatic `==` and `hashCode`**: Avoid writing boilerplate code for equality checks and object comparison.
-- **`copyWith` Method**: Easily create modified copies of existing objects without changing the original data.
-- **Union and Sealed Classes**: Simplifies state management by enabling us to represent different states in a clean and structured way.
-- **JSON Serialization Support**: Easily convert data classes to and from JSON using the `json_serializable` package.
-
-### Installation
-
-To use `freezed`, you need to add the following dependencies to your `pubspec.yaml` file:
-
-```yaml
-dependencies:
-  freezed_annotation: ^2.0.0
-  json_annotation: ^4.8.0
-
-dev_dependencies:
-  build_runner: ^2.3.0
-  freezed: ^2.0.0
-  json_serializable: ^6.6.0
-```
-
-### Creating a Model with `freezed`
-
-Below is an example of how to create an immutable model using `freezed`:
-
-```dart
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'user.freezed.dart';
-part 'user.g.dart';
-
-@freezed
-class User with _$User {
-  const factory User({
-    required int id,
-    required String name,
-    required String email,
-  }) = _User;
-
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-}
-```
-
-- The `@freezed` annotation is used to indicate that the class will have code generated by `freezed`.
-- The `User` class is now immutable, and we can use the `copyWith` method to create new instances with modified values.
-
-### Generating Code
-
-After you define your model, you need to run the **code generator** to create the necessary files (`*.freezed.dart` and `*.g.dart`):
-
-```bash
-dart run build_runner build
-```
-
-This command generates:
-- A `.freezed.dart` file for managing immutability, `copyWith`, equality, and unions.
-- A `.g.dart` file for handling JSON serialization and deserialization, if needed.
-
-### Example Usage
-
-```dart
-void main() {
-  final user = User(id: 1, name: 'John Doe', email: 'john.doe@example.com');
-
-  // Using copyWith to create a new User with a modified name
-  final updatedUser = user.copyWith(name: 'Jane Doe');
-  
-  print(updatedUser.name);  // Output: Jane Doe
-
-  // JSON Serialization
-  final json = user.toJson();
-  final newUser = User.fromJson(json);
-
-  print(newUser);  // Output: User(id: 1, name: John Doe, email: john.doe@example.com)
-}
-```
-
-### Using `freezed` for Other Features
-
-Besides data modeling, `freezed` is also very useful for managing different application states, especially in state management libraries like `Bloc` or `Provider`.
-
-#### Example: State Management with Union Classes
-
-```dart
-@freezed
-class AuthState with _$AuthState {
-  const factory AuthState.authenticated(User user) = Authenticated;
-  const factory AuthState.unauthenticated() = Unauthenticated;
-  const factory AuthState.loading() = Loading;
-}
-```
-
-This allows you to handle different states (`authenticated`, `unauthenticated`, `loading`) cleanly, and it integrates well with state management systems.
-
-
-```dart
-void handleAuthState(AuthState state) {
-  state.when(
-    authenticated: (user) => print('User is authenticated'),
-    unauthenticated: () => print('User is not authenticated'),
-    loading: () => print('Loading...'),
-  );
-}
-```
-
-### Conclusion
-
-The `freezed` library significantly improves the way we manage data and application states by reducing boilerplate code and enforcing immutability. We use it throughout this project to create models, manage states, and ensure that the code remains clean, maintainable, and easy to extend.
-
-For more detailed usage, refer to the official [freezed documentation](https://pub.dev/packages/freezed).
-
----
-
-### To sort the pubsec.yml
-
-`dart run pubspec_dependency_sorter`

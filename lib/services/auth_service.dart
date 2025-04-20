@@ -1,19 +1,29 @@
+import 'package:devity_console/config/constants.dart';
 import 'package:devity_console/models/token_response.dart';
 import 'package:devity_console/models/user.dart';
 import 'package:devity_console/services/authenticated_api_service.dart';
+import 'package:devity_console/services/error_handler_service.dart';
+import 'package:devity_console/services/network_service.dart';
 import 'package:devity_console/services/token_storage_service.dart';
+import 'package:devity_console/services/unprotected_api_service.dart';
 import 'package:flutter/material.dart';
 
 /// Authentication Service
 class AuthService {
-  final AuthenticatedApiService _apiService;
+  final UnprotectedApiService _apiService;
   final TokenStorageService _tokenStorageService;
 
   /// Constructor
   AuthService({
-    AuthenticatedApiService? apiService,
+    UnprotectedApiService? apiService,
     TokenStorageService? tokenStorageService,
-  })  : _apiService = apiService ?? AuthenticatedApiService(),
+  })  : _apiService = apiService ??
+            UnprotectedApiService(
+              networkService: NetworkService(
+                errorHandler: ErrorHandlerService(),
+              ),
+              baseUrl: constants.baseUrl,
+            ),
         _tokenStorageService = tokenStorageService ?? TokenStorageService();
 
   /// Login with email and password

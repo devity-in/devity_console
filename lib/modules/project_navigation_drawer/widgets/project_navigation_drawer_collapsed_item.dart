@@ -26,15 +26,15 @@ class ProjectNavigationDrawerCollapsedWidget extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           right: BorderSide(
-            color: Constants.appDividerColor,
-            width: Constants.appDividerWidth,
+            color: UIConstants.appDividerColor,
+            width: UIConstants.appDividerWidth,
           ),
         ),
       ),
       child: Center(
         child: ListView.separated(
           shrinkWrap: true,
-          physics: Constants.appScrollPhysics,
+          physics: UIConstants.appScrollPhysics,
           separatorBuilder: (context, index) => const SizedBox(height: 10),
           itemCount: items.length,
           itemBuilder: (context, index) {

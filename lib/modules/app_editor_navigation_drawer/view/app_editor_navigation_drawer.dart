@@ -17,8 +17,8 @@ class AppEditorNavigationDrawer extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           right: BorderSide(
-            color: Constants.appDividerColor,
-            width: Constants.appDividerWidth,
+            color: UIConstants.appDividerColor,
+            width: UIConstants.appDividerWidth,
           ),
         ),
       ),
