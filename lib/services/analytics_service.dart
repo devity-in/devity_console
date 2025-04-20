@@ -1,30 +1,89 @@
-import 'package:devity_console/services/authenticated_api_service.dart';
-import 'package:flutter/material.dart';
-
-/// Analytics event types
-enum AnalyticsEventType {
-  screenView,
-  buttonClick,
-  formSubmit,
-  error,
-  search,
-  purchase,
-  custom,
-}
+import 'dart:async';
+import 'package:devity_console/models/analytics_event.dart';
+import 'package:devity_console/services/analytics_queue_service.dart';
+import 'package:http/http.dart' as http;
 
 /// Analytics Service
 class AnalyticsService {
-  final AuthenticatedApiService _apiService;
-  bool _isEnabled = true;
-
   /// Constructor
-  AnalyticsService({
-    AuthenticatedApiService? apiService,
-  }) : _apiService = apiService ?? AuthenticatedApiService();
+  AnalyticsService() {
+    _queueService = AnalyticsQueueService();
+  }
+
+  /// Queue service instance
+  late AnalyticsQueueService _queueService;
+
+  /// HTTP client
+  final _client = http.Client();
+
+  /// Analytics endpoint
+  static const String _endpoint = 'https://api.example.com/analytics';
+
+  /// Whether analytics is enabled
+  bool _enabled = true;
 
   /// Enable or disable analytics tracking
   void setEnabled(bool enabled) {
-    _isEnabled = enabled;
+    _enabled = enabled;
+  }
+
+  /// Send an event
+  Future<void> sendEvent(AnalyticsEvent event) async {
+    if (!_enabled) return;
+    await _queueService.addEvent(event);
+    await _processQueue();
+  }
+
+  /// Process the queue
+  Future<void> _processQueue() async {
+    final batch = _queueService.getBatch();
+    if (batch.isEmpty) return;
+
+    final successfulEvents = <AnalyticsEvent>[];
+    final failedEvents = <AnalyticsEvent>[];
+
+    for (final event in batch) {
+      try {
+        final response = await _client.post(
+          Uri.parse(_endpoint),
+          headers: {'Content-Type': 'application/json'},
+          body: event.toJson(),
+        );
+
+        if (response.statusCode == 200) {
+          successfulEvents.add(event);
+        } else {
+          failedEvents.add(event);
+        }
+      } catch (e) {
+        failedEvents.add(event);
+      }
+    }
+
+    // Remove successful events
+    await _queueService.removeProcessedEvents(successfulEvents);
+
+    // Retry failed events
+    for (final event in failedEvents) {
+      if (event.canRetry) {
+        event.incrementRetryCount();
+        await _queueService.addEvent(event);
+      }
+    }
+  }
+
+  /// Clear the queue
+  Future<void> clearQueue() async {
+    await _queueService.clearQueue();
+  }
+
+  /// Get the current queue size
+  int get queueSize => _queueService.queueSize;
+
+  /// Dispose the service
+  void dispose() {
+    _queueService.dispose();
+    _client.close();
   }
 
   /// Track a screen view
@@ -149,25 +208,12 @@ class AnalyticsService {
     required String eventName,
     required Map<String, dynamic> parameters,
   }) async {
-    if (!_isEnabled) return;
-
-    try {
-      final eventData = {
-        'event_type': eventType.name,
-        'event_name': eventName,
-        'parameters': parameters,
-        'timestamp': DateTime.now().toIso8601String(),
-        'platform': 'flutter',
-      };
-
-      await _apiService.post(
-        '/analytics/track',
-        data: eventData,
-      );
-    } catch (e) {
-      debugPrint('Analytics tracking error: $e');
-      // Don't rethrow to prevent breaking the app flow
-    }
+    await _queueService.addEvent(AnalyticsEvent(
+      eventType: eventType,
+      eventName: eventName,
+      parameters: parameters,
+    ));
+    await _processQueue();
   }
 
   /// Set user properties
@@ -175,29 +221,24 @@ class AnalyticsService {
     required String userId,
     required Map<String, dynamic> properties,
   }) async {
-    if (!_isEnabled) return;
-
-    try {
-      await _apiService.post(
-        '/analytics/user-properties',
-        data: {
-          'user_id': userId,
-          'properties': properties,
-        },
-      );
-    } catch (e) {
-      debugPrint('Set user properties error: $e');
-    }
+    await _queueService.addEvent(AnalyticsEvent(
+      eventType: AnalyticsEventType.custom,
+      eventName: 'set_user_properties',
+      parameters: {
+        'user_id': userId,
+        'properties': properties,
+      },
+    ));
+    await _processQueue();
   }
 
   /// Clear user properties
   Future<void> clearUserProperties() async {
-    if (!_isEnabled) return;
-
-    try {
-      await _apiService.post('/analytics/clear-user-properties');
-    } catch (e) {
-      debugPrint('Clear user properties error: $e');
-    }
+    await _queueService.addEvent(AnalyticsEvent(
+      eventType: AnalyticsEventType.custom,
+      eventName: 'clear_user_properties',
+      parameters: {},
+    ));
+    await _processQueue();
   }
 }
