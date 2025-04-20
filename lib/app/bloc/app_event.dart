@@ -27,3 +27,17 @@ class AppLocaleChangedEvent extends AppEvent {
 
   final Locale locale;
 }
+
+/// Event for connectivity changes
+class AppConnectivityChangedEvent extends AppEvent {
+  const AppConnectivityChangedEvent({
+    required this.isOnline,
+  });
+
+  final bool isOnline;
+}
+
+/// Event to retry failed operations
+class AppRetryEvent extends AppEvent {
+  const AppRetryEvent();
+}
