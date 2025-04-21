@@ -12,19 +12,21 @@ class AppEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(10.h),
-        child: const AppEditorActionBar(),
-      ),
-      body: const Row(
-        children: [
-          AppEditorNavigationDrawer(),
-          Expanded(
-            child: AppEditorPageEditor(),
-          ),
-          AppEditorAttributeEditor(),
-        ],
+    return Material(
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(10.h),
+          child: const AppEditorActionBar(),
+        ),
+        body: const Row(
+          children: [
+            AppEditorNavigationDrawer(),
+            Expanded(
+              child: AppEditorPageEditor(),
+            ),
+            AppEditorAttributeEditor(),
+          ],
+        ),
       ),
     );
   }

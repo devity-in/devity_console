@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 
+/// Custom primary color
+const Color primaryColor = Color(0xFF1C1536);
+
 /// Light theme data
 ThemeData get lightTheme => ThemeData(
-      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
+      colorScheme: ColorScheme.light(
+        primary: primaryColor,
+        secondary: Colors.deepPurple.shade200,
+      ),
       useMaterial3: true,
     );
 
 /// Dark theme data
 ThemeData get darkTheme => ThemeData(
-      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
+      colorScheme: ColorScheme.dark(
+        primary: primaryColor,
+        secondary: Colors.deepPurple.shade200,
+        surface: Colors.grey.shade900,
+      ),
       useMaterial3: true,
     );
 

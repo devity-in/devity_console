@@ -14,41 +14,38 @@ class AppEditorNavigationDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 20.w,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
           right: BorderSide(
-            color: UIConstants.appDividerColor,
             width: UIConstants.appDividerWidth,
           ),
         ),
       ),
-      child: DefaultTabController(
+      child: const DefaultTabController(
         length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
+        child: Column(
+          children: [
+            TabBar(
               tabs: [
                 Tab(
-                  icon: Icon(
-                    Icons.pages_outlined,
-                  ),
+                  icon: Icon(Icons.pages_outlined),
                   text: 'Pages',
                 ),
                 Tab(
-                  icon: Icon(
-                    Icons.settings,
-                  ),
+                  icon: Icon(Icons.settings),
                   text: 'Components',
                 ),
               ],
             ),
-          ),
-          body: const TabBarView(
-            children: [
-              AppEditorPageList(),
-              AppEditorComponentList(),
-            ],
-          ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  AppEditorPageList(),
+                  AppEditorComponentList(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

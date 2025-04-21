@@ -142,16 +142,19 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   void initState() {
     super.initState();
     FlutterError.onError = (FlutterErrorDetails details) {
-      _handleError(details.exception, details.stack);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleError(details.exception, details.stack);
+      });
     };
   }
 
   void _handleError(Object error, StackTrace? stackTrace) {
-    setState(() {
-      _error = error;
-      _stackTrace = stackTrace;
-    });
-
-    widget.onError?.call(error, stackTrace ?? StackTrace.current);
+    if (mounted) {
+      setState(() {
+        _error = error;
+        _stackTrace = stackTrace;
+      });
+      widget.onError?.call(error, stackTrace ?? StackTrace.current);
+    }
   }
 }

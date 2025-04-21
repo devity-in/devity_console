@@ -144,7 +144,7 @@ class DesktopPopupMenuButton extends StatelessWidget {
                 //   ),
                 // ];
                 const message = 'No options available';
-                snackbarService.showNegativeSnackbar(message);
+                snackbarService.showNegativeSnackbar(context, message);
               }
               return options
                   .map(

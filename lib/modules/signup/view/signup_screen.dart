@@ -1,131 +1,289 @@
+import 'package:devity_console/modules/signup/bloc/signup_bloc.dart';
+import 'package:devity_console/modules/signup/bloc/signup_event.dart';
+import 'package:devity_console/modules/signup/bloc/signup_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:devity_console/repositories/auth_repository.dart';
-import 'package:devity_console/repositories/analytics_repository.dart';
-import 'package:devity_console/modules/project_list/project_list_screen.dart';
-
-import '../bloc/signup_bloc.dart';
-import '../bloc/signup_event.dart';
-import '../bloc/signup_state.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sizer/sizer.dart';
 
 class SignupScreen extends StatelessWidget {
-  const SignupScreen({Key? key}) : super(key: key);
+  const SignupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SignupBloc(
-        authRepository: context.read<AuthRepository>(),
-        analyticsRepository: context.read<AnalyticsRepository>(),
-      ),
+      create: (context) => SignupBloc(),
       child: const SignupView(),
     );
   }
 }
 
 class SignupView extends StatelessWidget {
-  const SignupView({Key? key}) : super(key: key);
+  const SignupView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
       body: BlocListener<SignupBloc, SignupState>(
         listener: (context, state) {
           if (state is SignupSuccess) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => const ProjectListScreen(),
-              ),
-            );
+            context.go('/project');
           } else if (state is SignupError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
           }
         },
-        child: BlocBuilder<SignupBloc, SignupState>(
-          builder: (context, state) {
-            if (state is SignupLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return const SignupForm();
-          },
+        child: Row(
+          children: [
+            // Left side with logo
+            Expanded(
+              flex: 3,
+              child: ColoredBox(
+                color: Theme.of(context).colorScheme.primary,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 200,
+                        height: 200,
+                      ),
+                      SizedBox(height: 24.sp),
+                      Text(
+                        'Create Your Account',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              color: Colors.white,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Right side with signup form
+            const Expanded(
+              flex: 2,
+              child: ColoredBox(
+                color: Colors.white,
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: SignupForm(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class SignupForm extends StatelessWidget {
-  const SignupForm({Key? key}) : super(key: key);
+class SignupForm extends StatefulWidget {
+  const SignupForm({super.key});
+
+  @override
+  State<SignupForm> createState() => _SignupFormState();
+}
+
+class _SignupFormState extends State<SignupForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleSignup() {
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<SignupBloc>().add(
+            SignupWithEmailAndPassword(
+              email: _emailController.text,
+              password: _passwordController.text,
+              name: _nameController.text,
+            ),
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final nameController = TextEditingController();
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return Form(
+      key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextField(
-            controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
+          Text(
+            'Create Account',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: emailController,
-            decoration: const InputDecoration(
+          SizedBox(height: 8.sp),
+          Text(
+            'Please fill in your details to create an account',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.grey.shade600,
+                ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 32.sp),
+
+          // Name Field
+          TextFormField(
+            controller: _nameController,
+            decoration: InputDecoration(
+              labelText: 'Full Name',
+              labelStyle: TextStyle(color: Colors.grey.shade600),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Theme.of(context).colorScheme.primary),
+              ),
+              prefixIcon:
+                  Icon(Icons.person_outline, color: Colors.grey.shade600),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your name';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 16.sp),
+
+          // Email Field
+          TextFormField(
+            controller: _emailController,
+            decoration: InputDecoration(
               labelText: 'Email',
-              border: OutlineInputBorder(),
+              labelStyle: TextStyle(color: Colors.grey.shade600),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Theme.of(context).colorScheme.primary),
+              ),
+              prefixIcon:
+                  Icon(Icons.email_outlined, color: Colors.grey.shade600),
+              filled: true,
+              fillColor: Colors.white,
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your email';
+              }
+              return null;
+            },
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: passwordController,
-            decoration: const InputDecoration(
+          SizedBox(height: 16.sp),
+
+          // Password Field
+          TextFormField(
+            controller: _passwordController,
+            decoration: InputDecoration(
               labelText: 'Password',
-              border: OutlineInputBorder(),
+              labelStyle: TextStyle(color: Colors.grey.shade600),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Theme.of(context).colorScheme.primary),
+              ),
+              prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade600),
+              filled: true,
+              fillColor: Colors.white,
             ),
             obscureText: true,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              final email = emailController.text;
-              final password = passwordController.text;
-              final name = nameController.text;
-
-              if (email.isEmpty || password.isEmpty || name.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill in all fields')),
-                );
-                return;
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your password';
               }
-
-              context.read<SignupBloc>().add(
-                    SignupWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                      name: name,
-                    ),
-                  );
+              return null;
             },
-            child: const Text('Sign Up'),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
+          SizedBox(height: 24.sp),
+
+          // Sign Up Button
+          BlocBuilder<SignupBloc, SignupState>(
+            builder: (context, state) {
+              if (state is SignupLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ElevatedButton(
+                onPressed: _handleSignup,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16.sp),
+                ),
+                child: const Text('Sign Up'),
+              );
             },
+          ),
+          SizedBox(height: 16.sp),
+
+          // Login Button
+          OutlinedButton(
+            onPressed: () => context.go('/auth/login'),
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: 16.sp),
+              side: BorderSide(color: Theme.of(context).colorScheme.primary),
+              foregroundColor: Theme.of(context).colorScheme.primary,
+            ),
             child: const Text('Already have an account? Login'),
+          ),
+          SizedBox(height: 32.sp),
+
+          // Privacy Policy and Terms
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () {},
+                child: const Text('Privacy Policy'),
+              ),
+              Text(
+                ' • ',
+                style: TextStyle(color: Colors.grey.shade400),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text('Terms & Conditions'),
+              ),
+            ],
           ),
         ],
       ),

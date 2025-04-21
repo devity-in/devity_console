@@ -9,10 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   /// The default constructor for the [LoginBloc].
   LoginBloc({
-    required AuthRepository authRepository,
-    required AnalyticsRepository analyticsRepository,
-  })  : _authRepository = authRepository,
-        _analyticsRepository = analyticsRepository,
+    AuthRepository? authRepository,
+    AnalyticsRepository? analyticsRepository,
+  })  : _authRepository = authRepository ?? AuthRepository(),
+        _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
         super(LoginInitial()) {
     on<LoginWithEmailAndPassword>(_onLoginWithEmailAndPassword);
     on<SendPasswordResetEmail>(_onSendPasswordResetEmail);

@@ -10,10 +10,10 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
   final AnalyticsRepository _analyticsRepository;
 
   SignupBloc({
-    required AuthRepository authRepository,
-    required AnalyticsRepository analyticsRepository,
-  })  : _authRepository = authRepository,
-        _analyticsRepository = analyticsRepository,
+    AuthRepository?  authRepository,
+    AnalyticsRepository? analyticsRepository,
+  })  : _authRepository = authRepository ?? AuthRepository(),
+        _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
         super(SignupInitial()) {
     on<SignupWithEmailAndPassword>(_onSignupWithEmailAndPassword);
   }

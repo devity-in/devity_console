@@ -23,7 +23,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
         _preferencesRepository = preferencesRepository ??
             PreferencesRepository(
-              SharedPreferences.getInstance() as SharedPreferences,
+              SharedPreferences.getInstance(),
             ),
         _connectivity = connectivity ?? Connectivity(),
         super(const AppInitialState()) {
@@ -100,7 +100,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           AppErrorState(
             message: 'Failed to change theme: $e',
             recoveryAction: () => add(
-                AppThemeModeChangedEvent(themeMode: currentState.themeMode)),
+              AppThemeModeChangedEvent(themeMode: currentState.themeMode),
+            ),
           ),
         );
       }

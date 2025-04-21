@@ -11,5 +11,9 @@
     "forgotPassword":"Forgot Password?",
     "@forgotPassword":{
         "description":"Text used to show while displaying Forgot Password? word"
+    },
+    "appTitle": "Devity Console",
+    "@appTitle": {
+        "description": "The title of the application"
     }
 }

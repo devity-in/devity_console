@@ -2,6 +2,7 @@
   "es": [
     "email",
     "password",
-    "forgotPassword"
+    "forgotPassword",
+    "appTitle"
   ]
 }

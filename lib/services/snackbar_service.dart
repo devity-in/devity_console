@@ -1,11 +1,10 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:devity_console/config/custom_key.dart';
 import 'package:flutter/material.dart';
 
 /// Snackbar service to show snackbar messages
 class SnackbarService {
   /// Show negative snackbar
-  void showNegativeSnackbar(String errorMessage) {
+  void showNegativeSnackbar(BuildContext context, String errorMessage) {
     final snackBar = SnackBar(
       /// need to set following properties for best effect of
       ///  awesome_snackbar_content
@@ -21,18 +20,13 @@ class SnackbarService {
         contentType: ContentType.failure,
       ),
     );
-    final scaffoldMessenger = CustomKey.scaffoldMessengerKey.currentState;
-    if (scaffoldMessenger == null || scaffoldMessenger.mounted == false) {
-      debugPrint('ScaffoldMessenger not available');
-      return;
-    }
-    scaffoldMessenger
+    ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(snackBar);
   }
 
   /// Show positive snackbar
-  void showPositiveSnackbar(String successMessage) {
+  void showPositiveSnackbar(BuildContext context, String successMessage) {
     final snackBar = SnackBar(
       /// need to set following properties for best effect of
       ///  awesome_snackbar_content
@@ -48,12 +42,7 @@ class SnackbarService {
         contentType: ContentType.success,
       ),
     );
-    final scaffoldMessenger = CustomKey.scaffoldMessengerKey.currentState;
-    if (scaffoldMessenger == null || scaffoldMessenger.mounted == false) {
-      debugPrint('ScaffoldMessenger not available');
-      return;
-    }
-    scaffoldMessenger
+    ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(snackBar);
   }

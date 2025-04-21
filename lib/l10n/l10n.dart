@@ -1,8 +1,8 @@
+import 'package:devity_console/l10n/gen/app_localizations.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+export 'package:devity_console/l10n/gen/app_localizations.dart';
 
 /// A custom [AppLocalizations] delegate that
 ///  uses a [GlobalMaterialLocalizations].
