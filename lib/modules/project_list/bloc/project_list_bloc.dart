@@ -1,19 +1,32 @@
 import 'package:devity_console/modules/project_list/bloc/project_list_event.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_state.dart';
+import 'package:devity_console/repositories/analytics_repository.dart';
 import 'package:devity_console/services/project_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// [ProjectListBloc] is a business logic component that manages the state of the
 /// project list.
 class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
+  /// The [ProjectService] instance.
   /// The default constructor for the [ProjectListBloc].
-  ProjectListBloc(this._projectService) : super(ProjectListInitial()) {
+
+  ProjectListBloc({
+    ProjectService? projectService,
+    AnalyticsRepository? analyticsRepository,
+  })  : _projectService = projectService ?? ProjectService(),
+        _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
+        super(ProjectListInitial()) {
     on<ProjectListStartedEvent>(_onStarted);
     on<ProjectListReloadEvent>(_onReload);
     on<ProjectListCreateEvent>(_onCreate);
     on<ProjectListDeleteEvent>(_onDelete);
   }
+
+  /// The [ProjectService] instance.
   final ProjectService _projectService;
+
+  /// The [AnalyticsRepository] instance.
+  final AnalyticsRepository _analyticsRepository;
 
   Future<void> _onStarted(
     ProjectListStartedEvent event,

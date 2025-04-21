@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
+  /// The default constructor for the [ForgotPasswordScreen].
   const ForgotPasswordScreen({super.key});
+
+  /// The name of the route for the [ForgotPasswordScreen].
+  static const routeName = '/forgot-password';
 
   @override
   Widget build(BuildContext context) {

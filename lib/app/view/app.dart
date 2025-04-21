@@ -1,6 +1,7 @@
 import 'package:devity_console/app/bloc/app_bloc.dart';
+import 'package:devity_console/config/theme.dart';
+import 'package:devity_console/config/util.dart';
 import 'package:devity_console/config/router.dart';
-import 'package:devity_console/config/themes.dart';
 import 'package:devity_console/l10n/gen/app_localizations.dart';
 import 'package:devity_console/widgets/error_boundary.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,16 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = View.of(context).platformDispatcher.platformBrightness;
+
+    // Retrieves the default theme for the platform
+    //TextTheme textTheme = Theme.of(context).textTheme;
+
+    // Use with Google Fonts package to use downloadable fonts
+    final TextTheme textTheme = createTextTheme(context, 'Open Sans', 'Roboto');
+
+    final theme = MaterialTheme(textTheme);
+
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Sizer(
@@ -28,9 +39,9 @@ class App extends StatelessWidget {
               },
               child: MaterialApp.router(
                 routerConfig: router,
-                theme: lightTheme,
-                darkTheme: darkTheme,
-                themeMode: currentThemeMode,
+                theme: brightness == Brightness.light
+                    ? theme.light()
+                    : theme.dark(),
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,

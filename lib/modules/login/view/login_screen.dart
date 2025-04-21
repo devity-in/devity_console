@@ -5,7 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 
 class LoginScreen extends StatelessWidget {
+  /// The default constructor for the [LoginScreen].
   const LoginScreen({super.key});
+
+  /// The name of the route for the [LoginScreen].
+  static const routeName = '/login';
 
   @override
   Widget build(BuildContext context) {

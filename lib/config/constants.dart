@@ -3,6 +3,9 @@ import 'package:flutter/material.dart'
 
 /// UI-related constants
 class UIConstants {
+  /// Primary color
+  static const Color primaryColor = Color(0xFF1C1536);
+
   /// App scroll physics
   static const ScrollPhysics appScrollPhysics = BouncingScrollPhysics();
 

@@ -1,6 +1,7 @@
 import 'package:devity_console/app/bloc/app_bloc.dart';
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
 import 'package:devity_console/modules/login/login.dart';
+import 'package:devity_console/modules/project_list/view/project_list_screen.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
 import 'package:flutter/material.dart';
@@ -33,25 +34,32 @@ final router = GoRouter(
       routes: [
         // Login route
         GoRoute(
-          path: '/login',
+          path: LoginScreen.routeName,
           name: 'login',
           builder: (context, state) => const LoginScreen(),
         ),
 
         // Signup route
         GoRoute(
-          path: '/signup',
+          path: SignupScreen.routeName,
           name: 'signup',
           builder: (context, state) => const SignupScreen(),
         ),
 
         // Forgot Password route
         GoRoute(
-          path: '/forgot-password',
+          path: ForgotPasswordScreen.routeName,
           name: 'forgot-password',
           builder: (context, state) => const ForgotPasswordScreen(),
         ),
       ],
+    ),
+
+    // Project route
+    GoRoute(
+      path: ProjectListScreen.routeName,
+      name: 'projects',
+      builder: (context, state) => const ProjectListScreen(),
     ),
   ],
   // Error page for invalid routes
@@ -75,6 +83,7 @@ final router = GoRouter(
       '/auth/login',
       '/auth/signup',
       '/auth/forgot-password',
+      '/projects', // TODO: Remove this after testing
     ].contains(state.matchedLocation);
 
     // Redirect logic
@@ -84,7 +93,7 @@ final router = GoRouter(
       return '/auth/login?redirect=$redirectPath';
     }
     if (isAuthenticated && isPublicRoute) {
-      return '/project';
+      return '/projects';
     }
 
     // Handle post-login redirect

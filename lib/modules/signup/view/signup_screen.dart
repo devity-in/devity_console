@@ -7,7 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 
 class SignupScreen extends StatelessWidget {
+  /// The default constructor for the [SignupScreen].
   const SignupScreen({super.key});
+
+  /// The name of the route for the [SignupScreen].
+  static const routeName = '/signup';
 
   @override
   Widget build(BuildContext context) {
