@@ -129,3 +129,54 @@ class ProjectListGrid extends StatelessWidget {
     );
   }
 }
+
+/// Widget for displaying an empty state when no projects are found
+class ProjectListEmptyState extends StatelessWidget {
+  /// Constructor
+  const ProjectListEmptyState({
+    required this.onAddProject,
+    super.key,
+  });
+
+  /// Callback when add project button is pressed
+  final VoidCallback onAddProject;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.folder_open_outlined,
+            size: 64,
+            color: colorScheme.primary.withOpacity(0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Projects Found',
+            style: textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Get started by creating your first project',
+            style: textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: onAddProject,
+            icon: const Icon(Icons.add),
+            label: const Text('Create Project'),
+          ),
+        ],
+      ),
+    );
+  }
+}

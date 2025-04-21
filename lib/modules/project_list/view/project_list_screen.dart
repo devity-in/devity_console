@@ -27,6 +27,20 @@ class ProjectListView extends StatelessWidget {
   /// Creates a [ProjectListView].
   const ProjectListView({super.key});
 
+  void _showAddProjectDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AddProjectDialog(
+        onCancel: () {
+          Navigator.of(context).pop();
+        },
+        onSave: (Map<String, String> data) {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,6 +52,11 @@ class ProjectListView extends StatelessWidget {
           if (state is ProjectListLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ProjectListLoaded) {
+            if (state.projects.isEmpty) {
+              return ProjectListEmptyState(
+                onAddProject: () => _showAddProjectDialog(context),
+              );
+            }
             return Column(
               children: [
                 Padding(
@@ -53,22 +72,7 @@ class ProjectListView extends StatelessWidget {
                       ),
                       const SizedBox(width: 16),
                       ProjectListAddButton(
-                        onPressed: () {
-                          showDialog<void>(
-                            context: context,
-                            builder: (context) => AddProjectDialog(
-                              title: 'Add New Project',
-                              description:
-                                  'Please enter the details for your new project',
-                              onCancel: () {
-                                Navigator.of(context).pop();
-                              },
-                              onSave: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          );
-                        },
+                        onPressed: () => _showAddProjectDialog(context),
                       ),
                     ],
                   ),
@@ -84,9 +88,38 @@ class ProjectListView extends StatelessWidget {
               ],
             );
           } else if (state is ProjectListError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      context
+                          .read<ProjectListBloc>()
+                          .add(ProjectListReloadEvent());
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
           }
-          return const Center(child: Text('No projects found'));
+          return ProjectListEmptyState(
+            onAddProject: () => _showAddProjectDialog(context),
+          );
         },
       ),
     );
