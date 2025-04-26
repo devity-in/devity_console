@@ -5,6 +5,7 @@ import 'package:devity_console/modules/project_list/widgets/add_project.dart';
 import 'package:devity_console/modules/project_list/widgets/project_list_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class ProjectListScreen extends StatelessWidget {
   /// The default constructor for the [ProjectListScreen].
@@ -93,7 +94,8 @@ class ProjectListView extends StatelessWidget {
                   child: ProjectListGrid(
                     projects: state.projects,
                     onProjectTap: (project) {
-                      // TODO: Navigate to project details
+                      // Navigate to project view
+                      context.push('/project/${project.id}');
                     },
                   ),
                 ),

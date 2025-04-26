@@ -1,6 +1,7 @@
 import 'package:devity_console/app/bloc/app_bloc.dart';
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
 import 'package:devity_console/modules/login/login.dart';
+import 'package:devity_console/modules/project/view/project_view.dart';
 import 'package:devity_console/modules/project_list/view/project_list_screen.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
@@ -61,6 +62,16 @@ final router = GoRouter(
       name: 'projects',
       builder: (context, state) => const ProjectListScreen(),
     ),
+
+    // Project view route
+    GoRoute(
+      path: '/project/:id',
+      name: 'project',
+      builder: (context, state) {
+        final projectId = state.pathParameters['id']!;
+        return ProjectView(projectId: projectId);
+      },
+    ),
   ],
   // Error page for invalid routes
   errorBuilder: (context, state) => Scaffold(
@@ -83,7 +94,8 @@ final router = GoRouter(
       '/auth/login',
       '/auth/signup',
       '/auth/forgot-password',
-      '/projects', // TODO: Remove this after testing
+      '/projects',
+      '/project/:id',
     ].contains(state.matchedLocation);
 
     // Redirect logic

@@ -8,16 +8,22 @@ import 'package:flutter/material.dart';
 /// It will have AppEditorView to edit the app design.
 class ProjectView extends StatelessWidget {
   /// Creates a [ProjectView].
-  const ProjectView({super.key});
+  const ProjectView({
+    required this.projectId,
+    super.key,
+  });
+
+  /// The ID of the project to display.
+  final String projectId;
 
   @override
   Widget build(BuildContext context) {
     /// It will consist of ProjectDrawer and AppEditorView.
-    return const Row(
+    return Row(
       children: [
-        ProjectNavigationDrawer(),
+        const ProjectNavigationDrawer(),
         Expanded(
-          child: AppEditor(),
+          child: AppEditor(projectId: projectId),
         ),
       ],
     );

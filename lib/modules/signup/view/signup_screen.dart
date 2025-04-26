@@ -34,7 +34,13 @@ class SignupView extends StatelessWidget {
             context.go('/project');
           } else if (state is SignupError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(
+                content: Text(state.message),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             );
           }
         },
@@ -43,18 +49,34 @@ class SignupView extends StatelessWidget {
             // Left side with logo
             Expanded(
               flex: 3,
-              child: ColoredBox(
-                color: Theme.of(context).colorScheme.primary,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    ],
+                  ),
+                ),
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        'assets/images/logo.png',
-                        width: 200,
-                        height: 200,
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          width: 180,
+                          height: 180,
+                        ),
                       ),
-                      SizedBox(height: 24.sp),
+                      const SizedBox(height: 32),
                       Text(
                         'Create Your Account',
                         style: Theme.of(context)
@@ -62,7 +84,17 @@ class SignupView extends StatelessWidget {
                             .headlineMedium
                             ?.copyWith(
                               color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Join our community of developers',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
                       ),
                     ],
                   ),
@@ -70,14 +102,23 @@ class SignupView extends StatelessWidget {
               ),
             ),
             // Right side with signup form
-            const Expanded(
+            Expanded(
               flex: 2,
-              child: ColoredBox(
-                color: Colors.white,
-                child: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: const Center(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.all(32),
+                      padding: EdgeInsets.all(40),
                       child: SignupForm(),
                     ),
                   ),
@@ -103,6 +144,7 @@ class _SignupFormState extends State<SignupForm> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -135,41 +177,51 @@ class _SignupFormState extends State<SignupForm> {
           Text(
             'Create Account',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                   color: Theme.of(context).colorScheme.primary,
+                  letterSpacing: 0.5,
                 ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 8.sp),
+          SizedBox(height: 12.sp),
           Text(
             'Please fill in your details to create an account',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.grey.shade600,
+                  letterSpacing: 0.3,
                 ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 32.sp),
+          SizedBox(height: 40.sp),
 
           // Name Field
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(
               labelText: 'Full Name',
-              labelStyle: TextStyle(color: Colors.grey.shade600),
+              labelStyle: TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: Theme.of(context).colorScheme.primary),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
               ),
               prefixIcon:
                   Icon(Icons.person_outline, color: Colors.grey.shade600),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Colors.grey.shade50,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -178,28 +230,36 @@ class _SignupFormState extends State<SignupForm> {
               return null;
             },
           ),
-          SizedBox(height: 16.sp),
+          SizedBox(height: 20.sp),
 
           // Email Field
           TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
               labelText: 'Email',
-              labelStyle: TextStyle(color: Colors.grey.shade600),
+              labelStyle: TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: Theme.of(context).colorScheme.primary),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
               ),
               prefixIcon:
                   Icon(Icons.email_outlined, color: Colors.grey.shade600),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Colors.grey.shade50,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -208,29 +268,48 @@ class _SignupFormState extends State<SignupForm> {
               return null;
             },
           ),
-          SizedBox(height: 16.sp),
+          SizedBox(height: 20.sp),
 
           // Password Field
           TextFormField(
             controller: _passwordController,
             decoration: InputDecoration(
               labelText: 'Password',
-              labelStyle: TextStyle(color: Colors.grey.shade600),
+              labelStyle: TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: Theme.of(context).colorScheme.primary),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
               ),
               prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade600),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey.shade600,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Colors.grey.shade50,
             ),
-            obscureText: true,
+            obscureText: _obscurePassword,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
@@ -244,7 +323,9 @@ class _SignupFormState extends State<SignupForm> {
           BlocBuilder<SignupBloc, SignupState>(
             builder: (context, state) {
               if (state is SignupLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               }
               return ElevatedButton(
                 onPressed: _handleSignup,
@@ -252,8 +333,18 @@ class _SignupFormState extends State<SignupForm> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16.sp),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
                 ),
-                child: const Text('Sign Up'),
+                child: const Text(
+                  'Sign Up',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               );
             },
           ),
@@ -264,12 +355,24 @@ class _SignupFormState extends State<SignupForm> {
             onPressed: () => context.go('/auth/login'),
             style: OutlinedButton.styleFrom(
               padding: EdgeInsets.symmetric(vertical: 16.sp),
-              side: BorderSide(color: Theme.of(context).colorScheme.primary),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
               foregroundColor: Theme.of(context).colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('Already have an account? Login'),
+            child: const Text(
+              'Already have an account? Login',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          SizedBox(height: 32.sp),
+          SizedBox(height: 40.sp),
 
           // Privacy Policy and Terms
           Row(
@@ -277,6 +380,9 @@ class _SignupFormState extends State<SignupForm> {
             children: [
               TextButton(
                 onPressed: () {},
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                ),
                 child: const Text('Privacy Policy'),
               ),
               Text(
@@ -285,6 +391,9 @@ class _SignupFormState extends State<SignupForm> {
               ),
               TextButton(
                 onPressed: () {},
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                ),
                 child: const Text('Terms & Conditions'),
               ),
             ],

@@ -8,7 +8,13 @@ import 'package:sizer/sizer.dart';
 /// [AppEditor] is a StatelessWidget that displays the app editor.
 class AppEditor extends StatelessWidget {
   /// Constructor
-  const AppEditor({super.key});
+  const AppEditor({
+    required this.projectId,
+    super.key,
+  });
+
+  /// The ID of the project to edit.
+  final String projectId;
 
   @override
   Widget build(BuildContext context) {
