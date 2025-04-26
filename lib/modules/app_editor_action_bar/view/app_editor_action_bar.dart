@@ -43,17 +43,11 @@ class _AppEditorActionBarContent extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        // TODO: Handle back navigation
-                      },
-                    ),
-                    const SizedBox(width: 8),
                     Text(
                       'App Editor',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
+                    const SizedBox(width: 8),
                   ],
                 ),
               ),
