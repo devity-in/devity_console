@@ -1,4 +1,3 @@
-import 'package:devity_console/app/bloc/app_bloc.dart';
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
 import 'package:devity_console/modules/login/login.dart';
 import 'package:devity_console/modules/project/view/project_view.dart';
@@ -6,7 +5,6 @@ import 'package:devity_console/modules/project_list/view/project_list_screen.dar
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// The router configuration for the application
@@ -81,38 +79,41 @@ final router = GoRouter(
   ),
   // Global redirect logic for protected routes
   redirect: (context, state) async {
+    // Temporarily disable authentication checks for development
+    return null;
+
     // Get app bloc from context
-    final appBloc = context.read<AppBloc>();
-    final appState = appBloc.state;
+    // final appBloc = context.read<AppBloc>();
+    // final appState = appBloc.state;
 
     // Check if app is loaded and user is authenticated
-    final isAuthenticated = appState is AppLoadedState && appState.user != null;
+    // final isAuthenticated = appState is AppLoadedState && appState.user != null;
 
     // Define public routes that don't require authentication
-    final isPublicRoute = [
-      '/splash',
-      '/auth/login',
-      '/auth/signup',
-      '/auth/forgot-password',
-      '/projects',
-      '/project/:id',
-    ].contains(state.matchedLocation);
+    // final isPublicRoute = [
+    //   '/splash',
+    //   '/auth/login',
+    //   '/auth/signup',
+    //   '/auth/forgot-password',
+    //   '/projects',
+    //   '/project/:id',
+    // ].contains(state.matchedLocation);
 
     // Redirect logic
-    if (!isAuthenticated && !isPublicRoute) {
-      // Store the intended destination for after login
-      final redirectPath = state.matchedLocation;
-      return '/auth/login?redirect=$redirectPath';
-    }
-    if (isAuthenticated && isPublicRoute) {
-      return '/projects';
-    }
+    // if (!isAuthenticated && !isPublicRoute) {
+    //   // Store the intended destination for after login
+    //   final redirectPath = state.matchedLocation;
+    //   return '/auth/login?redirect=$redirectPath';
+    // }
+    // if (isAuthenticated && isPublicRoute) {
+    //   return '/projects';
+    // }
 
     // Handle post-login redirect
-    if (isAuthenticated && state.uri.queryParameters.containsKey('redirect')) {
-      return state.uri.queryParameters['redirect'];
-    }
+    // if (isAuthenticated && state.uri.queryParameters.containsKey('redirect')) {
+    //   return state.uri.queryParameters['redirect'];
+    // }
 
-    return null;
+    // return null;
   },
 );
