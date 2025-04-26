@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// [AppEditorComponentList] is a StatelessWidget that displays
-/// the app editor component list.
+/// [AppEditorWidgetList] is a StatelessWidget that displays
+/// the app editor widget list.
 ///
-class AppEditorComponentList extends StatelessWidget {
-  /// Creates a new instance of [AppEditorComponentList].
-  const AppEditorComponentList({super.key});
+class AppEditorWidgetList extends StatelessWidget {
+  /// Creates a new instance of [AppEditorWidgetList].
+  const AppEditorWidgetList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildSectionHeader('Components', Icons.widgets),
-        ..._buildComponents(),
+        _buildSectionHeader(
+          'Widgets',
+          Icons.widgets_outlined,
+        ),
+        ..._buildAvailableWidgets(),
         const SizedBox(height: 16),
         _buildSectionHeader('Layouts', Icons.grid_view),
         ..._buildLayouts(),
@@ -40,61 +43,61 @@ class AppEditorComponentList extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildComponents() {
-    final components = [
-      _ComponentItem(
+  List<Widget> _buildAvailableWidgets() {
+    final widgets = [
+      const _WidgetItem(
         name: 'Text',
         icon: Icons.text_fields,
         description: 'Display text with various styles',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Button',
         icon: Icons.smart_button,
         description: 'Interactive button with different styles',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Image',
         icon: Icons.image,
         description: 'Display images from various sources',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Checkbox',
         icon: Icons.check_box,
         description: 'Selectable checkbox with different styles',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Text Field',
         icon: Icons.input,
         description: 'Input field for text entry',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Carousel',
         icon: Icons.view_carousel,
         description: 'Scrollable carousel of items',
       ),
     ];
 
-    return components.map((item) => item.build()).toList();
+    return widgets.map((item) => item.build()).toList();
   }
 
   List<Widget> _buildLayouts() {
     final layouts = [
-      _ComponentItem(
+      const _WidgetItem(
         name: 'ZStack',
         icon: Icons.layers,
         description: 'Stack widgets on top of one another',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Carousel',
         icon: Icons.view_carousel,
         description: 'Display widgets in a scrollable carousel',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Grid',
         icon: Icons.grid_4x4,
         description: 'Organize widgets in a grid pattern',
       ),
-      _ComponentItem(
+      const _WidgetItem(
         name: 'Vertical',
         icon: Icons.vertical_align_center,
         description: 'Stack widgets vertically with spacing',
@@ -105,8 +108,8 @@ class AppEditorComponentList extends StatelessWidget {
   }
 }
 
-class _ComponentItem {
-  const _ComponentItem({
+class _WidgetItem {
+  const _WidgetItem({
     required this.name,
     required this.icon,
     required this.description,

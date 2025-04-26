@@ -28,33 +28,37 @@ class ProjectNavigationDrawerCollapsedWidget extends StatelessWidget {
 
     return SizedBox(
       width: 8.w,
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final isSelected = item.id == selectedItem.id;
+      child: Center(
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final isSelected = item.id == selectedItem.id;
 
-          return Material(
-            color:
-                isSelected ? colorScheme.primaryContainer : Colors.transparent,
-            child: InkWell(
-              onTap: () => onItemTap(item),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 2.w,
-                  vertical: 1.5.h,
-                ),
-                child: Icon(
-                  item.icon,
-                  size: 2.5.h,
-                  color: isSelected
-                      ? colorScheme.onPrimaryContainer
-                      : colorScheme.onSurface,
+            return Material(
+              color: isSelected
+                  ? colorScheme.primaryContainer
+                  : Colors.transparent,
+              child: InkWell(
+                onTap: () => onItemTap(item),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 2.w,
+                    vertical: 1.5.h,
+                  ),
+                  child: Icon(
+                    item.icon,
+                    size: 2.5.h,
+                    color: isSelected
+                        ? colorScheme.onPrimaryContainer
+                        : colorScheme.onSurface,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

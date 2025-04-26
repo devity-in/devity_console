@@ -1,5 +1,5 @@
 import 'package:devity_console/config/constants.dart';
-import 'package:devity_console/modules/app_editor_component_list/view/app_editor_component_list.dart';
+import 'package:devity_console/modules/app_editor_widget_list/view/app_editor_widget_list.dart';
 import 'package:devity_console/modules/app_editor_page_list/app_editor_page_list.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -32,8 +32,8 @@ class AppEditorNavigationDrawer extends StatelessWidget {
                   text: 'Pages',
                 ),
                 Tab(
-                  icon: Icon(Icons.settings),
-                  text: 'Components',
+                  icon: Icon(Icons.widgets_outlined),
+                  text: 'Widgets',
                 ),
               ],
             ),
@@ -41,7 +41,7 @@ class AppEditorNavigationDrawer extends StatelessWidget {
               child: TabBarView(
                 children: [
                   AppEditorPageList(),
-                  AppEditorComponentList(),
+                  AppEditorWidgetList(),
                 ],
               ),
             ),

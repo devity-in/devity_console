@@ -28,49 +28,53 @@ class ProjectNavigationDrawerExpandedWidget extends StatelessWidget {
 
     return SizedBox(
       width: 24.w,
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final isSelected = item.id == selectedItem.id;
+      child: Center(
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final isSelected = item.id == selectedItem.id;
 
-          return Material(
-            color:
-                isSelected ? colorScheme.primaryContainer : Colors.transparent,
-            child: InkWell(
-              onTap: () => onItemTap(item),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 2.w,
-                  vertical: 1.5.h,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      item.icon,
-                      size: 2.5.h,
-                      color: isSelected
-                          ? colorScheme.onPrimaryContainer
-                          : colorScheme.onSurface,
-                    ),
-                    SizedBox(width: 2.w),
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        style: TextStyle(
-                          fontSize: 1.8.h,
-                          color: isSelected
-                              ? colorScheme.onPrimaryContainer
-                              : colorScheme.onSurface,
+            return Material(
+              color: isSelected
+                  ? colorScheme.primaryContainer
+                  : Colors.transparent,
+              child: InkWell(
+                onTap: () => onItemTap(item),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 2.w,
+                    vertical: 1.5.h,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        item.icon,
+                        size: 2.5.h,
+                        color: isSelected
+                            ? colorScheme.onPrimaryContainer
+                            : colorScheme.onSurface,
+                      ),
+                      SizedBox(width: 2.w),
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          style: TextStyle(
+                            fontSize: 1.8.h,
+                            color: isSelected
+                                ? colorScheme.onPrimaryContainer
+                                : colorScheme.onSurface,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
