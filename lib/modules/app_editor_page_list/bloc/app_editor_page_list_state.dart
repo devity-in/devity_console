@@ -1,50 +1,47 @@
-part of 'app_editor_page_list_bloc.dart';
+import 'package:devity_console/modules/app_editor_page_list/models/page.dart'
+    as models;
+import 'package:equatable/equatable.dart';
 
-/// States for the [AppEditorPageListBloc]
-sealed class AppEditorPageListState {
+/// Base class for all app editor page list states.
+abstract class AppEditorPageListState extends Equatable {
   const AppEditorPageListState();
+
+  @override
+  List<Object?> get props => [];
 }
 
-/// Initial state
+/// The initial state of the app editor page list.
 class AppEditorPageListInitialState extends AppEditorPageListState {
   const AppEditorPageListInitialState();
 }
 
-/// Loading state
+/// The state when the app editor page list is loading.
 class AppEditorPageListLoadingState extends AppEditorPageListState {
   const AppEditorPageListLoadingState();
 }
 
-/// Loaded state with pages
+/// The state when the app editor page list has been loaded successfully.
 class AppEditorPageListLoadedState extends AppEditorPageListState {
   const AppEditorPageListLoadedState({
     required this.pages,
   });
 
-  final List<Page> pages;
+  /// The list of pages.
+  final List<models.Page> pages;
+
+  @override
+  List<Object?> get props => [pages];
 }
 
-/// Error state
+/// The state when there was an error loading the app editor page list.
 class AppEditorPageListErrorState extends AppEditorPageListState {
   const AppEditorPageListErrorState({
     required this.message,
   });
 
+  /// The error message.
   final String message;
-}
 
-/// [Page] is a class that represents a page in the AppEditorPageList widget.
-class Page {
-  /// Creates a new instance of [Page].
-  const Page({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.createdAt,
-  });
-
-  final String id;
-  final String name;
-  final String description;
-  final DateTime createdAt;
+  @override
+  List<Object?> get props => [message];
 }

@@ -1,50 +1,60 @@
-import 'package:devity_console/config/constants.dart';
-import 'package:devity_console/modules/project_navigation_drawer/models/project_navigation_drawer_item.dart';
+import 'package:devity_console/models/project_navigation_drawer_item.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 /// [ProjectNavigationDrawerCollapsedWidget] is a StatelessWidget that displays
-/// a project navigation drawer collapsed item.
+/// the collapsed project navigation drawer item.
 class ProjectNavigationDrawerCollapsedWidget extends StatelessWidget {
-  /// Creates a [ProjectNavigationDrawerCollapsedWidget].
+  /// Creates a new instance of [ProjectNavigationDrawerCollapsedWidget].
   const ProjectNavigationDrawerCollapsedWidget({
     required this.items,
+    required this.onItemTap,
+    required this.selectedItem,
     super.key,
-    this.selectedItem,
   });
 
-  /// [items] is a list of project navigation drawer items.
+  /// The list of navigation items.
   final List<ProjectNavigationDrawerItem> items;
 
-  /// [selectedItem] is the selected project navigation drawer item.
-  final ProjectNavigationDrawerItem? selectedItem;
+  /// Callback when an item is tapped.
+  final void Function(ProjectNavigationDrawerItem item) onItemTap;
+
+  /// The currently selected item.
+  final ProjectNavigationDrawerItem selectedItem;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 10.w,
-      decoration: BoxDecoration(
-        border: Border(
-          right: BorderSide(
-            color: UIConstants.appDividerColor,
-            width: UIConstants.appDividerWidth,
-          ),
-        ),
-      ),
-      child: Center(
-        child: ListView.separated(
-          shrinkWrap: true,
-          physics: UIConstants.appScrollPhysics,
-          separatorBuilder: (context, index) => const SizedBox(height: 10),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            return Icon(
-              item.icon,
-              color: selectedItem == item ? Colors.black : Colors.grey,
-            );
-          },
-        ),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: 8.w,
+      child: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          final isSelected = item.id == selectedItem.id;
+
+          return Material(
+            color:
+                isSelected ? colorScheme.primaryContainer : Colors.transparent,
+            child: InkWell(
+              onTap: () => onItemTap(item),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 2.w,
+                  vertical: 1.5.h,
+                ),
+                child: Icon(
+                  item.icon,
+                  size: 2.5.h,
+                  color: isSelected
+                      ? colorScheme.onPrimaryContainer
+                      : colorScheme.onSurface,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

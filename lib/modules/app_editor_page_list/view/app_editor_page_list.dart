@@ -1,5 +1,8 @@
-import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_bloc.dart'
-    as editor_page;
+import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_bloc.dart';
+import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_event.dart';
+import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_state.dart';
+import 'package:devity_console/modules/app_editor_page_list/widgets/add_page.dart';
+import 'package:devity_console/modules/app_editor_page_list/widgets/app_editor_page_list_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,187 +15,126 @@ class AppEditorPageList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => editor_page.AppEditorPageListBloc()
-        ..add(const editor_page.AppEditorPageListStartedEvent()),
-      child: BlocBuilder<editor_page.AppEditorPageListBloc,
-          editor_page.AppEditorPageListState>(
-        builder: (context, state) {
-          if (state is editor_page.AppEditorPageListLoadingState) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is editor_page.AppEditorPageListLoadedState) {
-            return Column(
-              children: [
-                _buildHeader(context),
-                Expanded(
-                  child: _buildPageList(context, state.pages),
+      create: (context) =>
+          AppEditorPageListBloc()..add(const AppEditorPageListStartedEvent()),
+      child: const AppEditorPageListView(),
+    );
+  }
+}
+
+/// [AppEditorPageListView] is a StatelessWidget that displays
+/// the app editor page list view.
+class AppEditorPageListView extends StatelessWidget {
+  /// Creates a new instance of [AppEditorPageListView].
+  const AppEditorPageListView({super.key});
+
+  void _showAddPageDialog(BuildContext mainContext) {
+    showDialog<void>(
+      context: mainContext,
+      builder: (dialogContext) => AddPageDialog(
+        onCancel: () {
+          Navigator.of(dialogContext).pop();
+        },
+        onSave: (Map<String, String> data) {
+          mainContext.read<AppEditorPageListBloc>().add(
+                AppEditorPageListAddPageEvent(
+                  name: data['name']!,
+                  description: data['description'],
                 ),
-              ],
-            );
-          }
-          if (state is editor_page.AppEditorPageListErrorState) {
-            return Center(
-              child: Text(
-                'Error: ${state.message}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
+              );
+          Navigator.of(dialogContext).pop();
         },
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Pages',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          ElevatedButton.icon(
-            onPressed: () => _showAddPageDialog(context),
-            icon: const Icon(Icons.add),
-            label: const Text('Add Page'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPageList(BuildContext context, List<editor_page.Page> pages) {
-    if (pages.isEmpty) {
-      return const Center(
-        child: Text(
-          'No pages yet. Click the "Add Page" button to create one.',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: pages.length,
-      padding: const EdgeInsets.all(16),
-      itemBuilder: (context, index) {
-        final page = pages[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: ListTile(
-            title: Text(page.name),
-            subtitle: Text(page.description),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                context.read<editor_page.AppEditorPageListBloc>().add(
-                      editor_page.AppEditorPageListDeletePageEvent(
-                        pageId: page.id,
-                      ),
-                    );
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showAddPageDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const _AddPageDialog(),
-    );
-  }
-}
-
-class _AddPageDialog extends StatefulWidget {
-  const _AddPageDialog();
-
-  @override
-  State<_AddPageDialog> createState() => _AddPageDialogState();
-}
-
-class _AddPageDialogState extends State<_AddPageDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add New Page'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Page Name',
-                hintText: 'Enter page name',
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a page name';
-                }
-                return null;
-              },
+    return BlocBuilder<AppEditorPageListBloc, AppEditorPageListState>(
+      builder: (context, state) {
+        if (state is AppEditorPageListLoadingState) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is AppEditorPageListErrorState) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  state.message,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: () {
+                    context
+                        .read<AppEditorPageListBloc>()
+                        .add(const AppEditorPageListStartedEvent());
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                hintText: 'Enter page description',
-              ),
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a description';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              context.read<editor_page.AppEditorPageListBloc>().add(
-                    editor_page.AppEditorPageListAddPageEvent(
-                      name: _nameController.text,
-                      description: _descriptionController.text,
+          );
+        }
+
+        if (state is AppEditorPageListLoadedState) {
+          if (state.pages.isEmpty) {
+            return PageListEmptyState(
+              onAddPage: () => _showAddPageDialog(context),
+            );
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: PageListSearchBar(
+                        onSearchChanged: (query) {
+                          context
+                              .read<AppEditorPageListBloc>()
+                              .add(AppEditorPageListSearchEvent(query));
+                        },
+                      ),
                     ),
-                  );
-              Navigator.of(context).pop();
-            }
-          },
-          child: const Text('Add'),
-        ),
-      ],
+                    const SizedBox(width: 16),
+                    PageListAddButton(
+                      onPressed: () => _showAddPageDialog(context),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: PageListGrid(
+                  pages: state.pages,
+                  onDeletePage: (pageId) {
+                    context.read<AppEditorPageListBloc>().add(
+                          AppEditorPageListDeletePageEvent(
+                            pageId: pageId,
+                          ),
+                        );
+                  },
+                ),
+              ),
+            ],
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 }

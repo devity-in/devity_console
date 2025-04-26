@@ -1,16 +1,45 @@
 part of 'project_navigation_bloc.dart';
 
-/// Events for the [ProjectNavigationBloc]
+/// [ProjectNavigationEvent] is a class that describes the events that can be
+/// triggered in the [ProjectNavigationBloc].
 sealed class ProjectNavigationEvent {
   const ProjectNavigationEvent();
 }
 
-/// Initial event when the navigation drawer is started
+/// The event that is triggered when the [ProjectNavigationBloc] is started.
 class ProjectNavigationStartedEvent extends ProjectNavigationEvent {
-  const ProjectNavigationStartedEvent();
+  /// Creates a [ProjectNavigationStartedEvent].
+  const ProjectNavigationStartedEvent({required this.projectId});
+
+  /// The ID of the project.
+  final String projectId;
 }
 
-/// Event to reload the navigation drawer
+/// The event that is triggered when the [ProjectNavigationBloc] is reloaded.
 class ProjectNavigationReloadEvent extends ProjectNavigationEvent {
-  const ProjectNavigationReloadEvent();
+  /// Creates a [ProjectNavigationReloadEvent].
+  const ProjectNavigationReloadEvent({required this.projectId});
+
+  /// The ID of the project.
+  final String projectId;
+}
+
+/// The event that is triggered when the navigation drawer is toggled.
+class ProjectNavigationToggleExpandedEvent extends ProjectNavigationEvent {
+  /// Creates a [ProjectNavigationToggleExpandedEvent].
+  const ProjectNavigationToggleExpandedEvent();
+}
+
+/// Event when a navigation item is selected.
+class ProjectNavigationItemSelectedEvent extends ProjectNavigationEvent {
+  /// Creates a new instance of [ProjectNavigationItemSelectedEvent].
+  const ProjectNavigationItemSelectedEvent({
+    required this.item,
+  });
+
+  /// The selected navigation item.
+  final ProjectNavigationDrawerItem item;
+
+  @override
+  List<Object?> get props => [item];
 }

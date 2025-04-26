@@ -1,10 +1,12 @@
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
 import 'package:devity_console/modules/login/login.dart';
+import 'package:devity_console/modules/project/bloc/project_bloc.dart';
 import 'package:devity_console/modules/project/view/project_view.dart';
 import 'package:devity_console/modules/project_list/view/project_list_screen.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// The router configuration for the application
@@ -67,7 +69,15 @@ final router = GoRouter(
       name: 'project',
       builder: (context, state) {
         final projectId = state.pathParameters['id']!;
-        return ProjectView(projectId: projectId);
+        return BlocProvider(
+          create: (context) => ProjectBloc()
+            ..add(
+              ProjectStartedEvent(
+                projectId: projectId,
+              ),
+            ),
+          child: ProjectPage(projectId: projectId),
+        );
       },
     ),
   ],
