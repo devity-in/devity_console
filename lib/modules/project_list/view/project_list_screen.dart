@@ -27,14 +27,23 @@ class ProjectListView extends StatelessWidget {
   /// Creates a [ProjectListView].
   const ProjectListView({super.key});
 
-  void _showAddProjectDialog(BuildContext context) {
+  /// Shows the add project dialog.
+  void _showAddProjectDialog(BuildContext mainContext) {
     showDialog<void>(
-      context: context,
+      context: mainContext,
       builder: (context) => AddProjectDialog(
         onCancel: () {
           Navigator.of(context).pop();
         },
         onSave: (Map<String, String> data) {
+          // Create a new project
+          mainContext.read<ProjectListBloc>().add(
+                ProjectListCreateEvent(
+                  name: data['title']!,
+                  description: data['description'],
+                ),
+              );
+          // Close the dialog
           Navigator.of(context).pop();
         },
       ),
@@ -62,11 +71,14 @@ class ProjectListView extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: ProjectListSearchBar(
                           onSearchChanged: (query) {
-                            // TODO: Implement search functionality
+                            context.read<ProjectListBloc>().add(
+                                  ProjectListSearchEvent(query),
+                                );
                           },
                         ),
                       ),

@@ -100,7 +100,9 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: widget.onCancel,
+                    onPressed: () {
+                      widget.onCancel();
+                    },
                     style: TextButton.styleFrom(
                       foregroundColor: colorScheme.onSurfaceVariant,
                       padding: const EdgeInsets.symmetric(
@@ -114,10 +116,11 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
-                        widget.onSave({
-                          'title': _titleController.text,
-                          'description': _descriptionController.text,
-                        });
+                        final formData = {
+                          'title': _titleController.text.trim(),
+                          'description': _descriptionController.text.trim(),
+                        };
+                        widget.onSave(formData);
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -1,3 +1,4 @@
+import 'package:devity_console/models/project.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_event.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_state.dart';
 import 'package:devity_console/repositories/analytics_repository.dart';
@@ -20,6 +21,7 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
     on<ProjectListReloadEvent>(_onReload);
     on<ProjectListCreateEvent>(_onCreate);
     on<ProjectListDeleteEvent>(_onDelete);
+    on<ProjectListSearchEvent>(_onSearch);
   }
 
   /// The [ProjectService] instance.
@@ -28,14 +30,17 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   /// The [AnalyticsRepository] instance.
   final AnalyticsRepository _analyticsRepository;
 
+  /// List of all projects
+  List<Project> _allProjects = [];
+
   Future<void> _onStarted(
     ProjectListStartedEvent event,
     Emitter<ProjectListState> emit,
   ) async {
     emit(ProjectListLoading());
     try {
-      final projects = await _projectService.getProjects();
-      emit(ProjectListLoaded(projects));
+      _allProjects = await _projectService.getProjects();
+      emit(ProjectListLoaded(_allProjects));
     } catch (e) {
       emit(ProjectListError(e.toString()));
     }
@@ -47,8 +52,8 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   ) async {
     emit(ProjectListLoading());
     try {
-      final projects = await _projectService.getProjects();
-      emit(ProjectListLoaded(projects));
+      _allProjects = await _projectService.getProjects();
+      emit(ProjectListLoaded(_allProjects));
     } catch (e) {
       emit(ProjectListError(e.toString()));
     }
@@ -63,10 +68,8 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
         name: event.name,
         description: event.description,
       );
-      final currentState = state;
-      if (currentState is ProjectListLoaded) {
-        emit(ProjectListLoaded([...currentState.projects, project]));
-      }
+      _allProjects = [..._allProjects, project];
+      emit(ProjectListLoaded(_allProjects));
     } catch (e) {
       emit(ProjectListError(e.toString()));
     }
@@ -78,15 +81,32 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   ) async {
     try {
       // TODO: Implement delete project
-      final currentState = state;
-      if (currentState is ProjectListLoaded) {
-        final updatedProjects = currentState.projects
-            .where((project) => project.id != event.projectId)
-            .toList();
-        emit(ProjectListLoaded(updatedProjects));
-      }
+      _allProjects = _allProjects
+          .where((project) => project.id != event.projectId)
+          .toList();
+      emit(ProjectListLoaded(_allProjects));
     } catch (e) {
       emit(ProjectListError(e.toString()));
     }
+  }
+
+  void _onSearch(
+    ProjectListSearchEvent event,
+    Emitter<ProjectListState> emit,
+  ) {
+    if (event.query.isEmpty) {
+      emit(ProjectListLoaded(_allProjects));
+      return;
+    }
+
+    final query = event.query.toLowerCase();
+    final filteredProjects = _allProjects.where((project) {
+      final nameMatch = project.name.toLowerCase().contains(query);
+      final descriptionMatch =
+          project.description?.toLowerCase().contains(query) ?? false;
+      return nameMatch || descriptionMatch;
+    }).toList();
+
+    emit(ProjectListLoaded(filteredProjects));
   }
 }
