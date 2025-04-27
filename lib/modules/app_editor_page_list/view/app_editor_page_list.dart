@@ -1,3 +1,4 @@
+import 'package:devity_console/modules/app_editor/bloc/app_editor_bloc.dart';
 import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_bloc.dart';
 import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_event.dart';
 import 'package:devity_console/modules/app_editor_page_list/bloc/app_editor_page_list_state.dart';
@@ -118,14 +119,29 @@ class AppEditorPageListView extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: PageListGrid(
-                  pages: state.pages,
-                  onDeletePage: (pageId) {
-                    context.read<AppEditorPageListBloc>().add(
-                          AppEditorPageListDeletePageEvent(
-                            pageId: pageId,
-                          ),
-                        );
+                child: BlocBuilder<AppEditorBloc, AppEditorState>(
+                  builder: (context, appEditorState) {
+                    final selectedPageId =
+                        appEditorState is AppEditorLoadedState
+                            ? appEditorState.selectedPageId
+                            : null;
+
+                    return PageListGrid(
+                      pages: state.pages,
+                      selectedPageId: selectedPageId,
+                      onPageSelected: (pageId) {
+                        context
+                            .read<AppEditorBloc>()
+                            .add(AppEditorSelectPageEvent(id: pageId));
+                      },
+                      onDeletePage: (pageId) {
+                        context.read<AppEditorPageListBloc>().add(
+                              AppEditorPageListDeletePageEvent(
+                                pageId: pageId,
+                              ),
+                            );
+                      },
+                    );
                   },
                 ),
               ),

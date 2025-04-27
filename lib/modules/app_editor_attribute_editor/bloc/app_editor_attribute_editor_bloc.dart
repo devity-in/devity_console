@@ -1,111 +1,117 @@
-import 'package:devity_console/models/project.dart';
-import 'package:devity_console/modules/app_editor_attribute_editor/bloc/app_editor_attribute_editor_event.dart';
-import 'package:devity_console/modules/app_editor_attribute_editor/bloc/app_editor_attribute_editor_state.dart';
+import 'package:devity_console/modules/app_editor_page_editor/models/page_section.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Bloc for managing the app editor attribute editor
+part 'app_editor_attribute_editor_event.dart';
+part 'app_editor_attribute_editor_state.dart';
+
+/// Base class for attribute editor events
+abstract class AppEditorAttributeEditorEvent extends Equatable {
+  /// Creates a new instance of [AppEditorAttributeEditorEvent]
+  const AppEditorAttributeEditorEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// BLoC for managing attribute editor state
 class AppEditorAttributeEditorBloc
     extends Bloc<AppEditorAttributeEditorEvent, AppEditorAttributeEditorState> {
-  AppEditorAttributeEditorBloc() : super(AppEditorAttributeEditorInitial()) {
-    on<AppEditorAttributeEditorInitializeEvent>(_onInitialize);
-    on<AppEditorAttributeEditorUpdateEvent>(_onUpdate);
-    on<AppEditorAttributeEditorDeleteEvent>(_onDelete);
-    on<AppEditorAttributeEditorAddEvent>(_onAdd);
+  /// Creates a new instance of [AppEditorAttributeEditorBloc]
+  AppEditorAttributeEditorBloc()
+      : super(const AppEditorAttributeEditorInitial()) {
+    on<AppEditorAttributeEditorLoad>(_onLoad);
+    on<AppEditorAttributeEditorWidgetAttributeUpdated>(
+      _onWidgetAttributeUpdated,
+    );
+    on<AppEditorAttributeEditorLayoutAttributeUpdated>(
+      _onLayoutAttributeUpdated,
+    );
+    on<AppEditorAttributeEditorSectionAttributeUpdated>(
+      _onSectionAttributeUpdated,
+    );
   }
 
-  Future<void> _onInitialize(
-    AppEditorAttributeEditorInitializeEvent event,
+  void _onLoad(
+    AppEditorAttributeEditorLoad event,
     Emitter<AppEditorAttributeEditorState> emit,
-  ) async {
-    try {
-      emit(AppEditorAttributeEditorLoading());
-      // TODO: Load initial data
-      emit(
-        AppEditorAttributeEditorLoaded(
-          attributes: const [],
-          project: Project(
-            id: '',
-            name: '',
-            description: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        ),
-      );
-    } catch (e) {
-      emit(AppEditorAttributeEditorError(e.toString()));
-    }
+  ) {
+    emit(AppEditorAttributeEditorLoaded(sections: event.sections));
   }
 
-  Future<void> _onUpdate(
-    AppEditorAttributeEditorUpdateEvent event,
+  void _onWidgetAttributeUpdated(
+    AppEditorAttributeEditorWidgetAttributeUpdated event,
     Emitter<AppEditorAttributeEditorState> emit,
-  ) async {
-    try {
-      emit(AppEditorAttributeEditorLoading());
-      // TODO: Update attribute
-      emit(
-        AppEditorAttributeEditorLoaded(
-          attributes: const [],
-          project: Project(
-            id: '',
-            name: '',
-            description: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        ),
-      );
-    } catch (e) {
-      emit(AppEditorAttributeEditorError(e.toString()));
-    }
+  ) {
+    final state = this.state;
+    if (state is! AppEditorAttributeEditorLoaded) return;
+
+    final sections = state.sections.toList();
+    final sectionIndex =
+        sections.indexWhere((s) => s.type == event.sectionType);
+    if (sectionIndex == -1) return;
+
+    final section = sections[sectionIndex];
+    if (event.layoutIndex >= section.layouts.length) return;
+
+    final layout = section.layouts[event.layoutIndex];
+    if (event.widgetIndex >= layout.widgets.length) return;
+
+    final updatedWidget = layout.widgets[event.widgetIndex].copyWith(
+      attributes: event.attributes,
+    );
+
+    final updatedLayout = layout.copyWith(
+      widgets: List.from(layout.widgets)..[event.widgetIndex] = updatedWidget,
+    );
+
+    sections[sectionIndex] = section.copyWith(
+      layouts: List.from(section.layouts)..[event.layoutIndex] = updatedLayout,
+    );
+
+    emit(AppEditorAttributeEditorLoaded(sections: sections));
   }
 
-  Future<void> _onDelete(
-    AppEditorAttributeEditorDeleteEvent event,
+  void _onLayoutAttributeUpdated(
+    AppEditorAttributeEditorLayoutAttributeUpdated event,
     Emitter<AppEditorAttributeEditorState> emit,
-  ) async {
-    try {
-      emit(AppEditorAttributeEditorLoading());
-      // TODO: Delete attribute
-      emit(
-        AppEditorAttributeEditorLoaded(
-          attributes: const [],
-          project: Project(
-            id: '',
-            name: '',
-            description: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        ),
-      );
-    } catch (e) {
-      emit(AppEditorAttributeEditorError(e.toString()));
-    }
+  ) {
+    final state = this.state;
+    if (state is! AppEditorAttributeEditorLoaded) return;
+
+    final sections = state.sections.toList();
+    final sectionIndex =
+        sections.indexWhere((s) => s.type == event.sectionType);
+    if (sectionIndex == -1) return;
+
+    final section = sections[sectionIndex];
+    if (event.layoutIndex >= section.layouts.length) return;
+
+    final layout = section.layouts[event.layoutIndex];
+    final updatedLayout = layout.copyWith(attributes: event.attributes);
+
+    sections[sectionIndex] = section.copyWith(
+      layouts: List.from(section.layouts)..[event.layoutIndex] = updatedLayout,
+    );
+
+    emit(AppEditorAttributeEditorLoaded(sections: sections));
   }
 
-  Future<void> _onAdd(
-    AppEditorAttributeEditorAddEvent event,
+  void _onSectionAttributeUpdated(
+    AppEditorAttributeEditorSectionAttributeUpdated event,
     Emitter<AppEditorAttributeEditorState> emit,
-  ) async {
-    try {
-      emit(AppEditorAttributeEditorLoading());
-      // TODO: Add attribute
-      emit(
-        AppEditorAttributeEditorLoaded(
-          attributes: const [],
-          project: Project(
-            id: '',
-            name: '',
-            description: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        ),
-      );
-    } catch (e) {
-      emit(AppEditorAttributeEditorError(e.toString()));
-    }
+  ) {
+    final state = this.state;
+    if (state is! AppEditorAttributeEditorLoaded) return;
+
+    final sections = state.sections.toList();
+    final sectionIndex =
+        sections.indexWhere((s) => s.type == event.sectionType);
+    if (sectionIndex == -1) return;
+
+    final section = sections[sectionIndex];
+    sections[sectionIndex] = section.copyWith(attributes: event.attributes);
+
+    emit(AppEditorAttributeEditorLoaded(sections: sections));
   }
 }

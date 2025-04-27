@@ -120,6 +120,36 @@ class _WidgetItem {
   final String description;
 
   Widget build() {
+    return Draggable<Map<String, dynamic>>(
+      data: {
+        'name': name,
+        'icon': icon,
+        'description': description,
+      },
+      feedback: Material(
+        elevation: 4,
+        child: Container(
+          width: 200,
+          padding: const EdgeInsets.all(8),
+          color: Colors.white,
+          child: Row(
+            children: [
+              Icon(icon),
+              const SizedBox(width: 8),
+              Text(name),
+            ],
+          ),
+        ),
+      ),
+      childWhenDragging: Opacity(
+        opacity: 0.5,
+        child: _buildListTile(),
+      ),
+      child: _buildListTile(),
+    );
+  }
+
+  Widget _buildListTile() {
     return ListTile(
       leading: Icon(icon),
       title: Text(name),
@@ -129,9 +159,6 @@ class _WidgetItem {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       dense: true,
-      onTap: () {
-        // TODO: Handle component selection
-      },
     );
   }
 }

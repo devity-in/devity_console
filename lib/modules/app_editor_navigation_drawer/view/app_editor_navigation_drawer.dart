@@ -1,6 +1,6 @@
 import 'package:devity_console/config/constants.dart';
-import 'package:devity_console/modules/app_editor_widget_list/view/app_editor_widget_list.dart';
 import 'package:devity_console/modules/app_editor_page_list/app_editor_page_list.dart';
+import 'package:devity_console/modules/app_editor_widget_list/view/app_editor_widget_list.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -28,12 +28,24 @@ class AppEditorNavigationDrawer extends StatelessWidget {
             TabBar(
               tabs: [
                 Tab(
-                  icon: Icon(Icons.pages_outlined),
-                  text: 'Pages',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.pages_outlined),
+                      SizedBox(width: 8),
+                      Text('Pages'),
+                    ],
+                  ),
                 ),
                 Tab(
-                  icon: Icon(Icons.widgets_outlined),
-                  text: 'Widgets',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.widgets_outlined),
+                      SizedBox(width: 8),
+                      Text('Widgets'),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -83,6 +83,8 @@ class PageCard extends StatelessWidget {
   const PageCard({
     required this.page,
     required this.onDelete,
+    required this.isSelected,
+    required this.onSelected,
     super.key,
   });
 
@@ -91,6 +93,12 @@ class PageCard extends StatelessWidget {
 
   /// Callback when delete button is pressed
   final void Function() onDelete;
+
+  /// Whether this page is selected
+  final bool isSelected;
+
+  /// Callback when page is selected
+  final void Function() onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -102,57 +110,71 @@ class PageCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
+          color: isSelected
+              ? colorScheme.primary
+              : colorScheme.outlineVariant.withOpacity(0.5),
+          width: isSelected ? 2 : 1,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.description,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    page.name,
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+      child: InkWell(
+        onTap: onSelected,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? colorScheme.primary
+                          : colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    child: Icon(
+                      Icons.description,
+                      color: isSelected
+                          ? colorScheme.onPrimary
+                          : colorScheme.primary,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: onDelete,
-                  color: colorScheme.error,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      page.name,
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: onDelete,
+                    color: colorScheme.error,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (page.description != null) ...[
+                Text(
+                  page.description!,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
-            ),
-            const SizedBox(height: 16),
-            if (page.description != null) ...[
-              Text(
-                page.description!,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -165,6 +187,8 @@ class PageListGrid extends StatelessWidget {
   const PageListGrid({
     required this.pages,
     required this.onDeletePage,
+    required this.selectedPageId,
+    required this.onPageSelected,
     super.key,
   });
 
@@ -173,6 +197,12 @@ class PageListGrid extends StatelessWidget {
 
   /// Callback when a page is deleted
   final void Function(String) onDeletePage;
+
+  /// The ID of the currently selected page
+  final String? selectedPageId;
+
+  /// Callback when a page is selected
+  final void Function(String) onPageSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +216,8 @@ class PageListGrid extends StatelessWidget {
           child: PageCard(
             page: page,
             onDelete: () => onDeletePage(page.id),
+            isSelected: selectedPageId == page.id,
+            onSelected: () => onPageSelected(page.id),
           ),
         );
       },
