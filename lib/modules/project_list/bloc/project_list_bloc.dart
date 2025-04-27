@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:devity_console/models/project.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_event.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_state.dart';
@@ -37,6 +39,14 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
     ProjectListStartedEvent event,
     Emitter<ProjectListState> emit,
   ) async {
+    unawaited(
+      _analyticsRepository.trackScreenView(
+        screenName: 'project_list',
+        parameters: {
+          'event': 'project_list_started',
+        },
+      ),
+    );
     emit(ProjectListLoading());
     try {
       _allProjects = await _projectService.getProjects();

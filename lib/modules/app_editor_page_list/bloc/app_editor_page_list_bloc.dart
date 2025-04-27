@@ -26,7 +26,33 @@ class AppEditorPageListBloc
     emit(const AppEditorPageListLoadingState());
     try {
       // TODO: Implement API call to get pages
-      _allPages = [];
+      _allPages = [
+        const models.Page(
+          id: '1',
+          name: 'Home Page',
+          description: 'The main landing page of the application',
+        ),
+        const models.Page(
+          id: '2',
+          name: 'About Us',
+          description: 'Information about our company and team',
+        ),
+        const models.Page(
+          id: '3',
+          name: 'Contact',
+          description: 'Ways to get in touch with us',
+        ),
+        const models.Page(
+          id: '4',
+          name: 'Products',
+          description: 'Our product catalog and offerings',
+        ),
+        const models.Page(
+          id: '5',
+          name: 'Services',
+          description: 'Services we provide to our customers',
+        ),
+      ];
       emit(AppEditorPageListLoadedState(pages: _allPages));
     } catch (e) {
       emit(AppEditorPageListErrorState(message: e.toString()));
