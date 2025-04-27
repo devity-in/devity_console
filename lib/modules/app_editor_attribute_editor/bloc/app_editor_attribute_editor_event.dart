@@ -1,83 +1,89 @@
 part of 'app_editor_attribute_editor_bloc.dart';
 
-/// Event for loading attribute editor
-class AppEditorAttributeEditorLoad extends AppEditorAttributeEditorEvent {
-  /// Creates a new instance of [AppEditorAttributeEditorLoad]
-  const AppEditorAttributeEditorLoad({required this.sections});
-
-  /// The sections to load
-  final List<PageSection> sections;
+/// Base class for attribute editor events
+abstract class AppEditorAttributeEditorEvent extends Equatable {
+  /// Creates a new instance of [AppEditorAttributeEditorEvent]
+  const AppEditorAttributeEditorEvent();
 
   @override
-  List<Object?> get props => [sections];
+  List<Object?> get props => [];
 }
 
-/// Event for updating widget attributes
-class AppEditorAttributeEditorWidgetAttributeUpdated
+/// Event to initialize the attribute editor
+class AppEditorAttributeEditorInitialized
     extends AppEditorAttributeEditorEvent {
-  /// Creates a new instance of [AppEditorAttributeEditorWidgetAttributeUpdated]
-  const AppEditorAttributeEditorWidgetAttributeUpdated({
-    required this.sectionType,
-    required this.layoutIndex,
-    required this.widgetIndex,
-    required this.attributes,
+  /// Creates a new instance of [AppEditorAttributeEditorInitialized]
+  const AppEditorAttributeEditorInitialized();
+}
+
+/// Event when the selection changes
+class AppEditorAttributeEditorSelectionChanged
+    extends AppEditorAttributeEditorEvent {
+  /// Creates a new instance of [AppEditorAttributeEditorSelectionChanged]
+  const AppEditorAttributeEditorSelectionChanged({
+    this.selectedSectionType,
+    this.selectedLayoutIndex,
+    this.selectedWidgetIndex,
   });
 
-  /// The type of section containing the widget
-  final String sectionType;
+  /// The selected section type
+  final PageSectionType? selectedSectionType;
 
-  /// The index of the layout containing the widget
-  final int layoutIndex;
+  /// The index of the selected layout
+  final int? selectedLayoutIndex;
 
-  /// The index of the widget to update
-  final int widgetIndex;
-
-  /// The new attributes for the widget
-  final Map<String, dynamic> attributes;
+  /// The index of the selected widget
+  final int? selectedWidgetIndex;
 
   @override
-  List<Object?> get props =>
-      [sectionType, layoutIndex, widgetIndex, attributes];
+  List<Object?> get props => [
+        selectedSectionType,
+        selectedLayoutIndex,
+        selectedWidgetIndex,
+      ];
 }
 
-/// Event for updating layout attributes
-class AppEditorAttributeEditorLayoutAttributeUpdated
-    extends AppEditorAttributeEditorEvent {
-  /// Creates a new instance of [AppEditorAttributeEditorLayoutAttributeUpdated]
-  const AppEditorAttributeEditorLayoutAttributeUpdated({
-    required this.sectionType,
-    required this.layoutIndex,
-    required this.attributes,
-  });
-
-  /// The type of section containing the layout
-  final String sectionType;
-
-  /// The index of the layout to update
-  final int layoutIndex;
-
-  /// The new attributes for the layout
-  final Map<String, dynamic> attributes;
-
-  @override
-  List<Object?> get props => [sectionType, layoutIndex, attributes];
-}
-
-/// Event for updating section attributes
+/// Event to update section attributes
 class AppEditorAttributeEditorSectionAttributeUpdated
     extends AppEditorAttributeEditorEvent {
   /// Creates a new instance of [AppEditorAttributeEditorSectionAttributeUpdated]
   const AppEditorAttributeEditorSectionAttributeUpdated({
-    required this.sectionType,
     required this.attributes,
   });
 
-  /// The type of section to update
-  final String sectionType;
-
-  /// The new attributes for the section
+  /// The updated attributes
   final Map<String, dynamic> attributes;
 
   @override
-  List<Object?> get props => [sectionType, attributes];
+  List<Object?> get props => [attributes];
+}
+
+/// Event to update layout attributes
+class AppEditorAttributeEditorLayoutAttributeUpdated
+    extends AppEditorAttributeEditorEvent {
+  /// Creates a new instance of [AppEditorAttributeEditorLayoutAttributeUpdated]
+  const AppEditorAttributeEditorLayoutAttributeUpdated({
+    required this.attributes,
+  });
+
+  /// The updated attributes
+  final Map<String, dynamic> attributes;
+
+  @override
+  List<Object?> get props => [attributes];
+}
+
+/// Event to update widget attributes
+class AppEditorAttributeEditorWidgetAttributeUpdated
+    extends AppEditorAttributeEditorEvent {
+  /// Creates a new instance of [AppEditorAttributeEditorWidgetAttributeUpdated]
+  const AppEditorAttributeEditorWidgetAttributeUpdated({
+    required this.attributes,
+  });
+
+  /// The updated attributes
+  final Map<String, dynamic> attributes;
+
+  @override
+  List<Object?> get props => [attributes];
 }

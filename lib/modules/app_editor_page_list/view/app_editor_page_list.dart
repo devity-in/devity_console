@@ -37,13 +37,19 @@ class AppEditorPageListView extends StatelessWidget {
           Navigator.of(dialogContext).pop();
         },
         onSave: (Map<String, String> data) {
-          final bloc = mainContext.read<AppEditorPageListBloc>();
-          bloc.add(
-            AppEditorPageListAddPageEvent(
-              name: data['name']!,
-              description: data['description']!,
-            ),
-          );
+          mainContext.read<AppEditorPageListBloc>()
+            ..add(
+              AppEditorPageListAddPageEvent(
+                name: data['name']!,
+                description: data['description']!,
+              ),
+            )
+            ..add(
+              AppEditorPageListAddPageEvent(
+                name: data['name']!,
+                description: data['description']!,
+              ),
+            );
           // Select the newly created page
           mainContext.read<AppEditorBloc>().add(
                 AppEditorSelectPageEvent(

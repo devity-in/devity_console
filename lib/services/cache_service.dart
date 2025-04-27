@@ -21,8 +21,15 @@ class CacheService {
 
   /// Initializes the cache service
   Future<void> init() async {
-    if (!isInitialized) {
-      _sharedPreferences = await SharedPreferences.getInstance();
+    try {
+      if (!isInitialized) {
+        _sharedPreferences = await SharedPreferences.getInstance();
+      }
+    } catch (e) {
+      // Log the error but don't throw
+      print('Error initializing CacheService: $e');
+      // Set to null to allow retry
+      _sharedPreferences = null;
     }
   }
 
@@ -31,31 +38,54 @@ class CacheService {
     if (!isInitialized) {
       await init();
     }
+    if (!isInitialized) {
+      throw Exception('Failed to initialize CacheService');
+    }
   }
 
   /// Caches data with a specific key
   Future<void> cacheData(String key, dynamic data) async {
-    await _ensureInitialized();
-    await _sharedPreferences!.setString(key, json.encode(data));
+    try {
+      await _ensureInitialized();
+      await _sharedPreferences!.setString(key, json.encode(data));
+    } catch (e) {
+      print('Error caching data: $e');
+      rethrow;
+    }
   }
 
   /// Retrieves cached data
   Future<dynamic> getCachedData(String key) async {
-    await _ensureInitialized();
-    final jsonStr = _sharedPreferences!.getString(key);
-    if (jsonStr == null) return null;
-    return json.decode(jsonStr);
+    try {
+      await _ensureInitialized();
+      final jsonStr = _sharedPreferences!.getString(key);
+      if (jsonStr == null) return null;
+      return json.decode(jsonStr);
+    } catch (e) {
+      print('Error getting cached data: $e');
+      rethrow;
+    }
   }
 
   /// Clears cached data for a specific key
   Future<void> clearCache(String key) async {
-    await _ensureInitialized();
-    await _sharedPreferences!.remove(key);
+    try {
+      await _ensureInitialized();
+      await _sharedPreferences!.remove(key);
+    } catch (e) {
+      print('Error clearing cache: $e');
+      rethrow;
+    }
   }
 
   /// Clears all cached data
   Future<void> clearAllCache() async {
-    await _ensureInitialized();
-    await _sharedPreferences!.clear();
+    try {
+      await _ensureInitialized();
+      await _sharedPreferences!.clear();
+    } catch (e) {
+      print('Error clearing all cache: $e');
+      rethrow;
+    }
   }
 }

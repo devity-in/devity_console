@@ -20,10 +20,41 @@ class AppEditorLoadedState extends AppEditorState {
   const AppEditorLoadedState({
     this.selectedPageId,
     this.editorState,
+    this.selectedSectionType,
+    this.selectedLayoutIndex,
+    this.selectedWidgetIndex,
+    this.pageAttributes = const {},
+    this.sectionAttributes = const {},
+    this.layoutAttributes = const {},
+    this.widgetAttributes = const {},
   });
 
+  /// The ID of the currently selected page
   final String? selectedPageId;
+
+  /// The current editor state
   final Map<String, dynamic>? editorState;
+
+  /// The type of the currently selected section
+  final PageSectionType? selectedSectionType;
+
+  /// The index of the currently selected layout
+  final int? selectedLayoutIndex;
+
+  /// The index of the currently selected widget
+  final int? selectedWidgetIndex;
+
+  /// The attributes for the selected page
+  final Map<String, dynamic> pageAttributes;
+
+  /// The attributes for the selected section
+  final Map<String, dynamic> sectionAttributes;
+
+  /// The attributes for the selected layout
+  final Map<String, dynamic> layoutAttributes;
+
+  /// The attributes for the selected widget
+  final Map<String, dynamic> widgetAttributes;
 }
 
 /// Error state

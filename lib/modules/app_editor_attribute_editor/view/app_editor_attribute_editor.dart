@@ -1,55 +1,72 @@
 import 'package:devity_console/modules/app_editor/bloc/app_editor_bloc.dart';
 import 'package:devity_console/modules/app_editor_attribute_editor/bloc/app_editor_attribute_editor_bloc.dart';
-import 'package:devity_console/modules/app_editor_page_editor/bloc/app_editor_page_editor_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// [AppEditorAttributeEditor] is a widget that displays and allows editing
-/// of attributes for the currently selected item (page, layout, or widget).
+/// [AppEditorAttributeEditor] is a widget that provides the attribute editor bloc.
 class AppEditorAttributeEditor extends StatelessWidget {
   /// Creates a new instance of [AppEditorAttributeEditor].
   const AppEditorAttributeEditor({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AppEditorBloc, AppEditorState>(
-      builder: (context, state) {
-        if (state is! AppEditorLoadedState || state.selectedPageId == null) {
-          return const Center(
-            child: Text('Select a page to edit its properties'),
-          );
+    return BlocProvider(
+      create: (context) => AppEditorAttributeEditorBloc(),
+      child: const AppEditorAttributeEditorView(),
+    );
+  }
+}
+
+/// [AppEditorAttributeEditorView] is a widget that displays and allows editing
+/// of attributes for the currently selected item (page, layout, or widget).
+class AppEditorAttributeEditorView extends StatelessWidget {
+  /// Creates a new instance of [AppEditorAttributeEditorView].
+  const AppEditorAttributeEditorView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<AppEditorBloc, AppEditorState>(
+      listener: (context, state) {
+        if (state is AppEditorLoadedState) {
+          context.read<AppEditorAttributeEditorBloc>().add(
+                AppEditorAttributeEditorSelectionChanged(
+                  selectedSectionType: state.selectedSectionType,
+                  selectedLayoutIndex: state.selectedLayoutIndex,
+                  selectedWidgetIndex: state.selectedWidgetIndex,
+                ),
+              );
         }
-
-        return BlocBuilder<AppEditorPageEditorBloc, AppEditorPageEditorState>(
-          builder: (context, pageState) {
-            if (pageState is! AppEditorPageEditorLoaded) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return Container(
-              width: 300,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _getTitle(pageState),
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: _buildAttributeEditor(context, pageState),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
       },
+      child: BlocBuilder<AppEditorAttributeEditorBloc,
+          AppEditorAttributeEditorState>(
+        builder: (context, state) {
+          if (state is! AppEditorAttributeEditorLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return Container(
+            width: 300,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getTitle(state),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: _buildAttributeEditor(context, state),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
-  String _getTitle(AppEditorPageEditorLoaded state) {
+  String _getTitle(AppEditorAttributeEditorLoaded state) {
     if (state.selectedWidgetIndex != null) {
       return 'Widget Properties';
     } else if (state.selectedLayoutIndex != null) {
@@ -62,7 +79,7 @@ class AppEditorAttributeEditor extends StatelessWidget {
 
   Widget _buildAttributeEditor(
     BuildContext context,
-    AppEditorPageEditorLoaded state,
+    AppEditorAttributeEditorLoaded state,
   ) {
     if (state.selectedWidgetIndex != null) {
       return _buildWidgetAttributes(context, state);
@@ -78,107 +95,67 @@ class AppEditorAttributeEditor extends StatelessWidget {
 
   Widget _buildWidgetAttributes(
     BuildContext context,
-    AppEditorPageEditorLoaded state,
+    AppEditorAttributeEditorLoaded state,
   ) {
-    final section = state.sections.firstWhere(
-      (s) => s.type == state.selectedSectionType,
-    );
-    final layout = section.layouts[state.selectedLayoutIndex!];
-    final widget =
-        layout.widgets[state.selectedWidgetIndex!] as Map<String, dynamic>;
-
     return ListView(
-      children: [
-        _buildAttributeField(
+      children: state.widgetAttributes.entries.map((entry) {
+        return _buildAttributeField(
           context,
-          'Name',
-          widget['name'] as String,
+          entry.key,
+          entry.value.toString(),
           (value) {
             context.read<AppEditorAttributeEditorBloc>().add(
                   AppEditorAttributeEditorWidgetAttributeUpdated(
-                    sectionType: state.selectedSectionType!.name,
-                    layoutIndex: state.selectedLayoutIndex!,
-                    widgetIndex: state.selectedWidgetIndex!,
-                    attributes: {'name': value},
+                    attributes: {entry.key: value},
                   ),
                 );
           },
-        ),
-        _buildAttributeField(
-          context,
-          'Icon',
-          widget['icon'].toString(),
-          (value) {
-            context.read<AppEditorAttributeEditorBloc>().add(
-                  AppEditorAttributeEditorWidgetAttributeUpdated(
-                    sectionType: state.selectedSectionType!.name,
-                    layoutIndex: state.selectedLayoutIndex!,
-                    widgetIndex: state.selectedWidgetIndex!,
-                    attributes: {'icon': value},
-                  ),
-                );
-          },
-        ),
-        // Add more widget-specific attributes here
-      ],
+        );
+      }).toList(),
     );
   }
 
   Widget _buildLayoutAttributes(
     BuildContext context,
-    AppEditorPageEditorLoaded state,
+    AppEditorAttributeEditorLoaded state,
   ) {
-    final section = state.sections.firstWhere(
-      (s) => s.type == state.selectedSectionType,
-    );
-    final layout = section.layouts[state.selectedLayoutIndex!];
-
     return ListView(
-      children: [
-        _buildAttributeField(
+      children: state.layoutAttributes.entries.map((entry) {
+        return _buildAttributeField(
           context,
-          'Layout Type',
-          layout.type.toString().split('.').last,
+          entry.key,
+          entry.value.toString(),
           (value) {
             context.read<AppEditorAttributeEditorBloc>().add(
                   AppEditorAttributeEditorLayoutAttributeUpdated(
-                    sectionType: state.selectedSectionType!.name,
-                    layoutIndex: state.selectedLayoutIndex!,
-                    attributes: {'type': layout.type},
+                    attributes: {entry.key: value},
                   ),
                 );
           },
-        ),
-        // Add more layout-specific attributes here
-      ],
+        );
+      }).toList(),
     );
   }
 
   Widget _buildPageAttributes(
     BuildContext context,
-    AppEditorPageEditorLoaded state,
+    AppEditorAttributeEditorLoaded state,
   ) {
-    final section = state.sections.firstWhere(
-      (s) => s.type == state.selectedSectionType,
-    );
-
     return ListView(
-      children: [
-        _buildAttributeField(
+      children: state.sectionAttributes.entries.map((entry) {
+        return _buildAttributeField(
           context,
-          'Section Type',
-          section.type.toString().split('.').last,
+          entry.key,
+          entry.value.toString(),
           (value) {
             context.read<AppEditorAttributeEditorBloc>().add(
                   AppEditorAttributeEditorSectionAttributeUpdated(
-                    sectionType: state.selectedSectionType!.name,
-                    attributes: {'type': section.type},
+                    attributes: {entry.key: value},
                   ),
                 );
           },
-        ),
-        // Add more page-specific attributes here
-      ],
+        );
+      }).toList(),
     );
   }
 

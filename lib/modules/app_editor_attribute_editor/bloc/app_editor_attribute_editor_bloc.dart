@@ -5,113 +5,120 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'app_editor_attribute_editor_event.dart';
 part 'app_editor_attribute_editor_state.dart';
 
-/// Base class for attribute editor events
-abstract class AppEditorAttributeEditorEvent extends Equatable {
-  /// Creates a new instance of [AppEditorAttributeEditorEvent]
-  const AppEditorAttributeEditorEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
-/// BLoC for managing attribute editor state
+/// [AppEditorAttributeEditorBloc] manages the state of the attribute editor.
 class AppEditorAttributeEditorBloc
     extends Bloc<AppEditorAttributeEditorEvent, AppEditorAttributeEditorState> {
-  /// Creates a new instance of [AppEditorAttributeEditorBloc]
+  /// Creates a new instance of [AppEditorAttributeEditorBloc].
   AppEditorAttributeEditorBloc()
       : super(const AppEditorAttributeEditorInitial()) {
-    on<AppEditorAttributeEditorLoad>(_onLoad);
-    on<AppEditorAttributeEditorWidgetAttributeUpdated>(
-      _onWidgetAttributeUpdated,
+    on<AppEditorAttributeEditorInitialized>(_onInitialized);
+    on<AppEditorAttributeEditorSelectionChanged>(_onSelectionChanged);
+    on<AppEditorAttributeEditorSectionAttributeUpdated>(
+      _onSectionAttributeUpdated,
     );
     on<AppEditorAttributeEditorLayoutAttributeUpdated>(
       _onLayoutAttributeUpdated,
     );
-    on<AppEditorAttributeEditorSectionAttributeUpdated>(
-      _onSectionAttributeUpdated,
+    on<AppEditorAttributeEditorWidgetAttributeUpdated>(
+      _onWidgetAttributeUpdated,
     );
   }
 
-  void _onLoad(
-    AppEditorAttributeEditorLoad event,
+  void _onInitialized(
+    AppEditorAttributeEditorInitialized event,
     Emitter<AppEditorAttributeEditorState> emit,
   ) {
-    emit(AppEditorAttributeEditorLoaded(sections: event.sections));
+    emit(const AppEditorAttributeEditorLoaded());
   }
 
-  void _onWidgetAttributeUpdated(
-    AppEditorAttributeEditorWidgetAttributeUpdated event,
+  void _onSelectionChanged(
+    AppEditorAttributeEditorSelectionChanged event,
     Emitter<AppEditorAttributeEditorState> emit,
   ) {
-    final state = this.state;
-    if (state is! AppEditorAttributeEditorLoaded) return;
-
-    final sections = state.sections.toList();
-    final sectionIndex =
-        sections.indexWhere((s) => s.type == event.sectionType);
-    if (sectionIndex == -1) return;
-
-    final section = sections[sectionIndex];
-    if (event.layoutIndex >= section.layouts.length) return;
-
-    final layout = section.layouts[event.layoutIndex];
-    if (event.widgetIndex >= layout.widgets.length) return;
-
-    final updatedWidget = layout.widgets[event.widgetIndex].copyWith(
-      attributes: event.attributes,
-    );
-
-    final updatedLayout = layout.copyWith(
-      widgets: List.from(layout.widgets)..[event.widgetIndex] = updatedWidget,
-    );
-
-    sections[sectionIndex] = section.copyWith(
-      layouts: List.from(section.layouts)..[event.layoutIndex] = updatedLayout,
-    );
-
-    emit(AppEditorAttributeEditorLoaded(sections: sections));
-  }
-
-  void _onLayoutAttributeUpdated(
-    AppEditorAttributeEditorLayoutAttributeUpdated event,
-    Emitter<AppEditorAttributeEditorState> emit,
-  ) {
-    final state = this.state;
-    if (state is! AppEditorAttributeEditorLoaded) return;
-
-    final sections = state.sections.toList();
-    final sectionIndex =
-        sections.indexWhere((s) => s.type == event.sectionType);
-    if (sectionIndex == -1) return;
-
-    final section = sections[sectionIndex];
-    if (event.layoutIndex >= section.layouts.length) return;
-
-    final layout = section.layouts[event.layoutIndex];
-    final updatedLayout = layout.copyWith(attributes: event.attributes);
-
-    sections[sectionIndex] = section.copyWith(
-      layouts: List.from(section.layouts)..[event.layoutIndex] = updatedLayout,
-    );
-
-    emit(AppEditorAttributeEditorLoaded(sections: sections));
+    if (state is AppEditorAttributeEditorLoaded) {
+      final currentState = state as AppEditorAttributeEditorLoaded;
+      emit(
+        AppEditorAttributeEditorLoaded(
+          selectedSectionType:
+              event.selectedSectionType ?? currentState.selectedSectionType,
+          selectedLayoutIndex:
+              event.selectedLayoutIndex ?? currentState.selectedLayoutIndex,
+          selectedWidgetIndex:
+              event.selectedWidgetIndex ?? currentState.selectedWidgetIndex,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
   }
 
   void _onSectionAttributeUpdated(
     AppEditorAttributeEditorSectionAttributeUpdated event,
     Emitter<AppEditorAttributeEditorState> emit,
   ) {
-    final state = this.state;
-    if (state is! AppEditorAttributeEditorLoaded) return;
+    if (state is AppEditorAttributeEditorLoaded) {
+      final currentState = state as AppEditorAttributeEditorLoaded;
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.sectionAttributes)
+            ..addAll(event.attributes);
 
-    final sections = state.sections.toList();
-    final sectionIndex =
-        sections.indexWhere((s) => s.type == event.sectionType);
-    if (sectionIndex == -1) return;
+      emit(
+        AppEditorAttributeEditorLoaded(
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          sectionAttributes: updatedAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
 
-    final section = sections[sectionIndex];
-    sections[sectionIndex] = section.copyWith(attributes: event.attributes);
+  void _onLayoutAttributeUpdated(
+    AppEditorAttributeEditorLayoutAttributeUpdated event,
+    Emitter<AppEditorAttributeEditorState> emit,
+  ) {
+    if (state is AppEditorAttributeEditorLoaded) {
+      final currentState = state as AppEditorAttributeEditorLoaded;
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.layoutAttributes)
+            ..addAll(event.attributes);
 
-    emit(AppEditorAttributeEditorLoaded(sections: sections));
+      emit(
+        AppEditorAttributeEditorLoaded(
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: updatedAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  void _onWidgetAttributeUpdated(
+    AppEditorAttributeEditorWidgetAttributeUpdated event,
+    Emitter<AppEditorAttributeEditorState> emit,
+  ) {
+    if (state is AppEditorAttributeEditorLoaded) {
+      final currentState = state as AppEditorAttributeEditorLoaded;
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.widgetAttributes)
+            ..addAll(event.attributes);
+
+      emit(
+        AppEditorAttributeEditorLoaded(
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: updatedAttributes,
+        ),
+      );
+    }
   }
 }

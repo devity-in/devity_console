@@ -139,3 +139,46 @@ class AppEditorPageSelectionCleared extends AppEditorPageEditorEvent {
   /// Creates a new instance of [AppEditorPageSelectionCleared]
   const AppEditorPageSelectionCleared();
 }
+
+class AppEditorPageEditorSelectSection extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorSelectSection({
+    required this.sectionType,
+  });
+
+  final PageSectionType sectionType;
+
+  @override
+  List<Object?> get props => [sectionType];
+}
+
+class AppEditorPageEditorSelectLayout extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorSelectLayout({
+    required this.sectionType,
+    required this.layoutIndex,
+  });
+
+  final PageSectionType sectionType;
+  final int layoutIndex;
+
+  @override
+  List<Object?> get props => [sectionType, layoutIndex];
+}
+
+class AppEditorPageEditorSelectWidget extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorSelectWidget({
+    required this.sectionType,
+    required this.layoutIndex,
+    required this.widgetIndex,
+  });
+
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  final int widgetIndex;
+
+  @override
+  List<Object?> get props => [sectionType, layoutIndex, widgetIndex];
+}
+
+class AppEditorPageEditorClearSelection extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorClearSelection();
+}

@@ -21,6 +21,10 @@ class AppEditorPageEditorBloc
     on<AppEditorPageLayoutSelected>(_onLayoutSelected);
     on<AppEditorPageWidgetSelected>(_onWidgetSelected);
     on<AppEditorPageSelectionCleared>(_onSelectionCleared);
+    on<AppEditorPageEditorSelectSection>(_onSelectSection);
+    on<AppEditorPageEditorSelectLayout>(_onSelectLayout);
+    on<AppEditorPageEditorSelectWidget>(_onSelectWidget);
+    on<AppEditorPageEditorClearSelection>(_onClearSelection);
   }
 
   Future<void> _onInitialized(
@@ -212,6 +216,51 @@ class AppEditorPageEditorBloc
     final currentState = state as AppEditorPageEditorLoaded;
     emit(
       currentState.copyWith(),
+    );
+  }
+
+  void _onSelectSection(
+    AppEditorPageEditorSelectSection event,
+    Emitter<AppEditorPageEditorState> emit,
+  ) {
+    emit(
+      AppEditorPageEditorLoaded(
+        selectedSectionType: event.sectionType,
+      ),
+    );
+  }
+
+  void _onSelectLayout(
+    AppEditorPageEditorSelectLayout event,
+    Emitter<AppEditorPageEditorState> emit,
+  ) {
+    emit(
+      AppEditorPageEditorLoaded(
+        selectedSectionType: event.sectionType,
+        selectedLayoutIndex: event.layoutIndex,
+      ),
+    );
+  }
+
+  void _onSelectWidget(
+    AppEditorPageEditorSelectWidget event,
+    Emitter<AppEditorPageEditorState> emit,
+  ) {
+    emit(
+      AppEditorPageEditorLoaded(
+        selectedSectionType: event.sectionType,
+        selectedLayoutIndex: event.layoutIndex,
+        selectedWidgetIndex: event.widgetIndex,
+      ),
+    );
+  }
+
+  void _onClearSelection(
+    AppEditorPageEditorClearSelection event,
+    Emitter<AppEditorPageEditorState> emit,
+  ) {
+    emit(
+      const AppEditorPageEditorLoaded(),
     );
   }
 }

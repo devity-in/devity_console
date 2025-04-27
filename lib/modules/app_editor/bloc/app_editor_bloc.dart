@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:devity_console/modules/app_editor_page_editor/models/page_section.dart';
 import 'package:devity_console/repositories/app_editor_repository.dart';
 
 part 'app_editor_event.dart';
@@ -14,6 +15,14 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
     repository = AppEditorRepository();
     on<AppEditorStartedEvent>(_onStarted);
     on<AppEditorSelectPageEvent>(_onSelectPage);
+    on<AppEditorSelectSectionEvent>(_onSelectSection);
+    on<AppEditorSelectLayoutEvent>(_onSelectLayout);
+    on<AppEditorSelectWidgetEvent>(_onSelectWidget);
+    on<AppEditorClearSelectionEvent>(_onClearSelection);
+    on<AppEditorPageAttributesUpdated>(_onPageAttributesUpdated);
+    on<AppEditorSectionAttributesUpdated>(_onSectionAttributesUpdated);
+    on<AppEditorLayoutAttributesUpdated>(_onLayoutAttributesUpdated);
+    on<AppEditorWidgetAttributesUpdated>(_onWidgetAttributesUpdated);
     on<AppEditorSaveStateEvent>(_onSaveState);
     on<AppEditorLoadStateEvent>(_onLoadState);
   }
@@ -44,6 +53,197 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
       emit(
         AppEditorLoadedState(
           selectedPageId: event.id,
+          editorState: currentState.editorState,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSelectSection(
+    AppEditorSelectSectionEvent event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: event.sectionType,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSelectLayout(
+    AppEditorSelectLayoutEvent event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: event.sectionType,
+          selectedLayoutIndex: event.layoutIndex,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSelectWidget(
+    AppEditorSelectWidgetEvent event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: event.sectionType,
+          selectedLayoutIndex: event.layoutIndex,
+          selectedWidgetIndex: event.widgetIndex,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onClearSelection(
+    AppEditorClearSelectionEvent event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onPageAttributesUpdated(
+    AppEditorPageAttributesUpdated event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.pageAttributes)
+            ..addAll(event.attributes);
+
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          pageAttributes: updatedAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSectionAttributesUpdated(
+    AppEditorSectionAttributesUpdated event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.sectionAttributes)
+            ..addAll(event.attributes);
+
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: updatedAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onLayoutAttributesUpdated(
+    AppEditorLayoutAttributesUpdated event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.layoutAttributes)
+            ..addAll(event.attributes);
+
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: updatedAttributes,
+          widgetAttributes: currentState.widgetAttributes,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onWidgetAttributesUpdated(
+    AppEditorWidgetAttributesUpdated event,
+    Emitter<AppEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is AppEditorLoadedState) {
+      final updatedAttributes =
+          Map<String, dynamic>.from(currentState.widgetAttributes)
+            ..addAll(event.attributes);
+
+      emit(
+        AppEditorLoadedState(
+          selectedPageId: currentState.selectedPageId,
+          editorState: currentState.editorState,
+          selectedSectionType: currentState.selectedSectionType,
+          selectedLayoutIndex: currentState.selectedLayoutIndex,
+          selectedWidgetIndex: currentState.selectedWidgetIndex,
+          pageAttributes: currentState.pageAttributes,
+          sectionAttributes: currentState.sectionAttributes,
+          layoutAttributes: currentState.layoutAttributes,
+          widgetAttributes: updatedAttributes,
         ),
       );
     }
@@ -75,6 +275,13 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
           AppEditorLoadedState(
             selectedPageId: currentState.selectedPageId,
             editorState: state,
+            selectedSectionType: currentState.selectedSectionType,
+            selectedLayoutIndex: currentState.selectedLayoutIndex,
+            selectedWidgetIndex: currentState.selectedWidgetIndex,
+            pageAttributes: currentState.pageAttributes,
+            sectionAttributes: currentState.sectionAttributes,
+            layoutAttributes: currentState.layoutAttributes,
+            widgetAttributes: currentState.widgetAttributes,
           ),
         );
       }

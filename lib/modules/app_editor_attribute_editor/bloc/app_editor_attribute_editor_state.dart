@@ -24,13 +24,42 @@ class AppEditorAttributeEditorLoading extends AppEditorAttributeEditorState {
 /// State when the attribute editor is loaded
 class AppEditorAttributeEditorLoaded extends AppEditorAttributeEditorState {
   /// Creates a new instance of [AppEditorAttributeEditorLoaded]
-  const AppEditorAttributeEditorLoaded({required this.sections});
+  const AppEditorAttributeEditorLoaded({
+    this.selectedSectionType,
+    this.selectedLayoutIndex,
+    this.selectedWidgetIndex,
+    this.sectionAttributes = const {},
+    this.layoutAttributes = const {},
+    this.widgetAttributes = const {},
+  });
 
-  /// The sections being edited
-  final List<PageSection> sections;
+  /// The type of the selected section
+  final PageSectionType? selectedSectionType;
+
+  /// The index of the selected layout
+  final int? selectedLayoutIndex;
+
+  /// The index of the selected widget
+  final int? selectedWidgetIndex;
+
+  /// The attributes for the selected section
+  final Map<String, dynamic> sectionAttributes;
+
+  /// The attributes for the selected layout
+  final Map<String, dynamic> layoutAttributes;
+
+  /// The attributes for the selected widget
+  final Map<String, dynamic> widgetAttributes;
 
   @override
-  List<Object?> get props => [sections];
+  List<Object?> get props => [
+        selectedSectionType,
+        selectedLayoutIndex,
+        selectedWidgetIndex,
+        sectionAttributes,
+        layoutAttributes,
+        widgetAttributes,
+      ];
 }
 
 /// State when there is an error in the attribute editor

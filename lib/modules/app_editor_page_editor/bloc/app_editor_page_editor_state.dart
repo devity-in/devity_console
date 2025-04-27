@@ -1,12 +1,9 @@
 part of 'app_editor_page_editor_bloc.dart';
 
 /// Base class for page editor states
-abstract class AppEditorPageEditorState extends Equatable {
+sealed class AppEditorPageEditorState {
   /// Creates a new instance of [AppEditorPageEditorState]
   const AppEditorPageEditorState();
-
-  @override
-  List<Object?> get props => [];
 }
 
 /// Initial state of the page editor
@@ -25,7 +22,7 @@ class AppEditorPageEditorLoading extends AppEditorPageEditorState {
 class AppEditorPageEditorLoaded extends AppEditorPageEditorState {
   /// Creates a new instance of [AppEditorPageEditorLoaded]
   const AppEditorPageEditorLoaded({
-    required this.sections,
+    this.sections = const [],
     this.selectedSectionType,
     this.selectedLayoutIndex,
     this.selectedWidgetIndex,
@@ -42,14 +39,6 @@ class AppEditorPageEditorLoaded extends AppEditorPageEditorState {
 
   /// The index of the currently selected widget
   final int? selectedWidgetIndex;
-
-  @override
-  List<Object?> get props => [
-        sections,
-        selectedSectionType,
-        selectedLayoutIndex,
-        selectedWidgetIndex,
-      ];
 
   /// Creates a copy of this state with the given fields replaced with the new values
   AppEditorPageEditorLoaded copyWith({
@@ -74,7 +63,4 @@ class AppEditorPageEditorError extends AppEditorPageEditorState {
 
   /// The error message
   final String message;
-
-  @override
-  List<Object?> get props => [message];
 }
