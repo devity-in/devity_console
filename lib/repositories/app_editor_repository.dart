@@ -1,82 +1,27 @@
-import 'package:devity_console/models/app_page.dart';
 import 'package:devity_console/services/app_editor_service.dart';
+import 'package:devity_console/services/cache_service.dart';
 import 'package:devity_console/services/error_handler_service.dart';
+import 'package:devity_console/services/network_service.dart';
 
 /// Repository for handling app editor data
 class AppEditorRepository {
-  /// Creates a new [AppEditorRepository]
   AppEditorRepository({
     AppEditorService? service,
     ErrorHandlerService? errorHandler,
+    NetworkService? networkService,
+    CacheService? cacheService,
   })  : _service = service ?? AppEditorService(),
-        _errorHandler = errorHandler ?? ErrorHandlerService();
+        _errorHandler = errorHandler ?? ErrorHandlerService(),
+        _networkService = networkService ??
+            NetworkService(errorHandler: ErrorHandlerService()),
+        _cacheService = cacheService ?? CacheService.instance;
 
   final AppEditorService _service;
   final ErrorHandlerService _errorHandler;
-
-  /// Loads all pages for a project
-  Future<List<AppPage>> loadPages(String projectId) async {
-    try {
-      return await _service.loadPages(projectId);
-    } catch (e) {
-      _errorHandler.handleError(e);
-      rethrow;
-    }
-  }
-
-  /// Creates a new page
-  Future<AppPage> createPage({
-    required String projectId,
-    required String name,
-    required String description,
-  }) async {
-    try {
-      return await _service.createPage(
-        projectId: projectId,
-        name: name,
-        description: description,
-      );
-    } catch (e) {
-      _errorHandler.handleError(e);
-      rethrow;
-    }
-  }
-
-  /// Updates an existing page
-  Future<AppPage> updatePage({
-    required String projectId,
-    required String pageId,
-    required String name,
-    required String description,
-  }) async {
-    try {
-      return await _service.updatePage(
-        projectId: projectId,
-        pageId: pageId,
-        name: name,
-        description: description,
-      );
-    } catch (e) {
-      _errorHandler.handleError(e);
-      rethrow;
-    }
-  }
-
-  /// Deletes a page
-  Future<void> deletePage({
-    required String projectId,
-    required String pageId,
-  }) async {
-    try {
-      await _service.deletePage(
-        projectId: projectId,
-        pageId: pageId,
-      );
-    } catch (e) {
-      _errorHandler.handleError(e);
-      rethrow;
-    }
-  }
+  final NetworkService _networkService;
+  final CacheService _cacheService;
+  static const String _pagesKey = 'app_pages';
+  static const String _editorStateKey = 'editor_state';
 
   /// Saves the current state of the editor
   Future<void> saveEditorState({
@@ -84,10 +29,14 @@ class AppEditorRepository {
     required Map<String, dynamic> state,
   }) async {
     try {
-      await _service.saveEditorState(
-        projectId: projectId,
-        state: state,
+      await _networkService.request(
+        '/projects/$projectId/editor-state',
+        method: 'POST',
+        data: state,
       );
+
+      // Cache the state
+      await _cacheService.cacheData('$_editorStateKey:$projectId', state);
     } catch (e) {
       _errorHandler.handleError(e);
       rethrow;
@@ -97,8 +46,31 @@ class AppEditorRepository {
   /// Loads the editor state
   Future<Map<String, dynamic>> loadEditorState(String projectId) async {
     try {
-      return await _service.loadEditorState(projectId);
+      // Try to load from cache first
+      final cachedState =
+          await _cacheService.getCachedData('$_editorStateKey:$projectId');
+      if (cachedState != null) {
+        return cachedState as Map<String, dynamic>;
+      }
+
+      // If not in cache, load from API
+      final response = await _networkService.request(
+        '/projects/$projectId/editor-state',
+        useCache: true,
+      );
+      final state = response.data as Map<String, dynamic>;
+
+      // Cache the state
+      await _cacheService.cacheData('$_editorStateKey:$projectId', state);
+
+      return state;
     } catch (e) {
+      // If API fails, return cached data if available
+      final cachedState =
+          await _cacheService.getCachedData('$_editorStateKey:$projectId');
+      if (cachedState != null) {
+        return cachedState as Map<String, dynamic>;
+      }
       _errorHandler.handleError(e);
       rethrow;
     }
@@ -106,11 +78,12 @@ class AppEditorRepository {
 
   /// Clears the cache for a project
   void clearProjectCache(String projectId) {
-    _service.clearProjectCache(projectId);
+    _cacheService.clearCache('$_pagesKey:$projectId');
+    _cacheService.clearCache('$_editorStateKey:$projectId');
   }
 
   /// Disposes the repository
   void dispose() {
-    _service.dispose();
+    // No cleanup needed
   }
 }

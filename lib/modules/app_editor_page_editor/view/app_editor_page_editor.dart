@@ -28,7 +28,9 @@ class AppEditorPageEditor extends StatelessWidget {
       child: BlocBuilder<AppEditorPageEditorBloc, AppEditorPageEditorState>(
         builder: (context, state) {
           if (state is! AppEditorPageEditorLoaded) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
           return Scaffold(

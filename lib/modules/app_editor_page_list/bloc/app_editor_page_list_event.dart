@@ -8,7 +8,7 @@ abstract class AppEditorPageListEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Event to start loading the page list.
+/// Event to start the page list.
 class AppEditorPageListStartedEvent extends AppEditorPageListEvent {
   const AppEditorPageListStartedEvent();
 }
@@ -17,14 +17,30 @@ class AppEditorPageListStartedEvent extends AppEditorPageListEvent {
 class AppEditorPageListAddPageEvent extends AppEditorPageListEvent {
   const AppEditorPageListAddPageEvent({
     required this.name,
-    this.description,
+    required this.description,
   });
 
   final String name;
-  final String? description;
+  final String description;
 
   @override
   List<Object?> get props => [name, description];
+}
+
+/// Event to update a page.
+class AppEditorPageListUpdatePageEvent extends AppEditorPageListEvent {
+  const AppEditorPageListUpdatePageEvent({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
+
+  final String id;
+  final String name;
+  final String description;
+
+  @override
+  List<Object?> get props => [id, name, description];
 }
 
 /// Event to delete a page.
@@ -41,7 +57,9 @@ class AppEditorPageListDeletePageEvent extends AppEditorPageListEvent {
 
 /// Event to search pages.
 class AppEditorPageListSearchEvent extends AppEditorPageListEvent {
-  const AppEditorPageListSearchEvent(this.query);
+  const AppEditorPageListSearchEvent({
+    required this.query,
+  });
 
   final String query;
 

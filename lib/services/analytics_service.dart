@@ -1,10 +1,10 @@
 import 'dart:async';
+
 import 'package:devity_console/config/environment.dart';
 import 'package:devity_console/models/analytics_event.dart';
 import 'package:devity_console/services/analytics_queue_service.dart';
 import 'package:devity_console/services/error_handler_service.dart';
 import 'package:devity_console/services/network_service.dart';
-import 'package:dio/dio.dart';
 
 /// Analytics Service
 class AnalyticsService {
@@ -14,7 +14,8 @@ class AnalyticsService {
     ErrorHandlerService? errorHandler,
   })  : _networkService = networkService ??
             NetworkService(errorHandler: ErrorHandlerService()),
-        _errorHandler = errorHandler ?? ErrorHandlerService();
+        _errorHandler = errorHandler ?? ErrorHandlerService(),
+        _queueService = AnalyticsQueueService();
 
   /// Network service instance
   final NetworkService _networkService;
@@ -23,16 +24,10 @@ class AnalyticsService {
   final ErrorHandlerService _errorHandler;
 
   /// Queue service instance
-  late AnalyticsQueueService _queueService;
+  final AnalyticsQueueService _queueService;
 
   /// Whether analytics is enabled
-  bool _enabled = Environment.isAnalyticsEnabled;
-
-  /// Initialize the service
-  void initialize() {
-    _queueService = AnalyticsQueueService();
-  }
-
+  final bool _enabled = Environment.isAnalyticsEnabled;
 
   /// Send an event
   Future<void> sendEvent(AnalyticsEvent event) async {
@@ -56,7 +51,6 @@ class AnalyticsService {
           method: 'POST',
           data: event.toJson(),
           headers: {'Content-Type': 'application/json'},
-          useCache: false,
         );
 
         if (response.statusCode == 200) {
@@ -217,11 +211,13 @@ class AnalyticsService {
     required String eventName,
     required Map<String, dynamic> parameters,
   }) async {
-    await _queueService.addEvent(AnalyticsEvent(
-      eventType: eventType,
-      eventName: eventName,
-      parameters: parameters,
-    ));
+    await _queueService.addEvent(
+      AnalyticsEvent(
+        eventType: eventType,
+        eventName: eventName,
+        parameters: parameters,
+      ),
+    );
     await _processQueue();
   }
 
@@ -230,24 +226,28 @@ class AnalyticsService {
     required String userId,
     required Map<String, dynamic> properties,
   }) async {
-    await _queueService.addEvent(AnalyticsEvent(
-      eventType: AnalyticsEventType.custom,
-      eventName: 'set_user_properties',
-      parameters: {
-        'user_id': userId,
-        'properties': properties,
-      },
-    ));
+    await _queueService.addEvent(
+      AnalyticsEvent(
+        eventType: AnalyticsEventType.custom,
+        eventName: 'set_user_properties',
+        parameters: {
+          'user_id': userId,
+          'properties': properties,
+        },
+      ),
+    );
     await _processQueue();
   }
 
   /// Clear user properties
   Future<void> clearUserProperties() async {
-    await _queueService.addEvent(AnalyticsEvent(
-      eventType: AnalyticsEventType.custom,
-      eventName: 'clear_user_properties',
-      parameters: {},
-    ));
+    await _queueService.addEvent(
+      AnalyticsEvent(
+        eventType: AnalyticsEventType.custom,
+        eventName: 'clear_user_properties',
+        parameters: {},
+      ),
+    );
     await _processQueue();
   }
 }

@@ -3,7 +3,6 @@ import 'package:devity_console/modules/app_editor_action_bar/app_editor_action_b
 import 'package:devity_console/modules/app_editor_attribute_editor/app_editor_attribute_editor.dart';
 import 'package:devity_console/modules/app_editor_navigation_drawer/app_editor_navigation_drawer.dart';
 import 'package:devity_console/modules/app_editor_page_editor/app_editor_page_editor.dart';
-import 'package:devity_console/repositories/app_editor_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
@@ -23,10 +22,8 @@ class AppEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AppEditorBloc(
-        repository: AppEditorRepository(),
-        projectId: projectId,
-      )..add(const AppEditorStartedEvent()),
+      create: (context) => AppEditorBloc(projectId: projectId)
+        ..add(const AppEditorStartedEvent()),
       child: const AppEditorView(),
     );
   }

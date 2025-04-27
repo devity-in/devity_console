@@ -12,6 +12,7 @@ class AppEditorPageListBloc
   AppEditorPageListBloc() : super(const AppEditorPageListInitialState()) {
     on<AppEditorPageListStartedEvent>(_onStarted);
     on<AppEditorPageListAddPageEvent>(_onAddPage);
+    on<AppEditorPageListUpdatePageEvent>(_onUpdatePage);
     on<AppEditorPageListDeletePageEvent>(_onDeletePage);
     on<AppEditorPageListSearchEvent>(_onSearch);
   }
@@ -71,6 +72,28 @@ class AppEditorPageListBloc
         description: event.description,
       );
       _allPages = [..._allPages, page];
+      emit(AppEditorPageListLoadedState(pages: _allPages));
+    } catch (e) {
+      emit(AppEditorPageListErrorState(message: e.toString()));
+    }
+  }
+
+  Future<void> _onUpdatePage(
+    AppEditorPageListUpdatePageEvent event,
+    Emitter<AppEditorPageListState> emit,
+  ) async {
+    try {
+      // TODO: Implement API call to update page
+      _allPages = _allPages.map((page) {
+        if (page.id == event.id) {
+          return models.Page(
+            id: page.id,
+            name: event.name,
+            description: event.description,
+          );
+        }
+        return page;
+      }).toList();
       emit(AppEditorPageListLoadedState(pages: _allPages));
     } catch (e) {
       emit(AppEditorPageListErrorState(message: e.toString()));

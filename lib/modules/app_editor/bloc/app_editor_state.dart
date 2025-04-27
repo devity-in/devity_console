@@ -18,12 +18,10 @@ class AppEditorLoadingState extends AppEditorState {
 /// Loaded state with pages
 class AppEditorLoadedState extends AppEditorState {
   const AppEditorLoadedState({
-    required this.pages,
     this.selectedPageId,
     this.editorState,
   });
 
-  final List<AppPage> pages;
   final String? selectedPageId;
   final Map<String, dynamic>? editorState;
 }

@@ -1,16 +1,15 @@
 import 'dart:async';
+
 import 'package:devity_console/models/analytics_event.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:devity_console/services/cache_service.dart';
 
 /// Service for managing analytics event queue
 class AnalyticsQueueService {
   /// Constructor
   AnalyticsQueueService() {
+    // Initialize the service
     _init();
   }
-
-  /// Shared preferences instance
-  late SharedPreferences _prefs;
 
   /// Queue of events to be sent
   final List<AnalyticsEvent> _queue = [];
@@ -27,9 +26,12 @@ class AnalyticsQueueService {
   /// Processing interval
   static const Duration processingInterval = Duration(minutes: 5);
 
+  /// Queue cache key
+  static const String _queueCacheKey = 'analytics_queue';
+
   /// Initialize the service
   Future<void> _init() async {
-    _prefs = await SharedPreferences.getInstance();
+    await CacheService.instance.init();
     await _loadQueue();
     _startProcessingTimer();
   }
@@ -53,7 +55,8 @@ class AnalyticsQueueService {
 
   /// Remove processed events from the queue
   Future<void> removeProcessedEvents(
-      List<AnalyticsEvent> processedEvents) async {
+    List<AnalyticsEvent> processedEvents,
+  ) async {
     _queue.removeWhere((event) => processedEvents.contains(event));
     await _saveQueue();
   }
@@ -61,15 +64,17 @@ class AnalyticsQueueService {
   /// Save queue to persistent storage
   Future<void> _saveQueue() async {
     final eventsJson = _queue.map((e) => e.encode()).toList();
-    await _prefs.setStringList('analytics_queue', eventsJson);
+    await CacheService.instance.cacheData(_queueCacheKey, eventsJson);
   }
 
   /// Load queue from persistent storage
   Future<void> _loadQueue() async {
-    final eventsJson = _prefs.getStringList('analytics_queue') ?? [];
+    final eventsJson =
+        await CacheService.instance.getCachedData(_queueCacheKey) ?? [];
     _queue.clear();
     _queue.addAll(
-      eventsJson.map((json) => AnalyticsEvent.fromString(json)),
+      (eventsJson as List<dynamic>)
+          .map((json) => AnalyticsEvent.fromString(json as String)),
     );
   }
 
@@ -93,7 +98,7 @@ class AnalyticsQueueService {
   /// Clear the queue
   Future<void> clearQueue() async {
     _queue.clear();
-    await _saveQueue();
+    await CacheService.instance.clearCache(_queueCacheKey);
   }
 
   /// Get the current queue size

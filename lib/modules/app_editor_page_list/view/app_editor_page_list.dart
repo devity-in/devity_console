@@ -37,10 +37,17 @@ class AppEditorPageListView extends StatelessWidget {
           Navigator.of(dialogContext).pop();
         },
         onSave: (Map<String, String> data) {
-          mainContext.read<AppEditorPageListBloc>().add(
-                AppEditorPageListAddPageEvent(
-                  name: data['name']!,
-                  description: data['description'],
+          final bloc = mainContext.read<AppEditorPageListBloc>();
+          bloc.add(
+            AppEditorPageListAddPageEvent(
+              name: data['name']!,
+              description: data['description']!,
+            ),
+          );
+          // Select the newly created page
+          mainContext.read<AppEditorBloc>().add(
+                AppEditorSelectPageEvent(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
                 ),
               );
           Navigator.of(dialogContext).pop();
@@ -107,7 +114,7 @@ class AppEditorPageListView extends StatelessWidget {
                         onSearchChanged: (query) {
                           context
                               .read<AppEditorPageListBloc>()
-                              .add(AppEditorPageListSearchEvent(query));
+                              .add(AppEditorPageListSearchEvent(query: query));
                         },
                       ),
                     ),
@@ -130,9 +137,11 @@ class AppEditorPageListView extends StatelessWidget {
                       pages: state.pages,
                       selectedPageId: selectedPageId,
                       onPageSelected: (pageId) {
-                        context
-                            .read<AppEditorBloc>()
-                            .add(AppEditorSelectPageEvent(id: pageId));
+                        context.read<AppEditorBloc>().add(
+                              AppEditorSelectPageEvent(
+                                id: pageId,
+                              ),
+                            );
                       },
                       onDeletePage: (pageId) {
                         context.read<AppEditorPageListBloc>().add(
