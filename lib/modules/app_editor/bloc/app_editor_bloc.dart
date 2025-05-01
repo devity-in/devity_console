@@ -69,15 +69,17 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
   ) async {
     final currentState = state;
     if (currentState is AppEditorLoadedState) {
+      final sectionAttributes =
+          _getSectionAttributes(currentState.editorState, event.sectionType) ??
+              {};
+
       emit(
         AppEditorLoadedState(
           selectedPageId: currentState.selectedPageId,
           editorState: currentState.editorState,
           selectedSectionType: event.sectionType,
           pageAttributes: currentState.pageAttributes,
-          sectionAttributes: currentState.sectionAttributes,
-          layoutAttributes: currentState.layoutAttributes,
-          widgetAttributes: currentState.widgetAttributes,
+          sectionAttributes: sectionAttributes,
         ),
       );
     }
@@ -89,6 +91,13 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
   ) async {
     final currentState = state;
     if (currentState is AppEditorLoadedState) {
+      final layoutAttributes = _getLayoutAttributes(
+            currentState.editorState,
+            event.sectionType,
+            event.layoutIndex,
+          ) ??
+          {};
+
       emit(
         AppEditorLoadedState(
           selectedPageId: currentState.selectedPageId,
@@ -97,8 +106,7 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
           selectedLayoutIndex: event.layoutIndex,
           pageAttributes: currentState.pageAttributes,
           sectionAttributes: currentState.sectionAttributes,
-          layoutAttributes: currentState.layoutAttributes,
-          widgetAttributes: currentState.widgetAttributes,
+          layoutAttributes: layoutAttributes,
         ),
       );
     }
@@ -110,6 +118,14 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
   ) async {
     final currentState = state;
     if (currentState is AppEditorLoadedState) {
+      final widgetAttributes = _getWidgetAttributes(
+            currentState.editorState,
+            event.sectionType,
+            event.layoutIndex,
+            event.widgetIndex,
+          ) ??
+          {};
+
       emit(
         AppEditorLoadedState(
           selectedPageId: currentState.selectedPageId,
@@ -120,7 +136,7 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
           pageAttributes: currentState.pageAttributes,
           sectionAttributes: currentState.sectionAttributes,
           layoutAttributes: currentState.layoutAttributes,
-          widgetAttributes: currentState.widgetAttributes,
+          widgetAttributes: widgetAttributes,
         ),
       );
     }
@@ -287,6 +303,53 @@ class AppEditorBloc extends Bloc<AppEditorEvent, AppEditorState> {
       }
     } catch (e) {
       emit(AppEditorErrorState(message: e.toString()));
+    }
+  }
+
+  Map<String, dynamic>? _getSectionAttributes(
+    Map<String, dynamic>? editorState,
+    PageSectionType sectionType,
+  ) {
+    print(
+      'Fetching attributes for section: ${sectionType.name}',
+    );
+    return editorState?['sections']?[sectionType.name]?['attributes']
+        as Map<String, dynamic>?;
+  }
+
+  Map<String, dynamic>? _getLayoutAttributes(
+    Map<String, dynamic>? editorState,
+    PageSectionType sectionType,
+    int layoutIndex,
+  ) {
+    print(
+      'Fetching attributes for layout: ${sectionType.name}[$layoutIndex]',
+    );
+    try {
+      return editorState?['sections']?[sectionType.name]?['layouts']
+          ?[layoutIndex]?['attributes'] as Map<String, dynamic>?;
+    } catch (e) {
+      print('Error fetching layout attributes: $e');
+      return null;
+    }
+  }
+
+  Map<String, dynamic>? _getWidgetAttributes(
+    Map<String, dynamic>? editorState,
+    PageSectionType sectionType,
+    int layoutIndex,
+    int widgetIndex,
+  ) {
+    print(
+      'Fetching attributes for widget: ${sectionType.name}[$layoutIndex][$widgetIndex]',
+    );
+    try {
+      return editorState?['sections']?[sectionType.name]?['layouts']
+              ?[layoutIndex]?['widgets']?[widgetIndex]?['attributes']
+          as Map<String, dynamic>?;
+    } catch (e) {
+      print('Error fetching widget attributes: $e');
+      return null;
     }
   }
 }

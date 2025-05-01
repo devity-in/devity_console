@@ -24,6 +24,9 @@ class AppEditorAttributeEditorSelectionChanged
     this.selectedSectionType,
     this.selectedLayoutIndex,
     this.selectedWidgetIndex,
+    this.sectionAttributes,
+    this.layoutAttributes,
+    this.widgetAttributes,
   });
 
   /// The selected section type
@@ -35,11 +38,23 @@ class AppEditorAttributeEditorSelectionChanged
   /// The index of the selected widget
   final int? selectedWidgetIndex;
 
+  /// The attributes for the selected section (if applicable)
+  final Map<String, dynamic>? sectionAttributes;
+
+  /// The attributes for the selected layout (if applicable)
+  final Map<String, dynamic>? layoutAttributes;
+
+  /// The attributes for the selected widget (if applicable)
+  final Map<String, dynamic>? widgetAttributes;
+
   @override
   List<Object?> get props => [
         selectedSectionType,
         selectedLayoutIndex,
         selectedWidgetIndex,
+        sectionAttributes,
+        layoutAttributes,
+        widgetAttributes,
       ];
 }
 

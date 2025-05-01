@@ -33,6 +33,9 @@ class AppEditorAttributeEditorView extends StatelessWidget {
                   selectedSectionType: state.selectedSectionType,
                   selectedLayoutIndex: state.selectedLayoutIndex,
                   selectedWidgetIndex: state.selectedWidgetIndex,
+                  sectionAttributes: state.sectionAttributes,
+                  layoutAttributes: state.layoutAttributes,
+                  widgetAttributes: state.widgetAttributes,
                 ),
               );
         }
@@ -40,26 +43,36 @@ class AppEditorAttributeEditorView extends StatelessWidget {
       child: BlocBuilder<AppEditorAttributeEditorBloc,
           AppEditorAttributeEditorState>(
         builder: (context, state) {
-          if (state is! AppEditorAttributeEditorLoaded) {
+          if (state is AppEditorAttributeEditorLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return Container(
-            width: 300,
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _getTitle(state),
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: _buildAttributeEditor(context, state),
-                ),
-              ],
-            ),
+          if (state is AppEditorAttributeEditorError) {
+            return Center(child: Text(state.message));
+          }
+
+          if (state is AppEditorAttributeEditorLoaded) {
+            return Container(
+              width: 300,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _getTitle(state),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: _buildAttributeEditor(context, state),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return const Center(
+            child: Text('Select an item to edit its properties'),
           );
         },
       ),

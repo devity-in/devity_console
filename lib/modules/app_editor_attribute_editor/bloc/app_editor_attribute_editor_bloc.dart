@@ -35,22 +35,16 @@ class AppEditorAttributeEditorBloc
     AppEditorAttributeEditorSelectionChanged event,
     Emitter<AppEditorAttributeEditorState> emit,
   ) {
-    if (state is AppEditorAttributeEditorLoaded) {
-      final currentState = state as AppEditorAttributeEditorLoaded;
-      emit(
-        AppEditorAttributeEditorLoaded(
-          selectedSectionType:
-              event.selectedSectionType ?? currentState.selectedSectionType,
-          selectedLayoutIndex:
-              event.selectedLayoutIndex ?? currentState.selectedLayoutIndex,
-          selectedWidgetIndex:
-              event.selectedWidgetIndex ?? currentState.selectedWidgetIndex,
-          sectionAttributes: currentState.sectionAttributes,
-          layoutAttributes: currentState.layoutAttributes,
-          widgetAttributes: currentState.widgetAttributes,
-        ),
-      );
-    }
+    emit(
+      AppEditorAttributeEditorLoaded(
+        selectedSectionType: event.selectedSectionType,
+        selectedLayoutIndex: event.selectedLayoutIndex,
+        selectedWidgetIndex: event.selectedWidgetIndex,
+        sectionAttributes: event.sectionAttributes ?? const {},
+        layoutAttributes: event.layoutAttributes ?? const {},
+        widgetAttributes: event.widgetAttributes ?? const {},
+      ),
+    );
   }
 
   void _onSectionAttributeUpdated(
