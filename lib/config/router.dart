@@ -1,14 +1,10 @@
 import 'package:devity_console/modules/forgot_password/forgot_password.dart';
 import 'package:devity_console/modules/login/login.dart';
-import 'package:devity_console/modules/project/bloc/project_bloc.dart';
-import 'package:devity_console/modules/project/view/project_view.dart';
-import 'package:devity_console/modules/project_list/view/project_list_screen.dart';
 import 'package:devity_console/modules/project_detail/view/project_detail_screen.dart';
-import 'package:devity_console/modules/spec_editor/view/spec_editor_screen.dart';
+import 'package:devity_console/modules/project_list/view/project_list_screen.dart';
 import 'package:devity_console/modules/signup/signup.dart';
 import 'package:devity_console/modules/splash/splash.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// The router configuration for the application
@@ -60,35 +56,24 @@ final router = GoRouter(
 
     // Project route (List)
     GoRoute(
-        path: ProjectListScreen.routeName,
-        name: 'projects',
-        builder: (context, state) => const ProjectListScreen(),
-        // Nested route for project details
-        routes: [
-          GoRoute(
-              path: ':projectId', // Relative path: '/projects/:projectId'
-              name: 'project-detail', // Renamed for clarity
-              builder: (context, state) {
-                final projectId = state.pathParameters['projectId']!;
-                // Use the new ProjectDetailScreen which handles SpecListBloc internally
-                return ProjectDetailScreen(projectId: projectId);
-              },
-              // Nested route for spec editor
-              routes: [
-                GoRoute(
-                    path:
-                        'spec/:specId', // Relative path: '/projects/:projectId/spec/:specId'
-                    name: 'spec-editor',
-                    builder: (context, state) {
-                      final projectId = state.pathParameters['projectId']!;
-                      final specId = state.pathParameters['specId']!;
-                      return SpecEditorScreen(
-                        projectId: projectId,
-                        specId: specId,
-                      );
-                    })
-              ]),
-        ]),
+      path: ProjectListScreen.routeName,
+      name: 'projects',
+      builder: (context, state) => const ProjectListScreen(),
+      routes: [
+        // Project Detail route
+        GoRoute(
+          path: ':projectId', // Relative path: /projects/:projectId
+          name: 'project-detail',
+          builder: (context, state) {
+            final projectId = state.pathParameters['projectId'];
+            // TODO: Add error handling if projectId is null or invalid
+            return ProjectDetailScreen(
+              projectId: projectId!,
+            );
+          },
+        ),
+      ],
+    ),
   ],
   // Error page for invalid routes
   errorBuilder: (context, state) => Scaffold(

@@ -8,6 +8,15 @@ void main() async {
   setPathUrlStrategy();
 
   // Initialize environment configuration
-  await Environment.init(fileName: '.env.development');
+  print("MAIN_DEV: Attempting to load ${Environment.fileName}");
+  try {
+    await Environment.init(fileName: '.env.development');
+    print("MAIN_DEV: Environment.init completed.");
+    // Check the value loaded into the Environment class
+    print("MAIN_DEV: API_BASE_URL from Environment: ${Environment.apiBaseUrl}");
+  } catch (e) {
+    print("MAIN_DEV: Error initializing environment: $e");
+  }
+
   await bootstrap(() => const App());
 }

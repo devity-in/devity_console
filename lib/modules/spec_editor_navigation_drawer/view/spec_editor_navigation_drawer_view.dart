@@ -4,11 +4,11 @@ import 'package:devity_console/modules/spec_editor_widget_list/view/app_editor_w
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-/// [AppEditorNavigationDrawer] is a StatelessWidget that displays
+/// [SpecEditorNavigationDrawer] is a StatelessWidget that displays
 /// the app editor navigation drawer.
-class AppEditorNavigationDrawer extends StatelessWidget {
-  /// Creates a [AppEditorNavigationDrawer].
-  const AppEditorNavigationDrawer({super.key});
+class SpecEditorNavigationDrawer extends StatelessWidget {
+  /// Creates a [SpecEditorNavigationDrawer].
+  const SpecEditorNavigationDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,9 @@ class AppEditorNavigationDrawer extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
+                  // TODO: Rename AppEditorPageList?
                   AppEditorPageList(),
+                  // TODO: Rename AppEditorWidgetList?
                   AppEditorWidgetList(),
                 ],
               ),

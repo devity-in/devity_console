@@ -1,5 +1,5 @@
 import 'package:devity_console/models/widget.dart';
-import 'package:devity_console/modules/app_editor_page_editor/models/layout.dart';
+import 'package:devity_console/modules/spec_editor_page_editor/models/layout.dart';
 import 'package:devity_console/modules/widget_builder/bloc/widget_builder_bloc.dart'
     show WidgetBuilderBloc;
 import 'package:equatable/equatable.dart';

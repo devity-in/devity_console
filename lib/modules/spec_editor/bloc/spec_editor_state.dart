@@ -1,95 +1,87 @@
-import 'package:equatable/equatable.dart';
+part of 'spec_editor_bloc.dart';
 
-// Enum to represent the editor's status
-enum SpecEditorStatus { initial, loading, loaded, saving, error }
 
-abstract class SpecEditorState extends Equatable {
-  final SpecEditorStatus status;
-  final String specId; // Keep track of the spec being edited
-  final String currentContent; // The current text content in the editor
-  final String? errorMessage; // Optional error message
+/// States for the [SpecEditorBloc]
+sealed class SpecEditorState {
+  const SpecEditorState();
+}
 
-  const SpecEditorState({
-    this.status = SpecEditorStatus.initial,
-    this.specId = '', // Default empty ID
-    this.currentContent = '', // Default empty content
-    this.errorMessage,
+/// Initial state
+class SpecEditorInitialState extends SpecEditorState {
+  const SpecEditorInitialState();
+}
+
+/// Loading state
+class SpecEditorLoadingState extends SpecEditorState {
+  const SpecEditorLoadingState();
+}
+
+/// Loaded state with pages
+class SpecEditorLoadedState extends SpecEditorState {
+  const SpecEditorLoadedState({
+    this.selectedPageId,
+    this.editorState,
+    this.selectedSectionType,
+    this.selectedLayoutIndex,
+    this.selectedWidgetIndex,
+    this.pageAttributes = const {},
+    this.sectionAttributes = const {},
+    this.layoutAttributes = const {},
+    this.widgetAttributes = const {},
   });
 
-  @override
-  List<Object?> get props => [status, specId, currentContent, errorMessage];
+  /// The ID of the currently selected page
+  final String? selectedPageId;
 
-  // Helper method to create a copy with updated values
-  SpecEditorState copyWith({
-    SpecEditorStatus? status,
-    String? specId,
-    String? currentContent,
-    String? errorMessage,
-    bool clearError = false, // Flag to explicitly clear the error
-  }) {
-    // Need a concrete implementation or factory to use copyWith effectively.
-    // For now, this acts as a signature placeholder.
-    // You'll typically implement this in concrete state classes.
-    throw UnimplementedError(
-        'copyWith must be implemented in concrete state classes');
-  }
+  /// The current editor state
+  final Map<String, dynamic>? editorState;
+
+  /// The type of the currently selected section
+  final PageSectionType? selectedSectionType;
+
+  /// The index of the currently selected layout
+  final int? selectedLayoutIndex;
+
+  /// The index of the currently selected widget
+  final int? selectedWidgetIndex;
+
+  /// The attributes for the selected page
+  final Map<String, dynamic> pageAttributes;
+
+  /// The attributes for the selected section
+  final Map<String, dynamic> sectionAttributes;
+
+  /// The attributes for the selected layout
+  final Map<String, dynamic> layoutAttributes;
+
+  /// The attributes for the selected widget
+  final Map<String, dynamic> widgetAttributes;
 }
 
-class SpecEditorInitial extends SpecEditorState {
-  const SpecEditorInitial() : super(status: SpecEditorStatus.initial);
-}
-
-// Example concrete state extending the base
-class SpecEditorConcreteState extends SpecEditorState {
-  const SpecEditorConcreteState({
-    super.status,
-    super.specId,
-    super.currentContent,
-    super.errorMessage,
+/// Error state
+class SpecEditorErrorState extends SpecEditorState {
+  const SpecEditorErrorState({
+    required this.message,
   });
 
-  @override
-  SpecEditorConcreteState copyWith({
-    SpecEditorStatus? status,
-    String? specId,
-    String? currentContent,
-    String? errorMessage,
-    bool clearError = false,
-  }) {
-    return SpecEditorConcreteState(
-      status: status ?? this.status,
-      specId: specId ?? this.specId,
-      currentContent: currentContent ?? this.currentContent,
-      // If clearError is true, set errorMessage to null,
-      // otherwise update with provided message or keep existing.
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-    );
-  }
+  final String message;
 }
 
+/// Model for an app page
+class AppPage {
+  /// Creates a new [AppPage]
+  const AppPage({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
 
-// --- We could define specific states for loading, loaded, error etc. ---
-// --- OR use the single SpecEditorConcreteState with different status values. ---
-// --- Using a single state class with `copyWith` is often more flexible. ---
+  /// The unique identifier of the page
+  final String id;
 
-// Example using specific states (alternative approach):
-/*
-class SpecEditorLoading extends SpecEditorState {
-  const SpecEditorLoading({required String specId}) : super(status: SpecEditorStatus.loading, specId: specId);
+  /// The name of the page
+  final String name;
+
+  /// The description of the page
+  final String description;
 }
-
-class SpecEditorLoaded extends SpecEditorState {
-  const SpecEditorLoaded({required String specId, required String initialContent}) 
-      : super(status: SpecEditorStatus.loaded, specId: specId, currentContent: initialContent);
-}
-
-class SpecEditorSaving extends SpecEditorState {
-   const SpecEditorSaving({required String specId, required String contentToSave}) 
-      : super(status: SpecEditorStatus.saving, specId: specId, currentContent: contentToSave);
-}
-
-class SpecEditorError extends SpecEditorState {
-  const SpecEditorError({required String specId, required String content, required String message}) 
-      : super(status: SpecEditorStatus.error, specId: specId, currentContent: content, errorMessage: message);
-}
-*/ 

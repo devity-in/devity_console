@@ -56,9 +56,15 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
     );
     emit(ProjectListLoading());
     try {
+      print("ProjectListBloc: Fetching projects...");
       _allProjects = await _projectService.getProjects();
+      print(
+          "ProjectListBloc: Projects fetched successfully (count: ${_allProjects.length})");
+      print("ProjectListBloc: Emitting ProjectListLoaded state...");
       emit(ProjectListLoaded(_allProjects));
-    } catch (e) {
+      print("ProjectListBloc: ProjectListLoaded state emitted.");
+    } catch (e, s) {
+      print("ProjectListBloc: Error fetching projects: $e\n$s");
       emit(ProjectListError(e.toString()));
     }
   }
@@ -69,9 +75,15 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   ) async {
     emit(ProjectListLoading());
     try {
+      print("ProjectListBloc: Reloading projects...");
       _allProjects = await _projectService.getProjects();
+      print(
+          "ProjectListBloc: Projects reloaded successfully (count: ${_allProjects.length})");
+      print("ProjectListBloc: Emitting ProjectListLoaded state...");
       emit(ProjectListLoaded(_allProjects));
-    } catch (e) {
+      print("ProjectListBloc: ProjectListLoaded state emitted.");
+    } catch (e, s) {
+      print("ProjectListBloc: Error reloading projects: $e\n$s");
       emit(ProjectListError(e.toString()));
     }
   }

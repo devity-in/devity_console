@@ -105,6 +105,8 @@ class NetworkService {
   /// - Default headers
   /// - Interceptors for caching, retry, and error handling
   void _initDio() {
+    print("NETWORK SERVICE: Initializing Dio...");
+    print("NETWORK SERVICE: Using base URL: ${Environment.apiBaseUrl}");
     _dio = Dio(
       BaseOptions(
         baseUrl: Environment.apiBaseUrl,
@@ -120,12 +122,15 @@ class NetworkService {
       ),
     );
 
-    // Add interceptors
+    // Temporarily comment out interceptors for web debugging
+    /*
     _dio.interceptors.addAll([
       _getCacheInterceptor(),
       _getRetryInterceptor(),
       _getErrorInterceptor(),
     ]);
+    */
+    print("NETWORK SERVICE: INTERCEPTORS TEMPORARILY DISABLED FOR DEBUGGING");
   }
 
   /// Initializes network connectivity monitoring
