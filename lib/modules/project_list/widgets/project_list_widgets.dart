@@ -1,4 +1,4 @@
-import 'package:devity_console/models/project.dart';
+import 'package:devity_console/models/project_model.dart';
 import 'package:flutter/material.dart';
 
 /// Widget for the project list search bar
@@ -88,7 +88,7 @@ class ProjectCard extends StatelessWidget {
   });
 
   /// The project to display
-  final Project project;
+  final ProjectModel project;
 
   /// Callback when card is tapped
   final void Function() onTap;
@@ -194,10 +194,10 @@ class ProjectListGrid extends StatelessWidget {
   });
 
   /// List of projects to display
-  final List<Project> projects;
+  final List<ProjectModel> projects;
 
   /// Callback when a project is tapped
-  final void Function(Project) onProjectTap;
+  final void Function(ProjectModel) onProjectTap;
 
   @override
   Widget build(BuildContext context) {

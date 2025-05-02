@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:devity_console/models/project.dart';
+import 'package:devity_console/models/project_model.dart';
 
 /// Base class for all project list states.
 abstract class ProjectListState extends Equatable {
@@ -18,7 +18,7 @@ class ProjectListLoading extends ProjectListState {}
 /// The state when the project list has been loaded successfully.
 class ProjectListLoaded extends ProjectListState {
   /// The list of projects.
-  final List<Project> projects;
+  final List<ProjectModel> projects;
 
   /// Creates a new [ProjectListLoaded].
   const ProjectListLoaded(this.projects);
