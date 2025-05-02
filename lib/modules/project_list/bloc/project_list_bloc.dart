@@ -1,9 +1,11 @@
 import 'dart:async';
 
-import 'package:devity_console/models/project.dart';
+import 'package:devity_console/models/project_model.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_event.dart';
 import 'package:devity_console/modules/project_list/bloc/project_list_state.dart';
 import 'package:devity_console/repositories/analytics_repository.dart';
+import 'package:devity_console/services/error_handler_service.dart';
+import 'package:devity_console/services/network_service.dart';
 import 'package:devity_console/services/project_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,7 +18,12 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   ProjectListBloc({
     ProjectService? projectService,
     AnalyticsRepository? analyticsRepository,
-  })  : _projectService = projectService ?? ProjectService(),
+  })  : _projectService = projectService ??
+            ProjectService(
+              networkService: NetworkService(
+                errorHandler: ErrorHandlerService(),
+              ),
+            ),
         _analyticsRepository = analyticsRepository ?? AnalyticsRepository(),
         super(ProjectListInitial()) {
     on<ProjectListStartedEvent>(_onStarted);
@@ -33,7 +40,7 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   final AnalyticsRepository _analyticsRepository;
 
   /// List of all projects
-  List<Project> _allProjects = [];
+  List<ProjectModel> _allProjects = [];
 
   Future<void> _onStarted(
     ProjectListStartedEvent event,
