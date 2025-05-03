@@ -111,3 +111,19 @@ class SpecEditorLoadStateEvent extends SpecEditorEvent {
 class SpecEditorSaveSpecRequested extends SpecEditorEvent {
   const SpecEditorSaveSpecRequested();
 }
+
+/// Event when a component (widget or layout) is dropped onto the canvas.
+class SpecEditorComponentDropped extends SpecEditorEvent {
+  // Data from the Draggable
+
+  const SpecEditorComponentDropped({
+    // required this.sectionType,
+    // this.targetLayoutIndex,
+    // this.targetWidgetIndex,
+    required this.componentData,
+  });
+  // final PageSectionType sectionType; // Where it was dropped
+  // final int? targetLayoutIndex; // Optional target layout index within section
+  // final int? targetWidgetIndex; // Optional target widget index (for inserting between)
+  final Map<String, dynamic> componentData;
+}

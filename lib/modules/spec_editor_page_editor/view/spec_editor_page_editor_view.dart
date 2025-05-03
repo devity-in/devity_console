@@ -186,6 +186,7 @@ class SpecEditorPageEditorView extends StatelessWidget {
   ) {
     final isSelected =
         selectedSectionType == type && selectedLayoutIndex == null;
+    final specEditorBloc = context.read<SpecEditorBloc>();
 
     return GestureDetector(
       onTap: () {
@@ -193,27 +194,11 @@ class SpecEditorPageEditorView extends StatelessWidget {
               AppEditorPageEditorSelectSection(sectionType: type),
             );
       },
-      child: DragTarget<Object>(
+      child: DragTarget<Map<String, dynamic>>(
         onWillAcceptWithDetails: (data) => true,
-        onAcceptWithDetails: (DragTargetDetails<Object> details) {
+        onAcceptWithDetails: (DragTargetDetails<Map<String, dynamic>> details) {
           final data = details.data;
-          if (data is Map<String, dynamic>) {
-            // Handle widget drop
-            context.read<AppEditorPageEditorBloc>().add(
-                  AppEditorPageWidgetDropped(
-                    sectionType: type,
-                    widgetData: data,
-                  ),
-                );
-          } else if (data is LayoutType) {
-            // Handle layout drop
-            context.read<AppEditorPageEditorBloc>().add(
-                  AppEditorPageLayoutDropped(
-                    sectionType: type,
-                    layoutType: data,
-                  ),
-                );
-          }
+          specEditorBloc.add(SpecEditorComponentDropped(componentData: data));
         },
         builder: (context, candidateData, rejectedData) {
           return Container(

@@ -1,8 +1,10 @@
 import 'dart:async'; // Import for async
+import 'dart:convert'; // Import for jsonEncode/Decode
 
 import 'package:bloc/bloc.dart';
 import 'package:devity_console/modules/spec_editor_page_editor/models/page_section.dart';
 import 'package:devity_console/repositories/spec_editor_repository.dart';
+import 'package:uuid/uuid.dart'; // Import for unique IDs
 
 part 'spec_editor_event.dart';
 part 'spec_editor_state.dart';
@@ -27,10 +29,13 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     on<SpecEditorWidgetAttributesUpdated>(_onWidgetAttributesUpdated);
     on<SpecEditorSaveStateEvent>(_onSaveState);
     on<SpecEditorLoadStateEvent>(_onLoadState);
+    on<SpecEditorSaveSpecRequested>(_onSaveSpecRequested);
+    on<SpecEditorComponentDropped>(_onComponentDropped);
   }
 
   late final SpecEditorRepository repository;
   final String projectId;
+  final _uuid = const Uuid(); // UUID generator
 
   Future<void> _onStarted(
     SpecEditorStartedEvent event,
@@ -208,8 +213,11 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
       // newSpecData['screens'] = screens;
       // emit(currentState.copyWith(specData: newSpecData, pageAttributes: event.attributes));
       print('TODO: Implement _onPageAttributesUpdated to modify specData');
-      emit(currentState.copyWith(
-          pageAttributes: event.attributes)); // Placeholder update
+      emit(
+        currentState.copyWith(
+          pageAttributes: event.attributes,
+        ),
+      ); // Placeholder update
     }
   }
 
@@ -222,8 +230,11 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
         currentState.selectedSectionType != null) {
       // TODO: Implement logic to update section attributes in specData map
       print('TODO: Implement _onSectionAttributesUpdated to modify specData');
-      emit(currentState.copyWith(
-          sectionAttributes: event.attributes)); // Placeholder update
+      emit(
+        currentState.copyWith(
+          sectionAttributes: event.attributes,
+        ),
+      ); // Placeholder update
     }
   }
 
@@ -236,8 +247,11 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
         currentState.selectedLayoutIndex != null) {
       // TODO: Implement logic to update layout attributes in specData map
       print('TODO: Implement _onLayoutAttributesUpdated to modify specData');
-      emit(currentState.copyWith(
-          layoutAttributes: event.attributes)); // Placeholder update
+      emit(
+        currentState.copyWith(
+          layoutAttributes: event.attributes,
+        ),
+      ); // Placeholder update
     }
   }
 
@@ -250,8 +264,11 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
         currentState.selectedWidgetIndex != null) {
       // TODO: Implement logic to update widget attributes in specData map
       print('TODO: Implement _onWidgetAttributesUpdated to modify specData');
-      emit(currentState.copyWith(
-          widgetAttributes: event.attributes)); // Placeholder update
+      emit(
+        currentState.copyWith(
+          widgetAttributes: event.attributes,
+        ),
+      ); // Placeholder update
     }
   }
 
@@ -271,42 +288,164 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     print('Load State Event received - implementation pending');
   }
 
+  Future<void> _onComponentDropped(
+    SpecEditorComponentDropped event,
+    Emitter<SpecEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is SpecEditorLoadedState &&
+        currentState.selectedPageId != null) {
+      final componentType = event.componentData['componentType'] as String?;
+      final type =
+          event.componentData['type'] as String?; // 'Widget' or 'Renderer'
+
+      if (componentType == null || type == null) {
+        print('Error: Dropped component data missing type information.');
+        return; // Or emit error state
+      }
+
+      try {
+        // --- Create new component map ---
+        final newComponent = <String, dynamic>{
+          'id': '${componentType.toLowerCase()}_${_uuid.v4().substring(0, 8)}',
+          'type': type,
+        };
+
+        if (type == 'Widget') {
+          newComponent['widgetType'] = componentType;
+          // Add default attributes based on widgetType
+          switch (componentType) {
+            case 'Text':
+              newComponent['attributes'] = {'text': 'New Text'};
+            case 'Button':
+              newComponent['attributes'] = {
+                'text': 'New Button',
+                'enabled': true,
+              };
+            case 'Image':
+              newComponent['attributes'] = {
+                'url': 'placeholder.png',
+              }; // Placeholder
+            case 'TextField':
+              newComponent['attributes'] = {'placeholder': 'Enter text...'};
+            // Add other widget defaults
+            default:
+              newComponent['attributes'] = {};
+          }
+        } else if (type == 'Renderer') {
+          newComponent['rendererType'] = componentType;
+          // Add default attributes/children based on rendererType
+          switch (componentType) {
+            case 'Column':
+            case 'Row':
+            case 'Stack':
+              newComponent['attributes'] = {};
+              newComponent['children'] = [];
+            // Add other renderer defaults (Padding, Scrollable might need attributes)
+            default:
+              newComponent['attributes'] = {};
+              newComponent['children'] = []; // Default
+          }
+        }
+
+        // --- Modify specData ---
+        // Use helper for deep copy and type safety
+        final newSpecData = _deepCopyMap(currentState.specData);
+        final screens = newSpecData['screens'] as Map<String, dynamic>? ?? {};
+        final currentPage =
+            screens[currentState.selectedPageId] as Map<String, dynamic>?;
+
+        if (currentPage == null) {
+          print('Error: Current page not found in specData.');
+          return;
+        }
+
+        // Get body, ensuring type safety
+        final body = currentPage['body'] as Map<String, dynamic>?;
+        if (body == null || body['type'] != 'Renderer') {
+          print('Error: Current page body is not a valid renderer.');
+          return;
+        }
+
+        // Get children list, ensuring type safety
+        final children =
+            List<dynamic>.from(body['children'] as List<dynamic>? ?? []);
+        children.add(newComponent);
+        body['children'] = children;
+
+        // No need to reassign body to currentPage or currentPage to screens if modifying in place
+        // newSpecData already holds the reference through the deep copy
+
+        // --- Emit updated state ---
+        emit(currentState.copyWith(specData: newSpecData));
+      } catch (e, stackTrace) {
+        print('Error handling component drop: $e\n$stackTrace');
+      }
+    }
+  }
+
+  Future<void> _onSaveSpecRequested(
+    SpecEditorSaveSpecRequested event,
+    Emitter<SpecEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is SpecEditorLoadedState) {
+      print('Save Spec Requested. Current Data: ${currentState.specData}');
+      // TODO: Implement repository call
+      // Example:
+      // emit(currentState.copyWith(isSaving: true)); // Indicate loading
+      // try {
+      //   await repository.saveSpec(projectId, currentState.specData);
+      //   emit(currentState.copyWith(isSaving: false, saveSuccess: true)); // Indicate success
+      // } catch (e) {
+      //   emit(currentState.copyWith(isSaving: false, saveError: e.toString())); // Indicate error
+      // }
+    }
+  }
+
   // TODO: Add handler for SpecEditorSaveSpecRequested
   // This handler should:
   // 1. Get current specData from state.
   // 2. Call repository.saveSpec(projectId, specData).
   // 3. Handle success/failure (e.g., emit loading/success/error state).
+
+  // --- Helper for deep copying ---
+  Map<String, dynamic> _deepCopyMap(Map<String, dynamic> original) {
+    return jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
+  }
 }
 
-// --- Helper functions for attribute extraction (NEED REWORKING) ---
-// These functions are placeholders and need to be updated to work
-// with the new `specData` structure.
+// --- Attribute Getter Helpers (Still need rework for specData structure) ---
 
 Map<String, dynamic>? _getSectionAttributes(
-  Map<String, dynamic>? editorState, // Should be specData
+  Map<String, dynamic>? specData,
   PageSectionType sectionType,
 ) {
-  // TODO: Implement logic to extract section attributes from specData
-  return editorState?[sectionType.name]?['attributes'] as Map<String, dynamic>?;
-}
-
-Map<String, dynamic>? _getLayoutAttributes(
-  Map<String, dynamic>? editorState, // Should be specData
-  PageSectionType sectionType,
-  int layoutIndex,
-) {
-  // TODO: Implement logic to extract layout attributes from specData
-  return editorState?[sectionType.name]?['layouts']?[layoutIndex]?['attributes']
+  // Placeholder - needs correct path through specData
+  const screenId = 'page_default'; // Need actual selected page ID
+  return specData?['screens']?[screenId]?['attributes']
       as Map<String, dynamic>?;
 }
 
+Map<String, dynamic>? _getLayoutAttributes(
+  Map<String, dynamic>? specData,
+  PageSectionType sectionType,
+  int layoutIndex,
+) {
+  // Placeholder - needs correct path through specData
+  const screenId = 'page_default'; // Need actual selected page ID
+  return specData?['screens']?[screenId]?['body']?['children']?[layoutIndex]
+      ?['attributes'] as Map<String, dynamic>?;
+}
+
 Map<String, dynamic>? _getWidgetAttributes(
-  Map<String, dynamic>? editorState, // Should be specData
+  Map<String, dynamic>? specData,
   PageSectionType sectionType,
   int layoutIndex,
   int widgetIndex,
 ) {
-  // TODO: Implement logic to extract widget attributes from specData
-  return editorState?[sectionType.name]?['layouts']?[layoutIndex]?['widgets']
-      ?[widgetIndex]?['attributes'] as Map<String, dynamic>?;
+  // Placeholder - needs correct path through specData
+  const screenId = 'page_default'; // Need actual selected page ID
+  return specData?['screens']?[screenId]?['body']?['children']?[layoutIndex]
+      ?['children']?[widgetIndex]?['attributes'] as Map<String, dynamic>?;
 }
