@@ -1,26 +1,27 @@
 part of 'spec_editor_bloc.dart';
 
-
-/// States for the [SpecEditorBloc]
+/// Base state for the [SpecEditorBloc]
 sealed class SpecEditorState {
   const SpecEditorState();
 }
 
-/// Initial state
+/// Initial state before loading
 class SpecEditorInitialState extends SpecEditorState {
   const SpecEditorInitialState();
 }
 
-/// Loading state
+/// State while loading spec data
 class SpecEditorLoadingState extends SpecEditorState {
   const SpecEditorLoadingState();
 }
 
-/// Loaded state with pages
+/// State when spec data is loaded and editor is ready
 class SpecEditorLoadedState extends SpecEditorState {
+  // Removed editorState as specData holds the main content now
+
   const SpecEditorLoadedState({
+    this.specData = const {}, // Default to empty spec
     this.selectedPageId,
-    this.editorState,
     this.selectedSectionType,
     this.selectedLayoutIndex,
     this.selectedWidgetIndex,
@@ -29,41 +30,56 @@ class SpecEditorLoadedState extends SpecEditorState {
     this.layoutAttributes = const {},
     this.widgetAttributes = const {},
   });
-
-  /// The ID of the currently selected page
+  final Map<String, dynamic> specData; // Holds the loaded spec content
   final String? selectedPageId;
-
-  /// The current editor state
-  final Map<String, dynamic>? editorState;
-
-  /// The type of the currently selected section
   final PageSectionType? selectedSectionType;
-
-  /// The index of the currently selected layout
   final int? selectedLayoutIndex;
-
-  /// The index of the currently selected widget
   final int? selectedWidgetIndex;
-
-  /// The attributes for the selected page
   final Map<String, dynamic> pageAttributes;
-
-  /// The attributes for the selected section
   final Map<String, dynamic> sectionAttributes;
-
-  /// The attributes for the selected layout
   final Map<String, dynamic> layoutAttributes;
-
-  /// The attributes for the selected widget
   final Map<String, dynamic> widgetAttributes;
+
+  // Helper method to create a copy with updated values
+  SpecEditorLoadedState copyWith({
+    Map<String, dynamic>? specData,
+    String? selectedPageId,
+    bool clearSelectedPageId = false,
+    PageSectionType? selectedSectionType,
+    bool clearSelectedSectionType = false,
+    int? selectedLayoutIndex,
+    bool clearSelectedLayoutIndex = false,
+    int? selectedWidgetIndex,
+    bool clearSelectedWidgetIndex = false,
+    Map<String, dynamic>? pageAttributes,
+    Map<String, dynamic>? sectionAttributes,
+    Map<String, dynamic>? layoutAttributes,
+    Map<String, dynamic>? widgetAttributes,
+  }) {
+    return SpecEditorLoadedState(
+      specData: specData ?? this.specData,
+      selectedPageId:
+          clearSelectedPageId ? null : selectedPageId ?? this.selectedPageId,
+      selectedSectionType: clearSelectedSectionType
+          ? null
+          : selectedSectionType ?? this.selectedSectionType,
+      selectedLayoutIndex: clearSelectedLayoutIndex
+          ? null
+          : selectedLayoutIndex ?? this.selectedLayoutIndex,
+      selectedWidgetIndex: clearSelectedWidgetIndex
+          ? null
+          : selectedWidgetIndex ?? this.selectedWidgetIndex,
+      pageAttributes: pageAttributes ?? this.pageAttributes,
+      sectionAttributes: sectionAttributes ?? this.sectionAttributes,
+      layoutAttributes: layoutAttributes ?? this.layoutAttributes,
+      widgetAttributes: widgetAttributes ?? this.widgetAttributes,
+    );
+  }
 }
 
-/// Error state
+/// State when an error occurs
 class SpecEditorErrorState extends SpecEditorState {
-  const SpecEditorErrorState({
-    required this.message,
-  });
-
+  const SpecEditorErrorState({required this.message});
   final String message;
 }
 

@@ -82,6 +82,36 @@ class SpecEditorRepository {
     _cacheService.clearCache('$_editorStateKey:$projectId');
   }
 
+  /// Fetches the main spec content for a given project.
+  /// Returns the parsed JSON content as a map, or null if not found.
+  Future<Map<String, dynamic>?> getSpecForProject(String projectId) async {
+    // TODO: How to determine the primary spec ID (UUID) for a projectId?
+    // Option 1: Have a dedicated backend endpoint GET /projects/{projectId}/spec
+    // Option 2: Assume a naming convention or lookup mechanism.
+    // For now, this is a placeholder.
+    print(
+        'Placeholder: SpecEditorRepository.getSpecForProject called for $projectId');
+    // Simulate API call delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Simulate spec not found (e.g., for a new project)
+    // In a real scenario, call _networkService.request('/specs/{spec_id}')
+    // and handle potential 404 errors from the backend.
+    return null;
+    // Example for returning found data:
+    // try {
+    //   final response = await _networkService.request('/specs/{the_spec_id}');
+    //   return response.data as Map<String, dynamic>;
+    // } catch (e) {
+    //    // Handle network errors or 404s specifically
+    //    if (e is DioException && e.response?.statusCode == 404) {
+    //      return null; // Spec not found
+    //    }
+    //   _errorHandler.handleError(e);
+    //   rethrow; // Or return null / throw specific exception
+    // }
+  }
+
   /// Disposes the repository
   void dispose() {
     // No cleanup needed
