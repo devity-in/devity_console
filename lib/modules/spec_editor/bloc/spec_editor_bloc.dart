@@ -203,21 +203,37 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     final currentState = state;
     if (currentState is SpecEditorLoadedState &&
         currentState.selectedPageId != null) {
-      // TODO: Implement logic to update page attributes in specData map
-      // Example:
-      // Map<String, dynamic> newSpecData = Map.from(currentState.specData);
-      // Map<String, dynamic> screens = Map.from(newSpecData['screens'] ?? {});
-      // Map<String, dynamic> page = Map.from(screens[currentState.selectedPageId] ?? {});
-      // page.addAll(event.attributes); // Be careful about structure
-      // screens[currentState.selectedPageId] = page;
-      // newSpecData['screens'] = screens;
-      // emit(currentState.copyWith(specData: newSpecData, pageAttributes: event.attributes));
-      print('TODO: Implement _onPageAttributesUpdated to modify specData');
-      emit(
-        currentState.copyWith(
-          pageAttributes: event.attributes,
-        ),
-      ); // Placeholder update
+      print('Updating page attributes for ${currentState.selectedPageId}');
+      try {
+        final newSpecData = _deepCopyMap(currentState.specData);
+        final screens = newSpecData['screens'] as Map<String, dynamic>? ?? {};
+        final pageData =
+            screens[currentState.selectedPageId] as Map<String, dynamic>?;
+
+        if (pageData != null) {
+          // Update attributes directly on the page/screen level if applicable
+          // For now, assuming page-level attributes aren't directly edited this way,
+          // but maybe things like backgroundColor are?
+          // Let's assume we merge into the root of the page object for now.
+          pageData.addAll(event.attributes);
+          // TODO: Re-evaluate where page-level attributes should live (e.g., backgroundColor)
+
+          screens[currentState.selectedPageId!] = pageData;
+          newSpecData['screens'] = screens;
+          emit(
+            currentState.copyWith(
+              specData: newSpecData,
+              pageAttributes: event.attributes,
+            ),
+          );
+        } else {
+          print(
+            'Error: Page ${currentState.selectedPageId} not found in specData during attribute update.',
+          );
+        }
+      } catch (e, stackTrace) {
+        print('Error applying page attribute update: $e\n$stackTrace');
+      }
     }
   }
 
@@ -226,10 +242,13 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     Emitter<SpecEditorState> emit,
   ) async {
     final currentState = state;
-    if (currentState is SpecEditorLoadedState &&
-        currentState.selectedSectionType != null) {
-      // TODO: Implement logic to update section attributes in specData map
-      print('TODO: Implement _onSectionAttributesUpdated to modify specData');
+    // TODO: Implement section attribute updates (where do section attributes live?)
+    // Sections seem conceptual in the editor UI rather than direct spec nodes.
+    // This handler might not be needed if sections don't have own attributes in the spec.
+    print(
+      'TODO: Implement _onSectionAttributesUpdated if sections have spec attributes.',
+    );
+    if (currentState is SpecEditorLoadedState) {
       emit(
         currentState.copyWith(
           sectionAttributes: event.attributes,
@@ -244,14 +263,45 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState &&
+        currentState.selectedPageId != null &&
         currentState.selectedLayoutIndex != null) {
-      // TODO: Implement logic to update layout attributes in specData map
-      print('TODO: Implement _onLayoutAttributesUpdated to modify specData');
-      emit(
-        currentState.copyWith(
-          layoutAttributes: event.attributes,
-        ),
-      ); // Placeholder update
+      print(
+        'Updating layout attributes for page ${currentState.selectedPageId}, layout ${currentState.selectedLayoutIndex}',
+      );
+      try {
+        final newSpecData = _deepCopyMap(currentState.specData);
+        final screens = newSpecData['screens'] as Map<String, dynamic>? ?? {};
+        final pageData =
+            screens[currentState.selectedPageId] as Map<String, dynamic>?;
+        final body = pageData?['body'] as Map<String, dynamic>?;
+        final children = body?['children'] as List<dynamic>?;
+
+        if (children != null &&
+            currentState.selectedLayoutIndex! < children.length) {
+          final layoutData = Map<String, dynamic>.from(
+            children[currentState.selectedLayoutIndex!]
+                    as Map<String, dynamic>? ??
+                {},
+          );
+          final layoutAttributes = Map<String, dynamic>.from(
+            layoutData['attributes'] as Map<String, dynamic>? ?? {},
+          );
+          layoutAttributes.addAll(event.attributes);
+          layoutData['attributes'] = layoutAttributes;
+
+          children[currentState.selectedLayoutIndex!] = layoutData;
+          emit(
+            currentState.copyWith(
+              specData: newSpecData,
+              layoutAttributes: event.attributes,
+            ),
+          );
+        } else {
+          print('Error: Layout not found in specData during attribute update.');
+        }
+      } catch (e, stackTrace) {
+        print('Error applying layout attribute update: $e\n$stackTrace');
+      }
     }
   }
 
@@ -261,14 +311,62 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState &&
+        currentState.selectedPageId != null &&
+        currentState.selectedLayoutIndex != null &&
         currentState.selectedWidgetIndex != null) {
-      // TODO: Implement logic to update widget attributes in specData map
-      print('TODO: Implement _onWidgetAttributesUpdated to modify specData');
-      emit(
-        currentState.copyWith(
-          widgetAttributes: event.attributes,
-        ),
-      ); // Placeholder update
+      print(
+        'Updating widget attributes for page ${currentState.selectedPageId}, layout ${currentState.selectedLayoutIndex}, widget ${currentState.selectedWidgetIndex}',
+      );
+      try {
+        final newSpecData = _deepCopyMap(currentState.specData);
+        final screens = newSpecData['screens'] as Map<String, dynamic>? ?? {};
+        final pageData =
+            screens[currentState.selectedPageId] as Map<String, dynamic>?;
+        final body = pageData?['body'] as Map<String, dynamic>?;
+        final layoutChildren = body?['children'] as List<dynamic>?;
+
+        if (layoutChildren != null &&
+            currentState.selectedLayoutIndex! < layoutChildren.length) {
+          final layoutData = Map<String, dynamic>.from(
+            layoutChildren[currentState.selectedLayoutIndex!]
+                    as Map<String, dynamic>? ??
+                {},
+          );
+          final widgetChildren = layoutData['children'] as List<dynamic>?;
+
+          if (widgetChildren != null &&
+              currentState.selectedWidgetIndex! < widgetChildren.length) {
+            final widgetData = Map<String, dynamic>.from(
+              widgetChildren[currentState.selectedWidgetIndex!]
+                      as Map<String, dynamic>? ??
+                  {},
+            );
+            final widgetAttributes = Map<String, dynamic>.from(
+              widgetData['attributes'] as Map<String, dynamic>? ?? {},
+            );
+            widgetAttributes.addAll(event.attributes);
+            widgetData['attributes'] = widgetAttributes;
+
+            widgetChildren[currentState.selectedWidgetIndex!] = widgetData;
+            emit(
+              currentState.copyWith(
+                specData: newSpecData,
+                widgetAttributes: event.attributes,
+              ),
+            );
+          } else {
+            print(
+              'Error: Widget not found in layout children during attribute update.',
+            );
+          }
+        } else {
+          print(
+            'Error: Layout not found in specData during widget attribute update.',
+          );
+        }
+      } catch (e, stackTrace) {
+        print('Error applying widget attribute update: $e\n$stackTrace');
+      }
     }
   }
 
