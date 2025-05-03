@@ -18,7 +18,7 @@ class AppEditorWidgetList extends StatelessWidget {
         ),
         ..._buildAvailableWidgets(),
         const SizedBox(height: 16),
-        _buildSectionHeader('Layouts', Icons.grid_view),
+        _buildSectionHeader('Layouts', Icons.view_compact_outlined),
         ..._buildLayouts(),
       ],
     );
@@ -83,24 +83,19 @@ class AppEditorWidgetList extends StatelessWidget {
   List<Widget> _buildLayouts() {
     final layouts = [
       const _WidgetItem(
-        name: 'ZStack',
-        icon: Icons.layers,
+        name: 'Column',
+        icon: Icons.view_stream_outlined,
+        description: 'Arrange widgets vertically',
+      ),
+      const _WidgetItem(
+        name: 'Row',
+        icon: Icons.view_column_outlined,
+        description: 'Arrange widgets horizontally',
+      ),
+      const _WidgetItem(
+        name: 'Stack',
+        icon: Icons.layers_outlined,
         description: 'Stack widgets on top of one another',
-      ),
-      const _WidgetItem(
-        name: 'Carousel',
-        icon: Icons.view_carousel,
-        description: 'Display widgets in a scrollable carousel',
-      ),
-      const _WidgetItem(
-        name: 'Grid',
-        icon: Icons.grid_4x4,
-        description: 'Organize widgets in a grid pattern',
-      ),
-      const _WidgetItem(
-        name: 'Vertical',
-        icon: Icons.vertical_align_center,
-        description: 'Stack widgets vertically with spacing',
       ),
     ];
 
