@@ -1,6 +1,5 @@
 part of 'spec_editor_bloc.dart';
 
-
 /// Events for the [SpecEditorBloc]
 sealed class SpecEditorEvent {
   const SpecEditorEvent();
@@ -106,4 +105,9 @@ class SpecEditorSaveStateEvent extends SpecEditorEvent {
 /// Event to load the editor state
 class SpecEditorLoadStateEvent extends SpecEditorEvent {
   const SpecEditorLoadStateEvent();
+}
+
+/// Event triggered when the user requests to save the current spec.
+class SpecEditorSaveSpecRequested extends SpecEditorEvent {
+  const SpecEditorSaveSpecRequested();
 }

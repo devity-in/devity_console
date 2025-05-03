@@ -1,3 +1,4 @@
+import 'package:devity_console/modules/spec_editor/bloc/spec_editor_bloc.dart';
 import 'package:devity_console/modules/spec_editor_action_bar/bloc/app_editor_action_bar_bloc.dart';
 import 'package:devity_console/modules/spec_editor_action_bar/bloc/app_editor_action_bar_event.dart';
 import 'package:devity_console/modules/spec_editor_action_bar/bloc/app_editor_action_bar_state.dart';
@@ -26,6 +27,8 @@ class _AppEditorActionBarContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final specEditorBloc = context.read<SpecEditorBloc>();
+
     return BlocBuilder<AppEditorActionBarBloc, AppEditorActionBarState>(
       builder: (context, state) {
         return Container(
@@ -73,7 +76,9 @@ class _AppEditorActionBarContent extends StatelessWidget {
                   DesktopElevatedButton(
                     title: 'Save Changes',
                     onPressed: () {
-                      // TODO: Handle save action
+                      print(
+                          'Save Changes button pressed - Dispatching SaveSpecRequested');
+                      specEditorBloc.add(const SpecEditorSaveSpecRequested());
                     },
                   ),
                   const SizedBox(width: 12),
