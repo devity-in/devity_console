@@ -49,31 +49,37 @@ class AppEditorWidgetList extends StatelessWidget {
         name: 'Text',
         icon: Icons.text_fields,
         description: 'Display text with various styles',
+        componentType: 'Text',
       ),
       const _WidgetItem(
         name: 'Button',
         icon: Icons.smart_button,
         description: 'Interactive button with different styles',
+        componentType: 'Button',
       ),
       const _WidgetItem(
         name: 'Image',
         icon: Icons.image,
         description: 'Display images from various sources',
+        componentType: 'Image',
       ),
       const _WidgetItem(
         name: 'Checkbox',
         icon: Icons.check_box,
         description: 'Selectable checkbox with different styles',
+        componentType: 'Checkbox',
       ),
       const _WidgetItem(
         name: 'Text Field',
         icon: Icons.input,
         description: 'Input field for text entry',
+        componentType: 'TextField',
       ),
       const _WidgetItem(
         name: 'Carousel',
         icon: Icons.view_carousel,
         description: 'Scrollable carousel of items',
+        componentType: 'Carousel',
       ),
     ];
 
@@ -86,16 +92,19 @@ class AppEditorWidgetList extends StatelessWidget {
         name: 'Column',
         icon: Icons.view_stream_outlined,
         description: 'Arrange widgets vertically',
+        componentType: 'Column',
       ),
       const _WidgetItem(
         name: 'Row',
         icon: Icons.view_column_outlined,
         description: 'Arrange widgets horizontally',
+        componentType: 'Row',
       ),
       const _WidgetItem(
         name: 'Stack',
         icon: Icons.layers_outlined,
         description: 'Stack widgets on top of one another',
+        componentType: 'Stack',
       ),
     ];
 
@@ -108,11 +117,13 @@ class _WidgetItem {
     required this.name,
     required this.icon,
     required this.description,
+    required this.componentType,
   });
 
   final String name;
   final IconData icon;
   final String description;
+  final String componentType;
 
   Widget build() {
     return Draggable<Map<String, dynamic>>(
@@ -120,6 +131,12 @@ class _WidgetItem {
         'name': name,
         'icon': icon,
         'description': description,
+        'componentType': componentType,
+        'type': (componentType == 'Column' ||
+                componentType == 'Row' ||
+                componentType == 'Stack')
+            ? 'Renderer'
+            : 'Widget',
       },
       feedback: Material(
         elevation: 4,
