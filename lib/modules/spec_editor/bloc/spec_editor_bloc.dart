@@ -4,6 +4,7 @@ import 'dart:convert'; // Import for jsonEncode/Decode
 import 'package:bloc/bloc.dart';
 import 'package:devity_console/modules/spec_editor_page_editor/models/page_section.dart';
 import 'package:devity_console/repositories/spec_editor_repository.dart';
+import 'package:devity_console/services/logger_service.dart'; // Import Logger
 import 'package:uuid/uuid.dart'; // Import for unique IDs
 
 part 'spec_editor_event.dart';
@@ -43,34 +44,20 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     emit(const SpecEditorLoadingState());
     try {
-      // TODO: Implement repository method getSpecForProject
-      // This method should handle calling the backend API (e.g., GET /projects/{projectId}/spec)
-      // and return the spec content Map<String, dynamic> or null if not found.
       final loadedSpecData = await repository.getSpecForProject(projectId);
-
-      if (loadedSpecData != null) {
-        // Spec loaded successfully - Assume loadedSpecData contains the UUID 'id'
-        // Store the UUID if needed elsewhere, maybe add to state?
-        print(
-          "Loaded Spec ID (UUID): ${loadedSpecData['id']}",
-        ); // Example access
-        emit(SpecEditorLoadedState(specData: loadedSpecData));
-      } else {
-        // Spec not found, initialize with default (which won't have a DB id yet)
-        print('No spec found for project $projectId, initializing default.');
-        emit(SpecEditorLoadedState(specData: _createDefaultSpecData()));
-      }
-    } catch (e) {
-      print('Error loading spec for project $projectId: $e');
-      // Emit error state or a default state?
-      // Emitting default state might be safer for UI
-      emit(
-        SpecEditorLoadedState(
-          specData: _createDefaultSpecData(),
-          // Optionally add an error message field to the state later
-        ),
+      LoggerService.commonLog(
+        "Loaded Spec ID (UUID): ${loadedSpecData['id']}",
+        name: 'SpecEditorBloc._onStarted',
       );
-      // Or: emit(SpecEditorErrorState(message: "Failed to load spec: ${e.toString()}"));
+      emit(SpecEditorLoadedState(specData: loadedSpecData));
+    } catch (e, stackTrace) {
+      LoggerService.commonLog(
+        'Error loading spec for project $projectId',
+        name: 'SpecEditorBloc._onStarted',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      emit(SpecEditorLoadedState(specData: _createDefaultSpecData()));
     }
   }
 
@@ -111,8 +98,17 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState) {
-      // Update only selectedPageId, keep existing specData
-      emit(currentState.copyWith(selectedPageId: event.id));
+      final pageAttributes =
+          _getPageAttributes(currentState.specData, event.id);
+      emit(
+        currentState.copyWith(
+          selectedPageId: event.id,
+          pageAttributes: pageAttributes,
+          clearSelectedSectionType: true,
+          clearSelectedLayoutIndex: true,
+          clearSelectedWidgetIndex: true,
+        ),
+      );
     }
   }
 
@@ -122,14 +118,17 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState) {
-      // TODO: Update attribute extraction logic for selected section
-      // Needs to get attributes from the corresponding screen in specData
-      // based on selectedPageId and sectionType.
-      // final sectionAttributes = _getSectionAttributes(currentState.specData, ...);
+      // Selecting a "section" in the UI maps to selecting the page attributes
+      final pageAttributes = _getPageAttributes(
+        currentState.specData,
+        currentState.selectedPageId,
+      );
       emit(
         currentState.copyWith(
-          selectedSectionType: event.sectionType,
-          // sectionAttributes: sectionAttributes ?? {},
+          // Keep selectedPageId
+          selectedSectionType:
+              event.sectionType, // Keep track of UI section selection if needed
+          pageAttributes: pageAttributes, // Show page attributes
           clearSelectedLayoutIndex: true,
           clearSelectedWidgetIndex: true,
         ),
@@ -143,15 +142,16 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState) {
-      // TODO: Update attribute extraction logic for selected layout
-      // Needs to get attributes from specData based on selectedPageId,
-      // sectionType, and layoutIndex.
-      // final layoutAttributes = _getLayoutAttributes(currentState.specData, ...);
+      final layoutAttributes = _getLayoutAttributes(
+        currentState.specData,
+        currentState.selectedPageId,
+        event.layoutIndex,
+      );
       emit(
         currentState.copyWith(
-          selectedSectionType: event.sectionType, // Keep section selected
+          selectedSectionType: event.sectionType,
           selectedLayoutIndex: event.layoutIndex,
-          // layoutAttributes: layoutAttributes ?? {},
+          layoutAttributes: layoutAttributes,
           clearSelectedWidgetIndex: true,
         ),
       );
@@ -164,16 +164,18 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState) {
-      // TODO: Update attribute extraction logic for selected widget
-      // Needs to get attributes from specData based on selectedPageId,
-      // sectionType, layoutIndex, and widgetIndex.
-      // final widgetAttributes = _getWidgetAttributes(currentState.specData, ...);
+      final widgetAttributes = _getWidgetAttributes(
+        currentState.specData,
+        currentState.selectedPageId,
+        event.layoutIndex,
+        event.widgetIndex,
+      );
       emit(
         currentState.copyWith(
           selectedSectionType: event.sectionType,
           selectedLayoutIndex: event.layoutIndex,
           selectedWidgetIndex: event.widgetIndex,
-          // widgetAttributes: widgetAttributes ?? {},
+          widgetAttributes: widgetAttributes,
         ),
       );
     }
@@ -207,7 +209,10 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     final currentState = state;
     if (currentState is SpecEditorLoadedState &&
         currentState.selectedPageId != null) {
-      print('Updating page attributes for ${currentState.selectedPageId}');
+      LoggerService.commonLog(
+        'Updating page attributes for ${currentState.selectedPageId}',
+        name: 'SpecEditorBloc._onPageAttributesUpdated',
+      );
       try {
         final newSpecData = _deepCopyMap(currentState.specData);
         final screens = newSpecData['screens'] as Map<String, dynamic>? ?? {};
@@ -231,12 +236,18 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
             ),
           );
         } else {
-          print(
+          LoggerService.commonLog(
             'Error: Page ${currentState.selectedPageId} not found in specData during attribute update.',
+            name: 'SpecEditorBloc._onPageAttributesUpdated',
           );
         }
       } catch (e, stackTrace) {
-        print('Error applying page attribute update: $e\n$stackTrace');
+        LoggerService.commonLog(
+          'Error applying page attribute update',
+          name: 'SpecEditorBloc._onPageAttributesUpdated',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
@@ -249,8 +260,9 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     // TODO: Implement section attribute updates (where do section attributes live?)
     // Sections seem conceptual in the editor UI rather than direct spec nodes.
     // This handler might not be needed if sections don't have own attributes in the spec.
-    print(
+    LoggerService.commonLog(
       'TODO: Implement _onSectionAttributesUpdated if sections have spec attributes.',
+      name: 'SpecEditorBloc._onSectionAttributesUpdated',
     );
     if (currentState is SpecEditorLoadedState) {
       emit(
@@ -269,8 +281,9 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     if (currentState is SpecEditorLoadedState &&
         currentState.selectedPageId != null &&
         currentState.selectedLayoutIndex != null) {
-      print(
+      LoggerService.commonLog(
         'Updating layout attributes for page ${currentState.selectedPageId}, layout ${currentState.selectedLayoutIndex}',
+        name: 'SpecEditorBloc._onLayoutAttributesUpdated',
       );
       try {
         final newSpecData = _deepCopyMap(currentState.specData);
@@ -301,10 +314,18 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
             ),
           );
         } else {
-          print('Error: Layout not found in specData during attribute update.');
+          LoggerService.commonLog(
+            'Error: Layout not found in specData during attribute update.',
+            name: 'SpecEditorBloc._onLayoutAttributesUpdated',
+          );
         }
       } catch (e, stackTrace) {
-        print('Error applying layout attribute update: $e\n$stackTrace');
+        LoggerService.commonLog(
+          'Error applying layout attribute update',
+          name: 'SpecEditorBloc._onLayoutAttributesUpdated',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
@@ -318,8 +339,9 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
         currentState.selectedPageId != null &&
         currentState.selectedLayoutIndex != null &&
         currentState.selectedWidgetIndex != null) {
-      print(
+      LoggerService.commonLog(
         'Updating widget attributes for page ${currentState.selectedPageId}, layout ${currentState.selectedLayoutIndex}, widget ${currentState.selectedWidgetIndex}',
+        name: 'SpecEditorBloc._onWidgetAttributesUpdated',
       );
       try {
         final newSpecData = _deepCopyMap(currentState.specData);
@@ -359,17 +381,24 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
               ),
             );
           } else {
-            print(
+            LoggerService.commonLog(
               'Error: Widget not found in layout children during attribute update.',
+              name: 'SpecEditorBloc._onWidgetAttributesUpdated',
             );
           }
         } else {
-          print(
+          LoggerService.commonLog(
             'Error: Layout not found in specData during widget attribute update.',
+            name: 'SpecEditorBloc._onWidgetAttributesUpdated',
           );
         }
       } catch (e, stackTrace) {
-        print('Error applying widget attribute update: $e\n$stackTrace');
+        LoggerService.commonLog(
+          'Error applying widget attribute update',
+          name: 'SpecEditorBloc._onWidgetAttributesUpdated',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
@@ -378,16 +407,20 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     SpecEditorSaveStateEvent event,
     Emitter<SpecEditorState> emit,
   ) async {
-    // TODO: Implement editor state saving if needed (e.g., to local storage)
-    print('Save State Event received - implementation pending');
+    LoggerService.commonLog(
+      'Save State Event received - implementation pending',
+      name: 'SpecEditorBloc._onSaveState',
+    );
   }
 
   Future<void> _onLoadState(
     SpecEditorLoadStateEvent event,
     Emitter<SpecEditorState> emit,
   ) async {
-    // TODO: Implement editor state loading if needed
-    print('Load State Event received - implementation pending');
+    LoggerService.commonLog(
+      'Load State Event received - implementation pending',
+      name: 'SpecEditorBloc._onLoadState',
+    );
   }
 
   Future<void> _onComponentDropped(
@@ -402,7 +435,10 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
           event.componentData['type'] as String?; // 'Widget' or 'Renderer'
 
       if (componentType == null || type == null) {
-        print('Error: Dropped component data missing type information.');
+        LoggerService.commonLog(
+          'Error: Dropped component data missing type information.',
+          name: 'SpecEditorBloc._onComponentDropped',
+        );
         return; // Or emit error state
       }
 
@@ -458,14 +494,20 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
             screens[currentState.selectedPageId] as Map<String, dynamic>?;
 
         if (currentPage == null) {
-          print('Error: Current page not found in specData.');
+          LoggerService.commonLog(
+            'Error: Current page not found in specData.',
+            name: 'SpecEditorBloc._onComponentDropped',
+          );
           return;
         }
 
         // Get body, ensuring type safety
         final body = currentPage['body'] as Map<String, dynamic>?;
         if (body == null || body['type'] != 'Renderer') {
-          print('Error: Current page body is not a valid renderer.');
+          LoggerService.commonLog(
+            'Error: Current page body is not a valid renderer.',
+            name: 'SpecEditorBloc._onComponentDropped',
+          );
           return;
         }
 
@@ -481,7 +523,12 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
         // --- Emit updated state ---
         emit(currentState.copyWith(specData: newSpecData));
       } catch (e, stackTrace) {
-        print('Error handling component drop: $e\n$stackTrace');
+        LoggerService.commonLog(
+          'Error handling component drop',
+          name: 'SpecEditorBloc._onComponentDropped',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
@@ -492,28 +539,31 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState) {
-      print('Save Spec Requested. Attempting to save...');
-      // emit(currentState.copyWith(isSaving: true));
-
+      emit(currentState.copyWith(isSaving: true)); // Indicate saving state
       try {
-        // Extract the UUID id from the specData if it exists
-        final specUUID = currentState.specData['id'] as String?;
-
-        // Pass the data to the repository
-        await repository.saveSpec(
-          projectId: projectId,
-          specIdUUID: specUUID, // Pass UUID if available
-          specData: currentState.specData,
+        LoggerService.commonLog(
+          'Save spec requested for project $projectId',
+          name: 'SpecEditorBloc._onSaveSpecRequested',
         );
-
-        print('Spec saved successfully (Placeholder).');
-        // emit(currentState.copyWith(isSaving: false, saveSuccess: true));
+        // Call the repository method with correct positional arguments
+        await repository.saveSpec(projectId, currentState.specData);
+        LoggerService.commonLog(
+          'Save spec successful for project $projectId',
+          name: 'SpecEditorBloc._onSaveSpecRequested',
+        );
+        emit(currentState.copyWith(isSaving: false)); // Clear saving state
+        // Optionally, emit a success message or state
       } catch (e, stackTrace) {
-        print('Error saving spec: $e\n$stackTrace');
-        // emit(currentState.copyWith(isSaving: false, saveError: e.toString()));
+        LoggerService.commonLog(
+          'Error saving spec for project $projectId',
+          name: 'SpecEditorBloc._onSaveSpecRequested',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        emit(currentState.copyWith(isSaving: false)); // Clear saving state
+        // Optionally, emit an error state
+        // emit(SpecEditorErrorState(message: 'Failed to save spec: $e'));
       }
-    } else {
-      print('Save requested but state is not SpecEditorLoadedState.');
     }
   }
 
@@ -523,37 +573,121 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   }
 }
 
-// --- Attribute Getter Helpers (Still need rework for specData structure) ---
+// --- Attribute Getter Helpers ---
 
-Map<String, dynamic>? _getSectionAttributes(
-  Map<String, dynamic>? specData,
-  PageSectionType sectionType,
+Map<String, dynamic> _getPageAttributes(
+  Map<String, dynamic> specData,
+  String? pageId,
 ) {
-  // Placeholder - needs correct path through specData
-  const screenId = 'page_default'; // Need actual selected page ID
-  return specData?['screens']?[screenId]?['attributes']
-      as Map<String, dynamic>?;
+  if (pageId == null) return {};
+  final screens = specData['screens'] as Map<String, dynamic>?;
+  final pageData = screens?[pageId] as Map<String, dynamic>?;
+  if (pageData == null) {
+    LoggerService.commonLog(
+      'Error: Page $pageId not found in specData when getting attributes.',
+      name: 'SpecEditorBloc._getPageAttributes',
+    );
+    return {};
+  }
+  // Return relevant page attributes (e.g., excluding complex children structures)
+  // For now, let's return common ones like backgroundColor. Adjust as needed.
+  return {
+    'backgroundColor': pageData['backgroundColor'],
+    // Add other direct page attributes here if they exist
+  };
 }
 
-Map<String, dynamic>? _getLayoutAttributes(
-  Map<String, dynamic>? specData,
-  PageSectionType sectionType,
-  int layoutIndex,
+Map<String, dynamic> _getLayoutAttributes(
+  Map<String, dynamic> specData,
+  String? pageId,
+  int?
+      layoutIndex, // This index might refer to the position within the page body's children
 ) {
-  // Placeholder - needs correct path through specData
-  const screenId = 'page_default'; // Need actual selected page ID
-  return specData?['screens']?[screenId]?['body']?['children']?[layoutIndex]
-      ?['attributes'] as Map<String, dynamic>?;
+  if (pageId == null || layoutIndex == null) return {};
+
+  final screens = specData['screens'] as Map<String, dynamic>?;
+  final pageData = screens?[pageId] as Map<String, dynamic>?;
+  final body = pageData?['body'] as Map<String, dynamic>?;
+  final children = body?['children'] as List<dynamic>?;
+
+  if (children == null || layoutIndex < 0 || layoutIndex >= children.length) {
+    LoggerService.commonLog(
+      'Error: Invalid layoutIndex $layoutIndex or missing children for page $pageId.',
+      name: 'SpecEditorBloc._getLayoutAttributes',
+    );
+    return {};
+  }
+
+  final layoutData = children[layoutIndex] as Map<String, dynamic>?;
+  if (layoutData == null) {
+    LoggerService.commonLog(
+      'Error: Layout data at index $layoutIndex is null or not a map for page $pageId.',
+      name: 'SpecEditorBloc._getLayoutAttributes',
+    );
+    return {};
+  }
+
+  // Return attributes, excluding children for simplicity in the attribute editor
+  final attributes = Map<String, dynamic>.from(layoutData);
+  attributes.remove('children');
+  attributes.remove('id'); // Usually don't edit ID directly here
+  // Add component type for display maybe?
+  attributes['componentType'] = layoutData['type'];
+  return attributes;
 }
 
-Map<String, dynamic>? _getWidgetAttributes(
-  Map<String, dynamic>? specData,
-  PageSectionType sectionType,
-  int layoutIndex,
-  int widgetIndex,
+Map<String, dynamic> _getWidgetAttributes(
+  Map<String, dynamic> specData,
+  String? pageId,
+  int? layoutIndex,
+  int? widgetIndex,
 ) {
-  // Placeholder - needs correct path through specData
-  const screenId = 'page_default'; // Need actual selected page ID
-  return specData?['screens']?[screenId]?['body']?['children']?[layoutIndex]
-      ?['children']?[widgetIndex]?['attributes'] as Map<String, dynamic>?;
+  if (pageId == null || layoutIndex == null || widgetIndex == null) return {};
+
+  final screens = specData['screens'] as Map<String, dynamic>?;
+  final pageData = screens?[pageId] as Map<String, dynamic>?;
+  final body = pageData?['body'] as Map<String, dynamic>?;
+  final layoutChildren = body?['children'] as List<dynamic>?;
+
+  if (layoutChildren == null ||
+      layoutIndex < 0 ||
+      layoutIndex >= layoutChildren.length) {
+    // Log error if layout index is invalid
+    LoggerService.commonLog(
+      'Error: Invalid layoutIndex $layoutIndex when getting widget attributes for page $pageId.',
+      name: 'SpecEditorBloc._getWidgetAttributes',
+    );
+    return {};
+  }
+
+  final layoutData = layoutChildren[layoutIndex] as Map<String, dynamic>?;
+  final widgetChildren = layoutData?['children'] as List<dynamic>?;
+
+  if (widgetChildren == null ||
+      widgetIndex < 0 ||
+      widgetIndex >= widgetChildren.length) {
+    // Log error if widget index is invalid
+    LoggerService.commonLog(
+      'Error: Invalid widgetIndex $widgetIndex for layout $layoutIndex on page $pageId.',
+      name: 'SpecEditorBloc._getWidgetAttributes',
+    );
+    return {};
+  }
+
+  final widgetData = widgetChildren[widgetIndex] as Map<String, dynamic>?;
+  if (widgetData == null) {
+    LoggerService.commonLog(
+      'Error: Widget data at index $widgetIndex is null or not a map for layout $layoutIndex, page $pageId.',
+      name: 'SpecEditorBloc._getWidgetAttributes',
+    );
+    return {};
+  }
+
+  // Return attributes, maybe exclude complex fields like 'children' if widgets can have them
+  final attributes = Map<String, dynamic>.from(widgetData);
+  attributes.remove('children'); // If widgets could contain children
+  attributes.remove('id'); // Usually don't edit ID directly here
+  // Add component type for display
+  attributes['componentType'] = widgetData['type'];
+  return attributes;
 }

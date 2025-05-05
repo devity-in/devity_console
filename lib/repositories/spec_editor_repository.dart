@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:devity_console/services/app_editor_service.dart';
 import 'package:devity_console/services/cache_service.dart';
 import 'package:devity_console/services/error_handler_service.dart';
+import 'package:devity_console/services/logger_service.dart';
 import 'package:devity_console/services/network_service.dart';
+import 'package:http/http.dart' as http;
 
 /// Repository for handling app editor data
 class SpecEditorRepository {
@@ -50,7 +54,7 @@ class SpecEditorRepository {
       final cachedState =
           await _cacheService.getCachedData('$_editorStateKey:$projectId');
       if (cachedState != null) {
-        return cachedState as Map<String, dynamic>;
+        return Map<String, dynamic>.from(cachedState as Map);
       }
 
       // If not in cache, load from API
@@ -69,7 +73,7 @@ class SpecEditorRepository {
       final cachedState =
           await _cacheService.getCachedData('$_editorStateKey:$projectId');
       if (cachedState != null) {
-        return cachedState as Map<String, dynamic>;
+        return Map<String, dynamic>.from(cachedState as Map);
       }
       _errorHandler.handleError(e);
       rethrow;
@@ -82,91 +86,153 @@ class SpecEditorRepository {
     _cacheService.clearCache('$_editorStateKey:$projectId');
   }
 
-  /// Fetches the main spec content for a given project.
-  /// Returns the parsed JSON content as a map, or null if not found.
-  Future<Map<String, dynamic>?> getSpecForProject(String projectId) async {
-    // TODO: How to determine the primary spec ID (UUID) for a projectId?
-    // Option 1: Have a dedicated backend endpoint GET /projects/{projectId}/spec
-    // Option 2: Assume a naming convention or lookup mechanism.
-    // For now, this is a placeholder.
-    print(
-      'Placeholder: SpecEditorRepository.getSpecForProject called for $projectId',
-    );
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    // Simulate spec not found (e.g., for a new project)
-    // In a real scenario, call _networkService.request('/specs/{spec_id}')
-    // and handle potential 404 errors from the backend.
-    return null;
-    // Example for returning found data:
-    // try {
-    //   final response = await _networkService.request('/specs/{the_spec_id}');
-    //   return response.data as Map<String, dynamic>;
-    // } catch (e) {
-    //    // Handle network errors or 404s specifically
-    //    if (e is DioException && e.response?.statusCode == 404) {
-    //      return null; // Spec not found
-    //    }
-    //   _errorHandler.handleError(e);
-    //   rethrow; // Or return null / throw specific exception
-    // }
-  }
-
-  /// Saves the spec data to the backend.
-  /// Uses PUT if specIdUUID is provided, otherwise POST.
-  Future<void> saveSpec({
-    required String projectId,
-    required Map<String, dynamic> specData,
-    String? specIdUUID, // The database primary key (UUID as String)
-  }) async {
-    // TODO: Refine API endpoint strategy (e.g., dedicated project endpoint?)
-    String url;
-    String method;
-
-    final requestData = Map<String, dynamic>.from(specData);
-    // Ensure project_id is in the data being sent, if required by backend schema
-    if (!requestData.containsKey('project_id') ||
-        requestData['project_id'] == null) {
-      requestData['project_id'] = projectId;
-      // This assumes project_id is a simple string in the console context
-      // but the backend schema expects a UUID. Requires conversion or schema alignment.
-      print(
-          'Warning: Added projectId to specData for saving. Ensure backend schema alignment (String vs UUID).');
-      // If backend expects UUID: requestData['project_id'] = Uuid.parse(projectId); ?
-    }
-
-    if (specIdUUID != null) {
-      // Existing spec, use PUT to update
-      url = '/specs/$specIdUUID';
-      method = 'PUT';
-      print('Saving spec via PUT to $url');
-    } else {
-      // New spec, use POST to create
-      url = '/specs/';
-      method = 'POST';
-      print('Saving new spec via POST to $url');
-      // Backend will generate the UUID id upon creation
-    }
-
-    try {
-      final response = await _networkService.request(
-        url,
-        method: method,
-        data: requestData,
-      );
-      print('Save response: ${response.statusCode}');
-      // TODO: Handle response? Update local state with returned ID/data?
-      // If POST was used, the response body might contain the newly created spec with its UUID.
-      // We might want to update the Bloc state with this new data (especially the UUID).
-    } catch (e) {
-      _errorHandler.handleError(e);
-      rethrow;
-    }
-  }
-
   /// Disposes the repository
   void dispose() {
     // No cleanup needed
+  }
+
+  // --- Spec Loading/Saving Methods ---
+
+  // TODO: Replace with actual API endpoint from config/env
+  final String _baseUrl =
+      'http://127.0.0.1:8000'; // Assuming backend runs locally
+
+  /// Fetches the main spec content for a given project.
+  /// Returns the parsed JSON content as a map, or a default structure if not found.
+  Future<Map<String, dynamic>> getSpecForProject(String projectId) async {
+    // Assume projectId directly maps to the spec UUID/ID for the API call
+    final url = Uri.parse('$_baseUrl/specs/$projectId');
+    try {
+      LoggerService.commonLog(
+        'Attempting to fetch spec from $url',
+        name: 'SpecEditorRepository.getSpecForProject',
+      );
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        LoggerService.commonLog(
+          'Spec fetched successfully for $projectId',
+          name: 'SpecEditorRepository.getSpecForProject',
+        );
+        final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
+        if (responseBody.containsKey('content') &&
+            responseBody['content'] is Map) {
+          // Explicitly cast the content to the expected type
+          return Map<String, dynamic>.from(responseBody['content'] as Map);
+        } else {
+          LoggerService.commonLog(
+            'Warning: Spec content not found or not a map in response for $projectId. Returning default.',
+            name: 'SpecEditorRepository.getSpecForProject',
+          );
+          return _defaultSpec();
+        }
+      } else if (response.statusCode == 404) {
+        LoggerService.commonLog(
+          'Spec not found for project $projectId (404). Returning default.',
+          name: 'SpecEditorRepository.getSpecForProject',
+        );
+        return _defaultSpec();
+      } else {
+        LoggerService.commonLog(
+          'Failed to load spec: ${response.statusCode} ${response.body}',
+          name: 'SpecEditorRepository.getSpecForProject',
+        );
+        throw Exception('Failed to load spec: ${response.statusCode}');
+      }
+    } catch (e, stackTrace) {
+      LoggerService.commonLog(
+        'Error fetching spec: $e',
+        name: 'SpecEditorRepository.getSpecForProject',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      // Depending on requirements, might return default spec or rethrow
+      // return _defaultSpec();
+      throw Exception('Error fetching spec: $e');
+    }
+  }
+
+  /// Saves the spec data to the backend.
+  /// Attempts PUT first, then POST if PUT fails with 404.
+  Future<void> saveSpec(String projectId, Map<String, dynamic> specData) async {
+    // Assume projectId maps to spec ID.
+    final url = Uri.parse('$_baseUrl/specs/$projectId');
+    final postUrl = Uri.parse('$_baseUrl/specs');
+
+    try {
+      // The backend expects the spec data within a 'content' field,
+      // and also requires top-level 'id', 'name', and 'version'.
+      final body = jsonEncode({
+        'id': projectId, // Assuming projectId is the UUID
+        'name': 'Project Spec $projectId', // Placeholder name
+        'version': '1.0.0', // Placeholder version
+        'content': specData, // The actual spec tree goes here
+      });
+
+      LoggerService.commonLog(
+        'Attempting to save spec via PUT to $url',
+        name: 'SpecEditorRepository.saveSpec',
+      );
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        LoggerService.commonLog(
+          'Spec saved successfully (PUT) for project $projectId',
+          name: 'SpecEditorRepository.saveSpec',
+        );
+        // Potentially clear cache or update state if needed
+      } else if (response.statusCode == 404) {
+        LoggerService.commonLog(
+          'Spec not found for PUT (404), trying POST to $postUrl',
+          name: 'SpecEditorRepository.saveSpec',
+        );
+        // If PUT fails with 404, it might mean we need to POST (create)
+        final postResponse = await http.post(
+          postUrl,
+          headers: {'Content-Type': 'application/json'},
+          body: body,
+        );
+        if (postResponse.statusCode == 200 || postResponse.statusCode == 201) {
+          LoggerService.commonLog(
+            'Spec created successfully (POST) for project $projectId',
+            name: 'SpecEditorRepository.saveSpec',
+          );
+        } else {
+          LoggerService.commonLog(
+            'Failed to create spec (POST): ${postResponse.statusCode} ${postResponse.body}',
+            name: 'SpecEditorRepository.saveSpec',
+          );
+          throw Exception('Failed to create spec: ${postResponse.statusCode}');
+        }
+      } else {
+        LoggerService.commonLog(
+          'Failed to save spec (PUT): ${response.statusCode} ${response.body}',
+          name: 'SpecEditorRepository.saveSpec',
+        );
+        throw Exception('Failed to save spec: ${response.statusCode}');
+      }
+    } catch (e, stackTrace) {
+      LoggerService.commonLog(
+        'Error saving spec: $e',
+        name: 'SpecEditorRepository.saveSpec',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      // Rethrow or handle
+      throw Exception('Error saving spec: $e');
+    }
+  }
+
+  // Helper to return a default spec structure
+  Map<String, dynamic> _defaultSpec() {
+    return {
+      'id': 'root', // Default root ID
+      'type': 'Container', // Default root type
+      'children': [],
+    };
   }
 }

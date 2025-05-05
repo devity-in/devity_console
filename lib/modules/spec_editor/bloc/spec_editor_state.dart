@@ -29,6 +29,7 @@ class SpecEditorLoadedState extends SpecEditorState {
     this.sectionAttributes = const {},
     this.layoutAttributes = const {},
     this.widgetAttributes = const {},
+    this.isSaving = false,
   });
   final Map<String, dynamic> specData; // Holds the loaded spec content
   final String? selectedPageId;
@@ -39,6 +40,7 @@ class SpecEditorLoadedState extends SpecEditorState {
   final Map<String, dynamic> sectionAttributes;
   final Map<String, dynamic> layoutAttributes;
   final Map<String, dynamic> widgetAttributes;
+  final bool isSaving;
 
   // Helper method to create a copy with updated values
   SpecEditorLoadedState copyWith({
@@ -55,6 +57,7 @@ class SpecEditorLoadedState extends SpecEditorState {
     Map<String, dynamic>? sectionAttributes,
     Map<String, dynamic>? layoutAttributes,
     Map<String, dynamic>? widgetAttributes,
+    bool? isSaving,
   }) {
     return SpecEditorLoadedState(
       specData: specData ?? this.specData,
@@ -73,6 +76,7 @@ class SpecEditorLoadedState extends SpecEditorState {
       sectionAttributes: sectionAttributes ?? this.sectionAttributes,
       layoutAttributes: layoutAttributes ?? this.layoutAttributes,
       widgetAttributes: widgetAttributes ?? this.widgetAttributes,
+      isSaving: isSaving ?? this.isSaving,
     );
   }
 }
