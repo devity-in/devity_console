@@ -49,10 +49,14 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
       final loadedSpecData = await repository.getSpecForProject(projectId);
 
       if (loadedSpecData != null) {
-        // Spec loaded successfully
+        // Spec loaded successfully - Assume loadedSpecData contains the UUID 'id'
+        // Store the UUID if needed elsewhere, maybe add to state?
+        print(
+          "Loaded Spec ID (UUID): ${loadedSpecData['id']}",
+        ); // Example access
         emit(SpecEditorLoadedState(specData: loadedSpecData));
       } else {
-        // Spec not found (e.g., new project), initialize with default
+        // Spec not found, initialize with default (which won't have a DB id yet)
         print('No spec found for project $projectId, initializing default.');
         emit(SpecEditorLoadedState(specData: _createDefaultSpecData()));
       }
@@ -488,24 +492,30 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
   ) async {
     final currentState = state;
     if (currentState is SpecEditorLoadedState) {
-      print('Save Spec Requested. Current Data: ${currentState.specData}');
-      // TODO: Implement repository call
-      // Example:
-      // emit(currentState.copyWith(isSaving: true)); // Indicate loading
-      // try {
-      //   await repository.saveSpec(projectId, currentState.specData);
-      //   emit(currentState.copyWith(isSaving: false, saveSuccess: true)); // Indicate success
-      // } catch (e) {
-      //   emit(currentState.copyWith(isSaving: false, saveError: e.toString())); // Indicate error
-      // }
+      print('Save Spec Requested. Attempting to save...');
+      // emit(currentState.copyWith(isSaving: true));
+
+      try {
+        // Extract the UUID id from the specData if it exists
+        final specUUID = currentState.specData['id'] as String?;
+
+        // Pass the data to the repository
+        await repository.saveSpec(
+          projectId: projectId,
+          specIdUUID: specUUID, // Pass UUID if available
+          specData: currentState.specData,
+        );
+
+        print('Spec saved successfully (Placeholder).');
+        // emit(currentState.copyWith(isSaving: false, saveSuccess: true));
+      } catch (e, stackTrace) {
+        print('Error saving spec: $e\n$stackTrace');
+        // emit(currentState.copyWith(isSaving: false, saveError: e.toString()));
+      }
+    } else {
+      print('Save requested but state is not SpecEditorLoadedState.');
     }
   }
-
-  // TODO: Add handler for SpecEditorSaveSpecRequested
-  // This handler should:
-  // 1. Get current specData from state.
-  // 2. Call repository.saveSpec(projectId, specData).
-  // 3. Handle success/failure (e.g., emit loading/success/error state).
 
   // --- Helper for deep copying ---
   Map<String, dynamic> _deepCopyMap(Map<String, dynamic> original) {

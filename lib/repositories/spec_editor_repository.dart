@@ -90,7 +90,8 @@ class SpecEditorRepository {
     // Option 2: Assume a naming convention or lookup mechanism.
     // For now, this is a placeholder.
     print(
-        'Placeholder: SpecEditorRepository.getSpecForProject called for $projectId');
+      'Placeholder: SpecEditorRepository.getSpecForProject called for $projectId',
+    );
     // Simulate API call delay
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -110,6 +111,58 @@ class SpecEditorRepository {
     //   _errorHandler.handleError(e);
     //   rethrow; // Or return null / throw specific exception
     // }
+  }
+
+  /// Saves the spec data to the backend.
+  /// Uses PUT if specIdUUID is provided, otherwise POST.
+  Future<void> saveSpec({
+    required String projectId,
+    required Map<String, dynamic> specData,
+    String? specIdUUID, // The database primary key (UUID as String)
+  }) async {
+    // TODO: Refine API endpoint strategy (e.g., dedicated project endpoint?)
+    String url;
+    String method;
+
+    final requestData = Map<String, dynamic>.from(specData);
+    // Ensure project_id is in the data being sent, if required by backend schema
+    if (!requestData.containsKey('project_id') ||
+        requestData['project_id'] == null) {
+      requestData['project_id'] = projectId;
+      // This assumes project_id is a simple string in the console context
+      // but the backend schema expects a UUID. Requires conversion or schema alignment.
+      print(
+          'Warning: Added projectId to specData for saving. Ensure backend schema alignment (String vs UUID).');
+      // If backend expects UUID: requestData['project_id'] = Uuid.parse(projectId); ?
+    }
+
+    if (specIdUUID != null) {
+      // Existing spec, use PUT to update
+      url = '/specs/$specIdUUID';
+      method = 'PUT';
+      print('Saving spec via PUT to $url');
+    } else {
+      // New spec, use POST to create
+      url = '/specs/';
+      method = 'POST';
+      print('Saving new spec via POST to $url');
+      // Backend will generate the UUID id upon creation
+    }
+
+    try {
+      final response = await _networkService.request(
+        url,
+        method: method,
+        data: requestData,
+      );
+      print('Save response: ${response.statusCode}');
+      // TODO: Handle response? Update local state with returned ID/data?
+      // If POST was used, the response body might contain the newly created spec with its UUID.
+      // We might want to update the Bloc state with this new data (especially the UUID).
+    } catch (e) {
+      _errorHandler.handleError(e);
+      rethrow;
+    }
   }
 
   /// Disposes the repository
