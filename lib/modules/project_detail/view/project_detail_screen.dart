@@ -1,7 +1,15 @@
 import 'package:devity_console/models/project_navigation_drawer_item.dart';
+import 'package:devity_console/modules/action_builder/view/action_builder_screen.dart';
+import 'package:devity_console/modules/data_factory/view/data_factory_screen.dart';
+import 'package:devity_console/modules/marketing_campaigns/view/marketing_campaigns_screen.dart';
+import 'package:devity_console/modules/media_factory/view/media_factory_screen.dart';
 import 'package:devity_console/modules/project_detail/bloc/project_detail_bloc.dart';
 import 'package:devity_console/modules/project_navigation_drawer/project_navigation_drawer.dart';
+import 'package:devity_console/modules/project_overview/view/project_overview_screen.dart';
+import 'package:devity_console/modules/project_settings/view/project_settings_screen.dart';
+import 'package:devity_console/modules/spec_editor/bloc/spec_editor_bloc.dart';
 import 'package:devity_console/modules/spec_editor/spec_editor.dart';
+import 'package:devity_console/modules/widget_builder/view/widget_builder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -43,23 +51,27 @@ class ProjectDetailView extends StatelessWidget {
     return BlocBuilder<ProjectDetailBloc, ProjectDetailState>(
       builder: (context, state) {
         if (state is ProjectDetailLoadedState) {
-          return Row(
-            children: [
-              ProjectNavigationDrawer(
-                projectId: projectId,
-                onItemSelected: (item) {
-                  context
-                      .read<ProjectDetailBloc>()
-                      .add(ProjectDetailItemSelectedEvent(item: item));
-                },
-              ),
-              Expanded(
-                child: _buildSelectedView(
-                  context,
-                  state.selectedItem,
+          return BlocProvider<SpecEditorBloc>(
+            create: (_) => SpecEditorBloc(projectId: projectId)
+              ..add(const SpecEditorStartedEvent()),
+            child: Row(
+              children: [
+                ProjectNavigationDrawer(
+                  projectId: projectId,
+                  onItemSelected: (item) {
+                    context
+                        .read<ProjectDetailBloc>()
+                        .add(ProjectDetailItemSelectedEvent(item: item));
+                  },
                 ),
-              ),
-            ],
+                Expanded(
+                  child: _buildSelectedView(
+                    context,
+                    state.selectedItem,
+                  ),
+                ),
+              ],
+            ),
           );
         }
 
@@ -76,21 +88,23 @@ class ProjectDetailView extends StatelessWidget {
       builder: (context) {
         switch (selectedItem.route) {
           case '/overview':
-            return const Center(child: Text('Project Overview'));
-          case '/widget-builder': // Consider renaming route?
-            return const Center(child: Text('Widget Builder'));
+            return const ProjectOverviewScreen();
+          case '/widget-builder':
+            return const WidgetBuilderScreen();
           case '/data-factory':
-            return const Center(child: Text('Data Factory'));
+            return const DataFactoryScreen();
           case '/app-editor': // Route name vs actual module name
             return SpecEditor(projectId: projectId);
+          case '/action-builder':
+            return ActionBuilderScreen(projectId: projectId);
           case '/media-factory':
-            return const Center(child: Text('Media Factory'));
+            return const MediaFactoryScreen();
           case '/marketing-campaigns':
-            return const Center(child: Text('Marketing Campaigns'));
+            return const MarketingCampaignsScreen();
           case '/settings':
-            return const Center(child: Text('Project Settings'));
+            return const ProjectSettingsScreen();
           default:
-            return const Center(child: Text('Unknown View'));
+            return const Center(child: Text('Select an item from the drawer'));
         }
       },
     );

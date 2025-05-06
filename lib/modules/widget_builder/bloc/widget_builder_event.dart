@@ -4,6 +4,8 @@ import 'package:devity_console/modules/widget_builder/bloc/widget_builder_bloc.d
     show WidgetBuilderBloc;
 import 'package:equatable/equatable.dart';
 
+
+
 /// The events that can be dispatched to the [WidgetBuilderBloc]
 abstract class WidgetBuilderEvent extends Equatable {
   /// Creates a new [WidgetBuilderEvent]

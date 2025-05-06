@@ -1,6 +1,5 @@
+import 'package:devity_console/models/widget.dart';
 import 'package:devity_console/modules/widget_builder/bloc/widget_builder_bloc.dart';
-import 'package:devity_console/modules/widget_builder/bloc/widget_builder_event.dart';
-import 'package:devity_console/modules/widget_builder/bloc/widget_builder_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,7 +18,7 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
   @override
   void initState() {
     super.initState();
-    context.read<WidgetBuilderBloc>().add(const WidgetBuilderLoadWidgets());
+    context.read<WidgetBuilderBloc>().add(WidgetBuilderStarted());
   }
 
   void _onSearch(String query) {
@@ -40,7 +39,7 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
           return const Center(child: Text('Error loading widgets'));
         }
 
-        final filteredWidgets = state.widgets.where((widget) {
+        final filteredWidgets = state.availableStandardWidgets.where((widget) {
           final query = _searchQuery.toLowerCase();
           return widget.name.toLowerCase().contains(query) ||
               widget.description.toLowerCase().contains(query);
@@ -82,10 +81,13 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
                               leading: Icon(widget.icon),
                               title: Text(widget.name),
                               subtitle: Text(widget.description),
-                              onTap: state.selectedLayout != null
-                                  ? () => context
-                                      .read<WidgetBuilderBloc>()
-                                      .add(WidgetBuilderWidgetAdded(widget))
+                              onTap: state.currentCustomWidgetOnCanvasData !=
+                                      null
+                                  ? () => context.read<WidgetBuilderBloc>().add(
+                                        WidgetBuilderAvailableWidgetDraggedToCanvas(
+                                          widget,
+                                        ),
+                                      )
                                   : null,
                             );
                           },
@@ -99,7 +101,9 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
               Expanded(
                 flex: 2,
                 child: Card(
-                  child: state.selectedWidgets.isNotEmpty
+                  child: (state.currentCustomWidgetOnCanvasData?.components ??
+                              [])
+                          .isNotEmpty
                       ? Column(
                           children: [
                             Padding(
@@ -109,7 +113,7 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Selected Widgets',
+                                    'Canvas Widgets',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall,
@@ -119,9 +123,14 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
                             ),
                             Expanded(
                               child: ListView.builder(
-                                itemCount: state.selectedWidgets.length,
+                                itemCount: state
+                                    .currentCustomWidgetOnCanvasData!
+                                    .components
+                                    .length,
                                 itemBuilder: (context, index) {
-                                  final widget = state.selectedWidgets[index];
+                                  final widget = state
+                                      .currentCustomWidgetOnCanvasData!
+                                      .components[index];
                                   return ListTile(
                                     leading: Icon(widget.icon),
                                     title: Text(widget.name),
@@ -129,7 +138,7 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
                                       icon: const Icon(Icons.delete),
                                       onPressed: () =>
                                           context.read<WidgetBuilderBloc>().add(
-                                                WidgetBuilderWidgetRemoved(
+                                                WidgetBuilderCanvasWidgetRemoved(
                                                   index,
                                                 ),
                                               ),
@@ -141,7 +150,9 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
                           ],
                         )
                       : const Center(
-                          child: Text('Select a widget to preview'),
+                          child: Text(
+                            'Drag widgets from the left list here or create a new template',
+                          ),
                         ),
                 ),
               ),
@@ -160,7 +171,7 @@ class _WidgetBuilderState extends State<WidgetBuilder> {
 
     if (result != null) {
       context.read<WidgetBuilderBloc>().add(
-            WidgetBuilderCustomWidgetCreated(
+            WidgetBuilderSaveTemplateRequested(
               name: result['name'] as String,
               description: result['description'] as String,
               isPublic: result['isPublic'] as bool,
@@ -195,6 +206,9 @@ class _CreateCustomWidgetDialogState extends State<CreateCustomWidgetDialog> {
   Widget build(BuildContext context) {
     final state = context.watch<WidgetBuilderBloc>().state;
     if (state is! WidgetBuilderLoaded) return const SizedBox.shrink();
+
+    final layoutType = state.currentCustomWidgetOnCanvasData?.layout;
+    final components = state.currentCustomWidgetOnCanvasData?.components ?? [];
 
     return AlertDialog(
       title: const Text('Create Custom Widget'),
@@ -232,16 +246,16 @@ class _CreateCustomWidgetDialogState extends State<CreateCustomWidgetDialog> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Layout: ${state.selectedLayout.toString().split('.').last}',
+              'Layout: ${layoutType?.toString().split('.').last ?? "Not Set"}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Components (${state.selectedWidgets.length}):',
+              'Components (${components.length}):',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            ...state.selectedWidgets.map(
-              (widget) => ListTile(
+            ...components.map(
+              (AppWidget widget) => ListTile(
                 leading: Icon(widget.icon),
                 title: Text(widget.name),
               ),
