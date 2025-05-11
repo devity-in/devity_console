@@ -5,10 +5,230 @@ import 'package:bloc/bloc.dart';
 import 'package:devity_console/modules/spec_editor_page_editor/models/page_section.dart';
 import 'package:devity_console/repositories/spec_editor_repository.dart';
 import 'package:devity_console/services/logger_service.dart'; // Import Logger
+import 'package:equatable/equatable.dart';
 import 'package:uuid/uuid.dart'; // Import for unique IDs
 
-part 'spec_editor_event.dart';
-part 'spec_editor_state.dart';
+// Removed part directives
+// part 'spec_editor_event.dart';
+// part 'spec_editor_state.dart';
+
+// --- Spec Editor Event Definitions ---
+
+abstract class SpecEditorEvent extends Equatable {
+  const SpecEditorEvent();
+  @override
+  List<Object?> get props => [];
+}
+
+class SpecEditorStartedEvent extends SpecEditorEvent {
+  const SpecEditorStartedEvent();
+}
+
+class SpecEditorSelectPageEvent extends SpecEditorEvent {
+  const SpecEditorSelectPageEvent({required this.id});
+  final String id;
+  @override
+  List<Object?> get props => [id];
+}
+
+class SpecEditorSelectSectionEvent extends SpecEditorEvent {
+  const SpecEditorSelectSectionEvent({required this.sectionType});
+  final PageSectionType sectionType;
+  @override
+  List<Object?> get props => [sectionType];
+}
+
+class SpecEditorSelectLayoutEvent extends SpecEditorEvent {
+  const SpecEditorSelectLayoutEvent({
+    required this.sectionType,
+    required this.layoutIndex,
+  });
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex];
+}
+
+class SpecEditorSelectWidgetEvent extends SpecEditorEvent {
+  const SpecEditorSelectWidgetEvent({
+    required this.sectionType,
+    required this.layoutIndex,
+    required this.widgetIndex,
+  });
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  final int widgetIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex, widgetIndex];
+}
+
+class SpecEditorClearSelectionEvent extends SpecEditorEvent {}
+
+class SpecEditorPageAttributesUpdated extends SpecEditorEvent {
+  const SpecEditorPageAttributesUpdated({required this.attributes});
+  final Map<String, dynamic> attributes;
+  @override
+  List<Object?> get props => [attributes];
+}
+
+class SpecEditorSectionAttributesUpdated extends SpecEditorEvent {
+  const SpecEditorSectionAttributesUpdated({required this.attributes});
+  final Map<String, dynamic> attributes;
+  @override
+  List<Object?> get props => [attributes];
+}
+
+class SpecEditorLayoutAttributesUpdated extends SpecEditorEvent {
+  const SpecEditorLayoutAttributesUpdated({required this.attributes});
+  final Map<String, dynamic> attributes;
+  @override
+  List<Object?> get props => [attributes];
+}
+
+class SpecEditorWidgetAttributesUpdated extends SpecEditorEvent {
+  const SpecEditorWidgetAttributesUpdated({required this.attributes});
+  final Map<String, dynamic> attributes;
+  @override
+  List<Object?> get props => [attributes];
+}
+
+class SpecEditorSaveStateEvent extends SpecEditorEvent {}
+
+class SpecEditorLoadStateEvent extends SpecEditorEvent {}
+
+class SpecEditorComponentDropped extends SpecEditorEvent {
+  const SpecEditorComponentDropped({required this.componentData});
+  final Map<String, dynamic> componentData;
+  @override
+  List<Object?> get props => [componentData];
+}
+
+class SpecEditorSaveSpecRequested extends SpecEditorEvent {}
+
+class SpecEditorGlobalActionUpdated extends SpecEditorEvent {
+  const SpecEditorGlobalActionUpdated({
+    required this.actionId,
+    this.actionData,
+  });
+  final String actionId;
+  final Map<String, dynamic>? actionData;
+  @override
+  List<Object?> get props => [actionId, actionData];
+}
+
+// Event for updating a specific attribute of an element (widget/renderer)
+class ElementAttributeChangedEvent extends SpecEditorEvent {
+  const ElementAttributeChangedEvent({
+    required this.elementId,
+    required this.attributeKey,
+    required this.newValue,
+  });
+  final String elementId;
+  final String attributeKey;
+  final dynamic newValue;
+
+  @override
+  List<Object?> get props => [elementId, attributeKey, newValue];
+}
+
+// --- Spec Editor State Definitions ---
+
+abstract class SpecEditorState extends Equatable {
+  const SpecEditorState();
+  @override
+  List<Object?> get props => [];
+}
+
+class SpecEditorInitialState extends SpecEditorState {
+  const SpecEditorInitialState();
+}
+
+class SpecEditorLoadingState extends SpecEditorState {
+  const SpecEditorLoadingState();
+}
+
+class SpecEditorLoadedState extends SpecEditorState {
+  const SpecEditorLoadedState({
+    required this.specData,
+    this.selectedPageId,
+    this.selectedSectionType,
+    this.selectedLayoutIndex,
+    this.selectedWidgetIndex,
+    this.pageAttributes = const {},
+    this.sectionAttributes = const {},
+    this.layoutAttributes = const {},
+    this.widgetAttributes = const {},
+    this.isSaving = false,
+  });
+  final Map<String, dynamic> specData;
+  final String? selectedPageId;
+  final PageSectionType? selectedSectionType;
+  final int? selectedLayoutIndex;
+  final int? selectedWidgetIndex;
+  final Map<String, dynamic> pageAttributes;
+  final Map<String, dynamic> sectionAttributes;
+  final Map<String, dynamic> layoutAttributes;
+  final Map<String, dynamic> widgetAttributes;
+  final bool isSaving;
+
+  @override
+  List<Object?> get props => [
+        specData,
+        selectedPageId,
+        selectedSectionType,
+        selectedLayoutIndex,
+        selectedWidgetIndex,
+        pageAttributes,
+        sectionAttributes,
+        layoutAttributes,
+        widgetAttributes,
+        isSaving,
+      ];
+
+  SpecEditorLoadedState copyWith({
+    Map<String, dynamic>? specData,
+    String? selectedPageId,
+    PageSectionType? selectedSectionType,
+    int? selectedLayoutIndex,
+    int? selectedWidgetIndex,
+    Map<String, dynamic>? pageAttributes,
+    Map<String, dynamic>? sectionAttributes,
+    Map<String, dynamic>? layoutAttributes,
+    Map<String, dynamic>? widgetAttributes,
+    bool? isSaving,
+    bool clearSelectedPageId = false,
+    bool clearSelectedSectionType = false,
+    bool clearSelectedLayoutIndex = false,
+    bool clearSelectedWidgetIndex = false,
+  }) {
+    return SpecEditorLoadedState(
+      specData: specData ?? this.specData,
+      selectedPageId:
+          clearSelectedPageId ? null : selectedPageId ?? this.selectedPageId,
+      selectedSectionType: clearSelectedSectionType
+          ? null
+          : selectedSectionType ?? this.selectedSectionType,
+      selectedLayoutIndex: clearSelectedLayoutIndex
+          ? null
+          : selectedLayoutIndex ?? this.selectedLayoutIndex,
+      selectedWidgetIndex: clearSelectedWidgetIndex
+          ? null
+          : selectedWidgetIndex ?? this.selectedWidgetIndex,
+      pageAttributes: pageAttributes ?? this.pageAttributes,
+      sectionAttributes: sectionAttributes ?? this.sectionAttributes,
+      layoutAttributes: layoutAttributes ?? this.layoutAttributes,
+      widgetAttributes: widgetAttributes ?? this.widgetAttributes,
+      isSaving: isSaving ?? this.isSaving,
+    );
+  }
+}
+
+class SpecEditorErrorState extends SpecEditorState {
+  const SpecEditorErrorState({required this.message});
+  final String message;
+  @override
+  List<Object?> get props => [message];
+}
 
 /// [SpecEditorBloc] is a business logic component that manages the state of the
 /// SpecEditor widget.
@@ -32,6 +252,8 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
     on<SpecEditorLoadStateEvent>(_onLoadState);
     on<SpecEditorSaveSpecRequested>(_onSaveSpecRequested);
     on<SpecEditorComponentDropped>(_onComponentDropped);
+    on<SpecEditorGlobalActionUpdated>(_onGlobalActionUpdated);
+    on<ElementAttributeChangedEvent>(_onElementAttributeChanged);
   }
 
   late final SpecEditorRepository repository;
@@ -563,6 +785,200 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
         emit(currentState.copyWith(isSaving: false)); // Clear saving state
         // Optionally, emit an error state
         // emit(SpecEditorErrorState(message: 'Failed to save spec: $e'));
+      }
+    }
+  }
+
+  // Handler for updating global actions
+  Future<void> _onGlobalActionUpdated(
+    SpecEditorGlobalActionUpdated event,
+    Emitter<SpecEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is SpecEditorLoadedState) {
+      try {
+        final newSpecData = _deepCopyMap(currentState.specData);
+        // Ensure 'actions' map exists
+        final actionsMap = Map<String, dynamic>.from(
+          newSpecData['actions'] as Map<String, dynamic>? ?? {},
+        );
+
+        if (event.actionData != null) {
+          // Add or Update
+          actionsMap[event.actionId] = event.actionData;
+          LoggerService.commonLog(
+            'Added/Updated global action: ${event.actionId}',
+            name: 'SpecEditorBloc._onGlobalActionUpdated',
+          );
+        } else {
+          // Delete
+          if (actionsMap.containsKey(event.actionId)) {
+            actionsMap.remove(event.actionId);
+            LoggerService.commonLog(
+              'Deleted global action: ${event.actionId}',
+              name: 'SpecEditorBloc._onGlobalActionUpdated',
+            );
+          } else {
+            LoggerService.commonLog(
+              'Attempted to delete non-existent action: ${event.actionId}',
+              name: 'SpecEditorBloc._onGlobalActionUpdated',
+            );
+          }
+        }
+
+        newSpecData['actions'] = actionsMap;
+        emit(currentState.copyWith(specData: newSpecData));
+      } catch (e, stackTrace) {
+        LoggerService.commonLog(
+          'Error updating global action ${event.actionId}',
+          name: 'SpecEditorBloc._onGlobalActionUpdated',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        // Optionally emit an error state or log further
+      }
+    }
+  }
+
+  // Recursive helper to find and update an element's attribute in the spec JSON
+  bool _updateElementAttributeInJson(
+    dynamic componentJson,
+    String targetId,
+    String attributeKey,
+    dynamic newValue,
+  ) {
+    if (componentJson is! Map<String, dynamic>) return false;
+
+    if (componentJson['id'] == targetId) {
+      // Assuming attributes are stored directly or under a 'props' or 'attributes' key
+      // This needs to match the actual structure of your component JSON
+      // For simplicity, let's assume WidgetModels have attributes in a 'props' map,
+      // and RendererModels might have them directly or also in 'props'.
+      // If 'props' doesn't exist, create it.
+      if (!componentJson.containsKey('props')) {
+        componentJson['props'] = <String, dynamic>{};
+      }
+      final props = componentJson['props'] as Map<String, dynamic>;
+      props[attributeKey] = newValue;
+      // If the attributeKey is fundamental like 'text' for TextWidgetModel and it's at top level, handle that too.
+      // This part needs to align with how ComponentModel.toJson() structures the properties.
+      // Example: if 'text' is a top-level property for TextWidgetModel in its JSON:
+      if (componentJson.containsKey(attributeKey) &&
+          componentJson['type'] == 'Text') {
+        // Be more specific based on type if needed
+        componentJson[attributeKey] = newValue;
+      } else {
+        // Default to updating/creating in 'props'
+        if (!componentJson.containsKey('props')) {
+          componentJson['props'] = <String, dynamic>{};
+        }
+        final propsMap = componentJson['props'] as Map<String, dynamic>;
+        propsMap[attributeKey] = newValue;
+        componentJson['props'] =
+            propsMap; // Re-assign if propsMap was a new map
+      }
+      return true;
+    }
+
+    if (componentJson.containsKey('children') &&
+        componentJson['children'] is List) {
+      final children = componentJson['children'] as List<dynamic>;
+      for (var i = 0; i < children.length; i++) {
+        if (_updateElementAttributeInJson(
+          children[i],
+          targetId,
+          attributeKey,
+          newValue,
+        )) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  Future<void> _onElementAttributeChanged(
+    ElementAttributeChangedEvent event,
+    Emitter<SpecEditorState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is SpecEditorLoadedState) {
+      LoggerService.commonLog(
+        'Attempting to update attribute: ${event.attributeKey} for element ${event.elementId} to ${event.newValue}',
+        name: 'SpecEditorBloc._onElementAttributeChanged',
+      );
+
+      try {
+        // It's crucial to deep copy the specData to avoid mutating the current state directly.
+        final newSpecData = _deepCopyMap(currentState.specData);
+        var updated = false;
+
+        if (newSpecData['screens'] is Map) {
+          final screens = newSpecData['screens'] as Map<String, dynamic>;
+          for (final screenKey in screens.keys) {
+            final screenJson = screens[screenKey] as Map<String, dynamic>?;
+            if (screenJson == null) continue;
+
+            if (screenJson.containsKey('appBar')) {
+              if (_updateElementAttributeInJson(
+                screenJson['appBar'],
+                event.elementId,
+                event.attributeKey,
+                event.newValue,
+              )) {
+                updated = true;
+                break;
+              }
+            }
+            if (screenJson.containsKey('body')) {
+              if (_updateElementAttributeInJson(
+                screenJson['body'],
+                event.elementId,
+                event.attributeKey,
+                event.newValue,
+              )) {
+                updated = true;
+                break;
+              }
+            }
+            if (screenJson.containsKey('bottomNavBar')) {
+              if (_updateElementAttributeInJson(
+                screenJson['bottomNavBar'],
+                event.elementId,
+                event.attributeKey,
+                event.newValue,
+              )) {
+                updated = true;
+                break;
+              }
+            }
+          }
+        }
+
+        if (updated) {
+          LoggerService.commonLog(
+            'Successfully updated attribute ${event.attributeKey} for element ${event.elementId}. New specData: ${jsonEncode(newSpecData)}',
+            name: 'SpecEditorBloc._onElementAttributeChanged',
+          );
+          // TODO: Re-parse DevitySpec from newSpecData before emitting if state holds parsedSpec
+          // For now, just emitting with new JSON data.
+          // final newParsedSpec = DevitySpec.fromJson(newSpecData);
+
+          emit(currentState.copyWith(specData: newSpecData));
+        } else {
+          LoggerService.commonLog(
+            'Element with ID ${event.elementId} not found in spec for attribute update.',
+            name: 'SpecEditorBloc._onElementAttributeChanged',
+          );
+        }
+      } catch (e, stackTrace) {
+        LoggerService.commonLog(
+          'Error applying element attribute update to JSON spec',
+          name: 'SpecEditorBloc._onElementAttributeChanged',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        // Optionally emit an error state or re-emit current state
       }
     }
   }

@@ -78,7 +78,7 @@ class _AppEditorActionBarContent extends StatelessWidget {
                     onPressed: () {
                       print(
                           'Save Changes button pressed - Dispatching SaveSpecRequested');
-                      specEditorBloc.add(const SpecEditorSaveSpecRequested());
+                      specEditorBloc.add( SpecEditorSaveSpecRequested());
                     },
                   ),
                   const SizedBox(width: 12),

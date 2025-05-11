@@ -41,6 +41,13 @@ class ProjectNavigationBloc
       projectId: '',
     ),
     ProjectNavigationDrawerItem(
+      id: 'action-builder',
+      title: 'Action Builder',
+      route: '/action-builder',
+      icon: Icons.play_arrow_outlined,
+      projectId: '',
+    ),
+    ProjectNavigationDrawerItem(
       id: 'media-factory',
       title: 'Media Factory',
       route: '/media-factory',

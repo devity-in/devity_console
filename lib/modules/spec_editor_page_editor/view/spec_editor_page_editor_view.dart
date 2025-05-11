@@ -1,7 +1,10 @@
 import 'package:devity_console/modules/spec_editor/bloc/spec_editor_bloc.dart';
 import 'package:devity_console/modules/spec_editor_page_editor/bloc/app_editor_page_editor_bloc.dart';
-import 'package:devity_console/modules/spec_editor_page_editor/models/layout.dart';
-import 'package:devity_console/modules/spec_editor_page_editor/models/page_section.dart';
+// Import SDK components
+import 'package:devity_sdk/devity_sdk.dart';
+import 'package:devity_sdk/models/spec_model.dart' hide ScreenModel;
+import 'package:devity_sdk/providers/action_service_provider.dart';
+import 'package:devity_sdk/services/action_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -29,320 +32,166 @@ class SpecEditorPageEditorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AppEditorPageEditorBloc, AppEditorPageEditorState>(
-      listener: (context, state) {
-        if (state is AppEditorPageEditorLoaded) {
-          if (state.selectedWidgetIndex != null) {
-            context.read<SpecEditorBloc>().add(
-                  SpecEditorSelectWidgetEvent(
-                    sectionType: state.selectedSectionType!,
-                    layoutIndex: state.selectedLayoutIndex!,
-                    widgetIndex: state.selectedWidgetIndex!,
-                  ),
-                );
-          } else if (state.selectedLayoutIndex != null) {
-            context.read<SpecEditorBloc>().add(
-                  SpecEditorSelectLayoutEvent(
-                    sectionType: state.selectedSectionType!,
-                    layoutIndex: state.selectedLayoutIndex!,
-                  ),
-                );
-          } else if (state.selectedSectionType != null) {
-            context.read<SpecEditorBloc>().add(
-                  SpecEditorSelectSectionEvent(
-                    sectionType: state.selectedSectionType!,
-                  ),
-                );
-          } else {
-            context.read<SpecEditorBloc>().add(
-                  const SpecEditorClearSelectionEvent(),
-                );
-          }
-        }
-      },
-      child: BlocBuilder<AppEditorPageEditorBloc, AppEditorPageEditorState>(
-        builder: (context, state) {
-          if (state is! AppEditorPageEditorLoaded) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    // Listen to AppEditorPageEditorBloc for selection changes if needed for overlays later
+    // For now, primary data comes from SpecEditorBloc
 
-          return Center(
-            child: Container(
-              width: 375, // iPhone width
-              height: 812, // iPhone height
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(
-                  color: Colors.grey[800]!,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(38),
-                child: Scaffold(
-                  backgroundColor: Colors.white,
-                  body: Column(
+    // Get spec data from SpecEditorBloc
+    final specState = context.watch<SpecEditorBloc>().state;
+    // Get editor state from AppEditorPageEditorBloc for selectedElementId
+    final editorState = context.watch<AppEditorPageEditorBloc>().state;
+
+    const pageBackgroundColor = Colors.white; // Default, remove const var
+    DevitySpec? parsedSpec;
+    ScreenModel? currentScreenModel;
+
+    if (specState is SpecEditorLoadedState) {
+      try {
+        // Parse the full spec
+        parsedSpec = DevitySpec.fromJson(specState.specData);
+        final selectedPageId = specState.selectedPageId;
+
+        if (selectedPageId != null &&
+            parsedSpec.screens.containsKey(selectedPageId)) {
+          currentScreenModel = parsedSpec.screens[selectedPageId];
+          // TODO: Implement color parsing
+        } else {
+          // Handle case where selected page ID is invalid or not found
+          currentScreenModel = null;
+        }
+      } catch (e) {
+        print('Error parsing spec: $e');
+        // Handle parsing error - show error message?
+        parsedSpec = null;
+        currentScreenModel = null;
+      }
+    } else {
+      // Handle non-loaded states (show loading or error)
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Correct dummy handler signature
+    void dummyNavHandler(String screenId) {
+      print('[Preview Navigate] Screen ID: $screenId');
+      // Avoid using context directly inside the handler definition if possible,
+      // or ensure it's the correct context when called.
+      // For a simple preview snackbar, this might be okay, but risky.
+      if (context.mounted) {
+        // Check context validity
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('[Preview] Navigate to screen: $screenId')),
+        );
+      }
+    }
+
+    // Correct ActionService instantiation (positional spec) and fallback spec
+    final previewActionService = ActionService(
+      parsedSpec ??
+          const DevitySpec(
+            specVersion: 'error',
+            specId: 'error',
+            version: 0,
+            entryPoint: '',
+          ),
+      navigationHandler: dummyNavHandler,
+    );
+
+    // Main UI structure mimicking a phone
+    return Center(
+      child: Container(
+        width: 375, // iPhone width
+        height: 812, // iPhone height
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(40),
+          border: Border.all(color: Colors.grey[800]!, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(38),
+          child: Scaffold(
+            // Use background color from spec if available
+            backgroundColor: pageBackgroundColor,
+            body: Column(
+              children: [
+                // Status Bar
+                Container(
+                  height: 44,
+                  color: Colors.black,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Status Bar
-                      Container(
-                        height: 44,
-                        color: Colors.black,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(width: 60),
-                            Text(
-                              '9:41',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(width: 60),
-                          ],
+                      SizedBox(width: 60),
+                      Text(
+                        '9:41',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      // Top Navigation Bar
-                      _buildSection(
-                        context,
-                        PageSectionType.topNavigationBar,
-                        state.selectedSectionType,
-                        state.selectedLayoutIndex,
-                      ),
-                      // Top Sticky Section
-                      _buildSection(
-                        context,
-                        PageSectionType.topSticky,
-                        state.selectedSectionType,
-                        state.selectedLayoutIndex,
-                      ),
-                      // Scrollable Section
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: _buildSection(
-                            context,
-                            PageSectionType.scrollable,
-                            state.selectedSectionType,
-                            state.selectedLayoutIndex,
-                          ),
-                        ),
-                      ),
-                      // Bottom Sticky Section
-                      _buildSection(
-                        context,
-                        PageSectionType.bottomSticky,
-                        state.selectedSectionType,
-                        state.selectedLayoutIndex,
-                      ),
-                      // Bottom Navigation Bar
-                      _buildSection(
-                        context,
-                        PageSectionType.bottomNavigationBar,
-                        state.selectedSectionType,
-                        state.selectedLayoutIndex,
-                      ),
-                      // Home Indicator
-                      Container(
-                        height: 34,
-                        color: Colors.black,
-                        child: Center(
-                          child: Container(
-                            width: 134,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(2.5),
-                            ),
-                          ),
-                        ),
-                      ),
+                      SizedBox(width: 60),
                     ],
                   ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 
-  Widget _buildSection(
-    BuildContext context,
-    PageSectionType type,
-    PageSectionType? selectedSectionType,
-    int? selectedLayoutIndex,
-  ) {
-    final isSelected =
-        selectedSectionType == type && selectedLayoutIndex == null;
-    final specEditorBloc = context.read<SpecEditorBloc>();
-
-    return GestureDetector(
-      onTap: () {
-        context.read<AppEditorPageEditorBloc>().add(
-              AppEditorPageEditorSelectSection(sectionType: type),
-            );
-      },
-      child: DragTarget<Map<String, dynamic>>(
-        onWillAcceptWithDetails: (data) => true,
-        onAcceptWithDetails: (DragTargetDetails<Map<String, dynamic>> details) {
-          final data = details.data;
-          specEditorBloc.add(SpecEditorComponentDropped(componentData: data));
-        },
-        builder: (context, candidateData, rejectedData) {
-          return Container(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: isSelected ? Colors.yellow : Colors.white,
-                width: 2,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  type.toString().split('.').last,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                // --- Render Area ---
+                Expanded(
+                  child: currentScreenModel != null
+                      ? ActionServiceProvider(
+                          actionService: previewActionService,
+                          // TODO: Add selection overlay / interaction wrapper here?
+                          child: DevityScreenRenderer(
+                            screenModel: currentScreenModel,
+                            onElementTap: (elementId) {
+                              context.read<AppEditorPageEditorBloc>().add(
+                                    PreviewElementTapped(elementId: elementId),
+                                  );
+                            },
+                            selectedElementId:
+                                editorState is AppEditorPageEditorLoaded
+                                    ? editorState.selectedElementId
+                                    : null,
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            specState is SpecEditorLoadedState
+                                ? (specState.selectedPageId == null
+                                    ? 'Select a page to preview'
+                                    : 'Error loading screen data for ${specState.selectedPageId}')
+                                : 'Loading spec...',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                 ),
-                const SizedBox(height: 8),
-                _buildLayouts(context, type),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+                // --- End Render Area ---
 
-  Widget _buildLayouts(BuildContext context, PageSectionType sectionType) {
-    return BlocBuilder<AppEditorPageEditorBloc, AppEditorPageEditorState>(
-      builder: (context, state) {
-        if (state is! AppEditorPageEditorLoaded) return const SizedBox();
-
-        final section = state.sections.firstWhere(
-          (s) => s.type == sectionType,
-          orElse: () => PageSection(type: sectionType),
-        );
-
-        return Column(
-          children: section.layouts.asMap().entries.map((entry) {
-            final index = entry.key;
-            final layout = entry.value;
-            final isSelected = state.selectedLayoutIndex == index;
-
-            return GestureDetector(
-              onTap: () {
-                context.read<AppEditorPageEditorBloc>().add(
-                      AppEditorPageEditorSelectLayout(
-                        sectionType: sectionType,
-                        layoutIndex: index,
-                      ),
-                    );
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.grey,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      layout.type.toString().split('.').last,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                // Home Indicator
+                Container(
+                  height: 34,
+                  color: Colors.black,
+                  child: Center(
+                    child: Container(
+                      width: 134,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(2.5),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    _buildWidgets(context, sectionType, index, layout),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-
-  Widget _buildWidgets(
-    BuildContext context,
-    PageSectionType sectionType,
-    int layoutIndex,
-    Layout layout,
-  ) {
-    return ReorderableListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      onReorder: (oldIndex, newIndex) {
-        context.read<AppEditorPageEditorBloc>().add(
-              AppEditorPageWidgetReordered(
-                sectionType: sectionType,
-                layoutIndex: layoutIndex,
-                oldIndex: oldIndex,
-                newIndex: newIndex,
-              ),
-            );
-      },
-      children: layout.widgets.asMap().entries.map((entry) {
-        final index = entry.key;
-        final widget = entry.value;
-        final state = context.read<AppEditorPageEditorBloc>().state;
-        final isSelected = state is AppEditorPageEditorLoaded &&
-            state.selectedWidgetIndex == index;
-
-        return GestureDetector(
-          key: ValueKey('widget_$index'),
-          onTap: () {
-            context.read<AppEditorPageEditorBloc>().add(
-                  AppEditorPageEditorSelectWidget(
-                    sectionType: sectionType,
-                    layoutIndex: layoutIndex,
-                    widgetIndex: index,
                   ),
-                );
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: isSelected ? Colors.green : Colors.grey,
-              ),
-            ),
-            child: Text(
-              widget.toString(),
-              style: const TextStyle(color: Colors.black87),
+                ),
+              ],
             ),
           ),
-        );
-      }).toList(),
+        ),
+      ),
     );
   }
 }

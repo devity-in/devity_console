@@ -31,6 +31,8 @@ class AppEditorAttributeEditorLoaded extends AppEditorAttributeEditorState {
     this.sectionAttributes = const {},
     this.layoutAttributes = const {},
     this.widgetAttributes = const {},
+    this.globalActions = const {},
+    this.selectedElementAttributes,
   });
 
   /// The type of the selected section
@@ -51,6 +53,36 @@ class AppEditorAttributeEditorLoaded extends AppEditorAttributeEditorState {
   /// The attributes for the selected widget
   final Map<String, dynamic> widgetAttributes;
 
+  /// The map of global actions available in the spec.
+  final Map<String, dynamic> globalActions;
+
+  final Map<String, dynamic>? selectedElementAttributes;
+
+  AppEditorAttributeEditorLoaded copyWith({
+    PageSectionType? selectedSectionType,
+    int? selectedLayoutIndex,
+    int? selectedWidgetIndex,
+    Map<String, dynamic>? sectionAttributes,
+    Map<String, dynamic>? layoutAttributes,
+    Map<String, dynamic>? widgetAttributes,
+    Map<String, dynamic>? globalActions,
+    Map<String, dynamic>? selectedElementAttributes,
+    bool clearSelectedElementAttributes = false,
+  }) {
+    return AppEditorAttributeEditorLoaded(
+      selectedSectionType: selectedSectionType ?? this.selectedSectionType,
+      selectedLayoutIndex: selectedLayoutIndex ?? this.selectedLayoutIndex,
+      selectedWidgetIndex: selectedWidgetIndex ?? this.selectedWidgetIndex,
+      sectionAttributes: sectionAttributes ?? this.sectionAttributes,
+      layoutAttributes: layoutAttributes ?? this.layoutAttributes,
+      widgetAttributes: widgetAttributes ?? this.widgetAttributes,
+      globalActions: globalActions ?? this.globalActions,
+      selectedElementAttributes: clearSelectedElementAttributes
+          ? null
+          : selectedElementAttributes ?? this.selectedElementAttributes,
+    );
+  }
+
   @override
   List<Object?> get props => [
         selectedSectionType,
@@ -59,6 +91,8 @@ class AppEditorAttributeEditorLoaded extends AppEditorAttributeEditorState {
         sectionAttributes,
         layoutAttributes,
         widgetAttributes,
+        globalActions,
+        selectedElementAttributes,
       ];
 }
 

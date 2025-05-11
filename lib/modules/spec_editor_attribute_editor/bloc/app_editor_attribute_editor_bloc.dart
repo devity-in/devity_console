@@ -22,6 +22,10 @@ class AppEditorAttributeEditorBloc
     on<AppEditorAttributeEditorWidgetAttributeUpdated>(
       _onWidgetAttributeUpdated,
     );
+    on<SelectedElementAttributesUpdated>(_onSelectedElementAttributesUpdated);
+    on<SelectedElementSingleAttributeUpdated>(
+      _onSelectedElementSingleAttributeUpdated,
+    );
   }
 
   void _onInitialized(
@@ -43,6 +47,7 @@ class AppEditorAttributeEditorBloc
         sectionAttributes: event.sectionAttributes ?? const {},
         layoutAttributes: event.layoutAttributes ?? const {},
         widgetAttributes: event.widgetAttributes ?? const {},
+        globalActions: event.globalActions ?? const {},
       ),
     );
   }
@@ -65,6 +70,7 @@ class AppEditorAttributeEditorBloc
           sectionAttributes: updatedAttributes,
           layoutAttributes: currentState.layoutAttributes,
           widgetAttributes: currentState.widgetAttributes,
+          globalActions: currentState.globalActions,
         ),
       );
     }
@@ -88,6 +94,7 @@ class AppEditorAttributeEditorBloc
           sectionAttributes: currentState.sectionAttributes,
           layoutAttributes: updatedAttributes,
           widgetAttributes: currentState.widgetAttributes,
+          globalActions: currentState.globalActions,
         ),
       );
     }
@@ -104,15 +111,60 @@ class AppEditorAttributeEditorBloc
             ..addAll(event.attributes);
 
       emit(
-        AppEditorAttributeEditorLoaded(
-          selectedSectionType: currentState.selectedSectionType,
-          selectedLayoutIndex: currentState.selectedLayoutIndex,
-          selectedWidgetIndex: currentState.selectedWidgetIndex,
-          sectionAttributes: currentState.sectionAttributes,
-          layoutAttributes: currentState.layoutAttributes,
+        currentState.copyWith(
           widgetAttributes: updatedAttributes,
         ),
       );
+    }
+  }
+
+  void _onSelectedElementAttributesUpdated(
+    SelectedElementAttributesUpdated event,
+    Emitter<AppEditorAttributeEditorState> emit,
+  ) {
+    if (state is AppEditorAttributeEditorLoaded) {
+      final currentState = state as AppEditorAttributeEditorLoaded;
+      emit(
+        currentState.copyWith(
+          selectedElementAttributes: event.attributes,
+          globalActions: event.globalActions,
+          widgetAttributes: const {},
+          layoutAttributes: const {},
+          sectionAttributes: const {},
+        ),
+      );
+    } else {
+      emit(
+        AppEditorAttributeEditorLoaded(
+          selectedElementAttributes: event.attributes,
+          globalActions: event.globalActions,
+        ),
+      );
+    }
+  }
+
+  void _onSelectedElementSingleAttributeUpdated(
+    SelectedElementSingleAttributeUpdated event,
+    Emitter<AppEditorAttributeEditorState> emit,
+  ) {
+    if (state is AppEditorAttributeEditorLoaded) {
+      final currentState = state as AppEditorAttributeEditorLoaded;
+      if (currentState.selectedElementAttributes != null) {
+        final updatedAttributes =
+            Map<String, dynamic>.from(currentState.selectedElementAttributes!)
+              ..[event.attributeKey] = event.newValue;
+
+        emit(currentState.copyWith(
+            selectedElementAttributes: updatedAttributes));
+
+        // Call onCommit if provided
+        if (event.onCommit != null) {
+          final elementId = updatedAttributes['id'] as String?;
+          if (elementId != null) {
+            event.onCommit!(elementId, event.attributeKey, event.newValue);
+          }
+        }
+      }
     }
   }
 }

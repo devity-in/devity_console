@@ -249,6 +249,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
+  devity_sdk:
+    dependency: "direct main"
+    description:
+      path: "../devity_flutter_sdk"
+      relative: true
+    source: path
+    version: "0.0.1"
   diff_match_patch:
     dependency: transitive
     description:
@@ -386,6 +393,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: c87ff004c8aa6af2d531668b46a4ea379f7191dc6dfa066acd53d506da6e044b
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -596,6 +611,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  multi_dropdown:
+    dependency: "direct main"
+    description:
+      name: multi_dropdown
+      sha256: da25f6defdc62aaf8ce0842d31ff7875fad29aeb13f5b2de9e157a06d53f4b74
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   nested:
     dependency: transitive
     description:

@@ -27,6 +27,7 @@ class AppEditorAttributeEditorSelectionChanged
     this.sectionAttributes,
     this.layoutAttributes,
     this.widgetAttributes,
+    this.globalActions,
   });
 
   /// The selected section type
@@ -47,6 +48,9 @@ class AppEditorAttributeEditorSelectionChanged
   /// The attributes for the selected widget (if applicable)
   final Map<String, dynamic>? widgetAttributes;
 
+  /// The map of global actions available in the spec.
+  final Map<String, dynamic>? globalActions;
+
   @override
   List<Object?> get props => [
         selectedSectionType,
@@ -55,6 +59,7 @@ class AppEditorAttributeEditorSelectionChanged
         sectionAttributes,
         layoutAttributes,
         widgetAttributes,
+        globalActions,
       ];
 }
 
@@ -101,4 +106,34 @@ class AppEditorAttributeEditorWidgetAttributeUpdated
 
   @override
   List<Object?> get props => [attributes];
+}
+
+class SelectedElementAttributesUpdated extends AppEditorAttributeEditorEvent {
+  // Assuming global actions are still needed
+
+  const SelectedElementAttributesUpdated({
+    required this.globalActions,
+    this.attributes,
+  });
+  final Map<String, dynamic>? attributes;
+  final Map<String, dynamic> globalActions;
+
+  @override
+  List<Object?> get props => [attributes, globalActions];
+}
+
+class SelectedElementSingleAttributeUpdated
+    extends AppEditorAttributeEditorEvent {
+  const SelectedElementSingleAttributeUpdated({
+    required this.attributeKey,
+    required this.newValue,
+    this.onCommit,
+  });
+  final String attributeKey;
+  final dynamic newValue;
+  final void Function(String elementId, String attributeKey, dynamic newValue)?
+      onCommit;
+
+  @override
+  List<Object?> get props => [attributeKey, newValue, onCommit];
 }

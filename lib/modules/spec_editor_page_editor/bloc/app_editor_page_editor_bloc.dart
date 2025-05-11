@@ -3,8 +3,200 @@ import 'package:devity_console/modules/spec_editor_page_editor/models/page_secti
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'app_editor_page_editor_event.dart';
-part 'app_editor_page_editor_state.dart';
+// Consolidated Event Definitions
+sealed class AppEditorPageEditorEvent extends Equatable {
+  const AppEditorPageEditorEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class AppEditorPageEditorInitialized extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorInitialized();
+}
+
+final class AppEditorPageLayoutUpdated extends AppEditorPageEditorEvent {
+  const AppEditorPageLayoutUpdated({required this.layouts});
+  final List<Layout> layouts;
+  @override
+  List<Object?> get props => [layouts];
+}
+
+final class AppEditorPageWidgetDropped extends AppEditorPageEditorEvent {
+  const AppEditorPageWidgetDropped({
+    required this.sectionType,
+    required this.widgetData,
+  });
+  final PageSectionType sectionType;
+  final dynamic widgetData;
+  @override
+  List<Object?> get props => [sectionType, widgetData];
+}
+
+final class AppEditorPageLayoutDropped extends AppEditorPageEditorEvent {
+  const AppEditorPageLayoutDropped({
+    required this.sectionType,
+    required this.layoutType,
+  });
+  final PageSectionType sectionType;
+  final LayoutType layoutType;
+  @override
+  List<Object?> get props => [sectionType, layoutType];
+}
+
+final class AppEditorPageWidgetReordered extends AppEditorPageEditorEvent {
+  const AppEditorPageWidgetReordered({
+    required this.sectionType,
+    required this.layoutIndex,
+    required this.oldIndex,
+    required this.newIndex,
+  });
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  final int oldIndex;
+  final int newIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex, oldIndex, newIndex];
+}
+
+final class AppEditorPageSectionSelected extends AppEditorPageEditorEvent {
+  const AppEditorPageSectionSelected({required this.sectionType});
+  final PageSectionType sectionType;
+  @override
+  List<Object?> get props => [sectionType];
+}
+
+final class AppEditorPageLayoutSelected extends AppEditorPageEditorEvent {
+  const AppEditorPageLayoutSelected({
+    required this.sectionType,
+    required this.layoutIndex,
+  });
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex];
+}
+
+final class AppEditorPageWidgetSelected extends AppEditorPageEditorEvent {
+  const AppEditorPageWidgetSelected({
+    required this.sectionType,
+    required this.layoutIndex,
+    required this.widgetIndex,
+  });
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  final int widgetIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex, widgetIndex];
+}
+
+final class AppEditorPageSelectionCleared extends AppEditorPageEditorEvent {
+  const AppEditorPageSelectionCleared();
+}
+
+class AppEditorPageEditorSelectSection extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorSelectSection(this.sectionType);
+  final PageSectionType sectionType;
+  @override
+  List<Object?> get props => [sectionType];
+}
+
+class AppEditorPageEditorSelectLayout extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorSelectLayout(this.sectionType, this.layoutIndex);
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex];
+}
+
+class AppEditorPageEditorSelectWidget extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorSelectWidget(
+    this.sectionType,
+    this.layoutIndex,
+    this.widgetIndex,
+  );
+  final PageSectionType sectionType;
+  final int layoutIndex;
+  final int widgetIndex;
+  @override
+  List<Object?> get props => [sectionType, layoutIndex, widgetIndex];
+}
+
+class AppEditorPageEditorClearSelection extends AppEditorPageEditorEvent {
+  const AppEditorPageEditorClearSelection();
+}
+
+class PreviewElementTapped extends AppEditorPageEditorEvent {
+  const PreviewElementTapped({this.elementId});
+  final String? elementId;
+  @override
+  List<Object?> get props => [elementId];
+}
+
+// Consolidated State Definitions
+sealed class AppEditorPageEditorState extends Equatable {
+  const AppEditorPageEditorState();
+  @override
+  List<Object?> get props => [];
+}
+
+final class AppEditorPageEditorInitial extends AppEditorPageEditorState {
+  const AppEditorPageEditorInitial();
+}
+
+final class AppEditorPageEditorLoading extends AppEditorPageEditorState {
+  const AppEditorPageEditorLoading();
+}
+
+class AppEditorPageEditorLoaded extends AppEditorPageEditorState {
+  const AppEditorPageEditorLoaded({
+    this.sections = const [],
+    this.selectedSectionType,
+    this.selectedLayoutIndex,
+    this.selectedWidgetIndex,
+    this.selectedElementId,
+  });
+  final List<PageSection> sections;
+  final PageSectionType? selectedSectionType;
+  final int? selectedLayoutIndex;
+  final int? selectedWidgetIndex;
+  final String? selectedElementId;
+
+  AppEditorPageEditorLoaded copyWith({
+    List<PageSection>? sections,
+    PageSectionType? selectedSectionType,
+    int? selectedLayoutIndex,
+    int? selectedWidgetIndex,
+    String? selectedElementId,
+    bool clearSelectedElementId = false,
+  }) {
+    return AppEditorPageEditorLoaded(
+      sections: sections ?? this.sections,
+      selectedSectionType: selectedSectionType ?? this.selectedSectionType,
+      selectedLayoutIndex: selectedLayoutIndex ?? this.selectedLayoutIndex,
+      selectedWidgetIndex: selectedWidgetIndex ?? this.selectedWidgetIndex,
+      selectedElementId: clearSelectedElementId
+          ? null
+          : (selectedElementId ?? this.selectedElementId),
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        sections,
+        selectedSectionType,
+        selectedLayoutIndex,
+        selectedWidgetIndex,
+        selectedElementId,
+      ];
+}
+
+final class AppEditorPageEditorError extends AppEditorPageEditorState {
+  const AppEditorPageEditorError({required this.message});
+  final String message;
+  @override
+  List<Object?> get props => [message];
+}
 
 /// [AppEditorPageEditorBloc] is a business logic component that manages the
 /// state of the AppEditorPageEditor widget.
@@ -25,6 +217,7 @@ class AppEditorPageEditorBloc
     on<AppEditorPageEditorSelectLayout>(_onSelectLayout);
     on<AppEditorPageEditorSelectWidget>(_onSelectWidget);
     on<AppEditorPageEditorClearSelection>(_onClearSelection);
+    on<PreviewElementTapped>(_onPreviewElementTapped);
   }
 
   Future<void> _onInitialized(
@@ -33,7 +226,6 @@ class AppEditorPageEditorBloc
   ) async {
     try {
       emit(const AppEditorPageEditorLoading());
-      // Initialize with empty sections
       final sections = PageSectionType.values
           .map((type) => PageSection(type: type))
           .toList();
@@ -47,17 +239,25 @@ class AppEditorPageEditorBloc
     AppEditorPageLayoutUpdated event,
     Emitter<AppEditorPageEditorState> emit,
   ) async {
-    try {
-      emit(const AppEditorPageEditorLoading());
-      // TODO: Update the page layout
-      if (state is AppEditorPageEditorLoaded) {
-        final currentState = state as AppEditorPageEditorLoaded;
-        emit(AppEditorPageEditorLoaded(sections: currentState.sections));
+    final currentState = state;
+    if (currentState is AppEditorPageEditorLoaded) {
+      if (currentState.sections.isNotEmpty) {
+        final updatedSections = List<PageSection>.from(currentState.sections);
+        // Replace layouts of the first section. This is a simplified handling.
+        // A more robust solution would identify which section to update.
+        updatedSections[0] =
+            updatedSections[0].copyWith(layouts: event.layouts);
+        emit(currentState.copyWith(sections: updatedSections));
       } else {
-        emit(const AppEditorPageEditorLoaded(sections: []));
+        // No sections to update, maybe emit an empty state or log
+        emit(
+          currentState.copyWith(),
+        ); // Or emit current state if no change is made
       }
-    } catch (e) {
-      emit(AppEditorPageEditorError(message: e.toString()));
+    } else {
+      // If not loaded, perhaps initialize with new sections based on event.layouts
+      // This case might need more thought based on desired behavior.
+      emit(const AppEditorPageEditorLoaded());
     }
   }
 
@@ -65,33 +265,18 @@ class AppEditorPageEditorBloc
     AppEditorPageWidgetDropped event,
     Emitter<AppEditorPageEditorState> emit,
   ) async {
-    try {
-      if (state is! AppEditorPageEditorLoaded) return;
+    if (state is! AppEditorPageEditorLoaded) return;
+    final currentState = state as AppEditorPageEditorLoaded;
+    final sections = List<PageSection>.from(currentState.sections);
+    final sectionIndex =
+        sections.indexWhere((s) => s.type == event.sectionType);
 
-      final currentState = state as AppEditorPageEditorLoaded;
-      final sections = List<PageSection>.from(currentState.sections);
-
-      // Find the section to update
-      final sectionIndex = sections.indexWhere(
-        (section) => section.type == event.sectionType,
-      );
-
-      if (sectionIndex != -1) {
-        // Create a new section with the added widget
-        final section = sections[sectionIndex];
-        final updatedWidgets = List<dynamic>.from(section.widgets)
-          ..add(event.widgetData);
-
-        sections[sectionIndex] = PageSection(
-          type: section.type,
-          widgets: updatedWidgets,
-          layouts: section.layouts,
-        );
-
-        emit(AppEditorPageEditorLoaded(sections: sections));
-      }
-    } catch (e) {
-      emit(AppEditorPageEditorError(message: e.toString()));
+    if (sectionIndex != -1) {
+      final section = sections[sectionIndex];
+      final updatedWidgets = List<dynamic>.from(section.widgets)
+        ..add(event.widgetData);
+      sections[sectionIndex] = section.copyWith(widgets: updatedWidgets);
+      emit(currentState.copyWith(sections: sections));
     }
   }
 
@@ -99,33 +284,18 @@ class AppEditorPageEditorBloc
     AppEditorPageLayoutDropped event,
     Emitter<AppEditorPageEditorState> emit,
   ) async {
-    try {
-      if (state is! AppEditorPageEditorLoaded) return;
+    if (state is! AppEditorPageEditorLoaded) return;
+    final currentState = state as AppEditorPageEditorLoaded;
+    final sections = List<PageSection>.from(currentState.sections);
+    final sectionIndex =
+        sections.indexWhere((s) => s.type == event.sectionType);
 
-      final currentState = state as AppEditorPageEditorLoaded;
-      final sections = List<PageSection>.from(currentState.sections);
-
-      // Find the section to update
-      final sectionIndex = sections.indexWhere(
-        (section) => section.type == event.sectionType,
-      );
-
-      if (sectionIndex != -1) {
-        // Create a new section with the added layout
-        final section = sections[sectionIndex];
-        final updatedLayouts = List<Layout>.from(section.layouts)
-          ..add(Layout(type: event.layoutType));
-
-        sections[sectionIndex] = PageSection(
-          type: section.type,
-          widgets: section.widgets,
-          layouts: updatedLayouts,
-        );
-
-        emit(AppEditorPageEditorLoaded(sections: sections));
-      }
-    } catch (e) {
-      emit(AppEditorPageEditorError(message: e.toString()));
+    if (sectionIndex != -1) {
+      final section = sections[sectionIndex];
+      final updatedLayouts = List<Layout>.from(section.layouts)
+        ..add(Layout(type: event.layoutType));
+      sections[sectionIndex] = section.copyWith(layouts: updatedLayouts);
+      emit(currentState.copyWith(sections: sections));
     }
   }
 
@@ -133,33 +303,36 @@ class AppEditorPageEditorBloc
     AppEditorPageWidgetReordered event,
     Emitter<AppEditorPageEditorState> emit,
   ) {
-    final state = this.state;
-    if (state is! AppEditorPageEditorLoaded) return;
+    final currentState = state;
+    if (currentState is! AppEditorPageEditorLoaded) return;
 
-    final sections = List<PageSection>.from(state.sections);
+    final sections = List<PageSection>.from(currentState.sections);
     final sectionIndex =
         sections.indexWhere((s) => s.type == event.sectionType);
     if (sectionIndex == -1) return;
 
     final section = sections[sectionIndex];
-    if (event.layoutIndex >= section.layouts.length) return;
+    if (event.layoutIndex < 0 || event.layoutIndex >= section.layouts.length)
+      return;
 
     final layout = section.layouts[event.layoutIndex];
-    if (event.oldIndex >= layout.widgets.length ||
-        event.newIndex >= layout.widgets.length) return;
+    if (event.oldIndex < 0 ||
+        event.oldIndex >= layout.widgets.length ||
+        event.newIndex < 0 ||
+        event.newIndex > layout.widgets.length) return;
 
     final widgets = List<dynamic>.from(layout.widgets);
     final widget = widgets.removeAt(event.oldIndex);
-    widgets.insert(event.newIndex, widget);
+    widgets.insert(
+      event.newIndex > widgets.length ? widgets.length : event.newIndex,
+      widget,
+    );
 
-    final updatedLayout = layout.copyWith(widgets: widgets);
     final updatedLayouts = List<Layout>.from(section.layouts);
-    updatedLayouts[event.layoutIndex] = updatedLayout;
+    updatedLayouts[event.layoutIndex] = layout.copyWith(widgets: widgets);
+    sections[sectionIndex] = section.copyWith(layouts: updatedLayouts);
 
-    final updatedSection = section.copyWith(layouts: updatedLayouts);
-    sections[sectionIndex] = updatedSection;
-
-    emit(AppEditorPageEditorLoaded(sections: sections));
+    emit(currentState.copyWith(sections: sections));
   }
 
   Future<void> _onSectionSelected(
@@ -167,11 +340,11 @@ class AppEditorPageEditorBloc
     Emitter<AppEditorPageEditorState> emit,
   ) async {
     if (state is! AppEditorPageEditorLoaded) return;
-
     final currentState = state as AppEditorPageEditorLoaded;
     emit(
       currentState.copyWith(
         selectedSectionType: event.sectionType,
+        clearSelectedElementId: true,
       ),
     );
   }
@@ -181,12 +354,12 @@ class AppEditorPageEditorBloc
     Emitter<AppEditorPageEditorState> emit,
   ) async {
     if (state is! AppEditorPageEditorLoaded) return;
-
     final currentState = state as AppEditorPageEditorLoaded;
     emit(
       currentState.copyWith(
         selectedSectionType: event.sectionType,
         selectedLayoutIndex: event.layoutIndex,
+        clearSelectedElementId: true,
       ),
     );
   }
@@ -196,13 +369,13 @@ class AppEditorPageEditorBloc
     Emitter<AppEditorPageEditorState> emit,
   ) async {
     if (state is! AppEditorPageEditorLoaded) return;
-
     final currentState = state as AppEditorPageEditorLoaded;
     emit(
       currentState.copyWith(
         selectedSectionType: event.sectionType,
         selectedLayoutIndex: event.layoutIndex,
         selectedWidgetIndex: event.widgetIndex,
+        clearSelectedElementId: true,
       ),
     );
   }
@@ -212,10 +385,11 @@ class AppEditorPageEditorBloc
     Emitter<AppEditorPageEditorState> emit,
   ) async {
     if (state is! AppEditorPageEditorLoaded) return;
-
     final currentState = state as AppEditorPageEditorLoaded;
     emit(
-      currentState.copyWith(),
+      currentState.copyWith(
+        clearSelectedElementId: true,
+      ),
     );
   }
 
@@ -223,44 +397,91 @@ class AppEditorPageEditorBloc
     AppEditorPageEditorSelectSection event,
     Emitter<AppEditorPageEditorState> emit,
   ) {
-    emit(
-      AppEditorPageEditorLoaded(
-        selectedSectionType: event.sectionType,
-      ),
-    );
+    final currentState = state;
+    if (currentState is AppEditorPageEditorLoaded) {
+      emit(
+        currentState.copyWith(
+          selectedSectionType: event.sectionType,
+          clearSelectedElementId: true,
+        ),
+      );
+    } else {
+      emit(AppEditorPageEditorLoaded(selectedSectionType: event.sectionType));
+    }
   }
 
   void _onSelectLayout(
     AppEditorPageEditorSelectLayout event,
     Emitter<AppEditorPageEditorState> emit,
   ) {
-    emit(
-      AppEditorPageEditorLoaded(
-        selectedSectionType: event.sectionType,
-        selectedLayoutIndex: event.layoutIndex,
-      ),
-    );
+    final currentState = state;
+    if (currentState is AppEditorPageEditorLoaded) {
+      emit(
+        currentState.copyWith(
+          selectedSectionType: event.sectionType,
+          selectedLayoutIndex: event.layoutIndex,
+          clearSelectedElementId: true,
+        ),
+      );
+    } else {
+      emit(
+        AppEditorPageEditorLoaded(
+          selectedSectionType: event.sectionType,
+          selectedLayoutIndex: event.layoutIndex,
+        ),
+      );
+    }
   }
 
   void _onSelectWidget(
     AppEditorPageEditorSelectWidget event,
     Emitter<AppEditorPageEditorState> emit,
   ) {
-    emit(
-      AppEditorPageEditorLoaded(
-        selectedSectionType: event.sectionType,
-        selectedLayoutIndex: event.layoutIndex,
-        selectedWidgetIndex: event.widgetIndex,
-      ),
-    );
+    final currentState = state;
+    if (currentState is AppEditorPageEditorLoaded) {
+      emit(
+        currentState.copyWith(
+          selectedSectionType: event.sectionType,
+          selectedLayoutIndex: event.layoutIndex,
+          selectedWidgetIndex: event.widgetIndex,
+          clearSelectedElementId: true,
+        ),
+      );
+    } else {
+      emit(
+        AppEditorPageEditorLoaded(
+          selectedSectionType: event.sectionType,
+          selectedLayoutIndex: event.layoutIndex,
+          selectedWidgetIndex: event.widgetIndex,
+        ),
+      );
+    }
   }
 
   void _onClearSelection(
     AppEditorPageEditorClearSelection event,
     Emitter<AppEditorPageEditorState> emit,
   ) {
-    emit(
-      const AppEditorPageEditorLoaded(),
-    );
+    final currentState = state;
+    if (currentState is AppEditorPageEditorLoaded) {
+      emit(currentState.copyWith(clearSelectedElementId: true));
+    }
+  }
+
+  void _onPreviewElementTapped(
+    PreviewElementTapped event,
+    Emitter<AppEditorPageEditorState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is AppEditorPageEditorLoaded) {
+      emit(
+        currentState.copyWith(
+          selectedElementId: event.elementId,
+        ),
+      );
+    } else if (currentState is AppEditorPageEditorInitial ||
+        currentState is AppEditorPageEditorLoading) {
+      emit(AppEditorPageEditorLoaded(selectedElementId: event.elementId));
+    }
   }
 }
