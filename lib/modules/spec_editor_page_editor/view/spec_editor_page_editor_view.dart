@@ -16,11 +16,8 @@ class SpecEditorPageEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AppEditorPageEditorBloc()
-        ..add(const AppEditorPageEditorInitialized()),
-      child: const SpecEditorPageEditorView(),
-    );
+    // BlocProvider removed from here
+    return const SpecEditorPageEditorView();
   }
 }
 

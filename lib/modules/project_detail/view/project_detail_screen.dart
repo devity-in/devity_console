@@ -29,8 +29,12 @@ class ProjectDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProjectDetailView(
-      projectId: projectId,
+    return BlocProvider<ProjectDetailBloc>(
+      create: (context) => ProjectDetailBloc()
+        ..add(ProjectDetailStartedEvent(projectId: projectId)),
+      child: ProjectDetailView(
+        projectId: projectId,
+      ),
     );
   }
 }

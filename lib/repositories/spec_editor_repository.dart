@@ -97,6 +97,36 @@ class SpecEditorRepository {
   final String _baseUrl =
       'http://127.0.0.1:8000'; // Assuming backend runs locally
 
+  // Helper function to deeply cast maps
+  Map<String, dynamic> _deepCastStringDynamicMap(Map originalMap) {
+    final newMap = <String, dynamic>{};
+    originalMap.forEach((key, value) {
+      final stringKey = key.toString(); // Ensure key is a string
+      if (value is Map) {
+        newMap[stringKey] = _deepCastStringDynamicMap(value);
+      } else if (value is List) {
+        newMap[stringKey] = _deepCastList(value);
+      } else {
+        newMap[stringKey] = value;
+      }
+    });
+    return newMap;
+  }
+
+  List<dynamic> _deepCastList(List originalList) {
+    final newList = <dynamic>[];
+    for (final item in originalList) {
+      if (item is Map) {
+        newList.add(_deepCastStringDynamicMap(item));
+      } else if (item is List) {
+        newList.add(_deepCastList(item));
+      } else {
+        newList.add(item);
+      }
+    }
+    return newList;
+  }
+
   /// Fetches the main spec content for a given project.
   /// Returns the parsed JSON content as a map, or a default structure if not found.
   Future<Map<String, dynamic>> getSpecForProject(String projectId) async {
@@ -117,8 +147,8 @@ class SpecEditorRepository {
         final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
         if (responseBody.containsKey('content') &&
             responseBody['content'] is Map) {
-          // Explicitly cast the content to the expected type
-          return Map<String, dynamic>.from(responseBody['content'] as Map);
+          // Explicitly cast the content to the expected type using the helper
+          return _deepCastStringDynamicMap(responseBody['content'] as Map);
         } else {
           LoggerService.commonLog(
             'Warning: Spec content not found or not a map in response for $projectId. Returning default.',

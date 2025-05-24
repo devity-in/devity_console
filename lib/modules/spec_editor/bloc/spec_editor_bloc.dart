@@ -985,7 +985,38 @@ class SpecEditorBloc extends Bloc<SpecEditorEvent, SpecEditorState> {
 
   // --- Helper for deep copying ---
   Map<String, dynamic> _deepCopyMap(Map<String, dynamic> original) {
-    return jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
+    // Now it correctly deep casts to Map<String, dynamic> throughout
+    return _deepCastStringDynamicMap(original);
+  }
+
+  // Helper function to deeply cast maps (copied from SpecEditorRepository)
+  Map<String, dynamic> _deepCastStringDynamicMap(Map originalMap) {
+    final newMap = <String, dynamic>{};
+    originalMap.forEach((key, value) {
+      final stringKey = key.toString(); // Ensure key is a string
+      if (value is Map) {
+        newMap[stringKey] = _deepCastStringDynamicMap(value);
+      } else if (value is List) {
+        newMap[stringKey] = _deepCastList(value);
+      } else {
+        newMap[stringKey] = value;
+      }
+    });
+    return newMap;
+  }
+
+  List<dynamic> _deepCastList(List originalList) {
+    final newList = <dynamic>[];
+    for (final item in originalList) {
+      if (item is Map) {
+        newList.add(_deepCastStringDynamicMap(item));
+      } else if (item is List) {
+        newList.add(_deepCastList(item));
+      } else {
+        newList.add(item);
+      }
+    }
+    return newList;
   }
 }
 
