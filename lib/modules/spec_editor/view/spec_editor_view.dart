@@ -25,7 +25,7 @@ class SpecEditor extends StatelessWidget {
     return BlocProvider(
       create: (context) => SpecEditorBloc(projectId: projectId)
         ..add(const SpecEditorStartedEvent()),
-      child: const SpecEditorView(),
+      child: SpecEditorView(projectId: projectId),
     );
   }
 }
@@ -33,7 +33,12 @@ class SpecEditor extends StatelessWidget {
 /// [SpecEditorView] is a StatelessWidget that displays the app editor UI.
 class SpecEditorView extends StatelessWidget {
   /// Constructor
-  const SpecEditorView({super.key});
+  const SpecEditorView({
+    required this.projectId,
+    super.key,
+  });
+
+  final String projectId;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +55,7 @@ class SpecEditorView extends StatelessWidget {
               ),
               body: Row(
                 children: [
-                  const SpecEditorNavigationDrawer(),
+                  SpecEditorNavigationDrawer(projectId: projectId),
                   Expanded(
                     child: state is SpecEditorLoadedState &&
                             state.selectedPageId != null

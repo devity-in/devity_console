@@ -60,7 +60,7 @@ class ProjectListView extends StatelessWidget {
       body: BlocBuilder<ProjectListBloc, ProjectListState>(
         builder: (context, state) {
           // Add print statement to debug state changes
-          print("ProjectListView received state: ${state.runtimeType}");
+          print('ProjectListView received state: ${state.runtimeType}');
 
           if (state is ProjectListLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -98,7 +98,10 @@ class ProjectListView extends StatelessWidget {
                     projects: state.projects,
                     onProjectTap: (project) {
                       // Navigate to project view
-                      context.push('/projects/${project.id}');
+                      context.push(
+                        '/projects/${project.id}',
+                        extra: project,
+                      );
                     },
                   ),
                 ),

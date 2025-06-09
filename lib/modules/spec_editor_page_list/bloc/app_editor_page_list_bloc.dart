@@ -2,6 +2,9 @@ import 'package:devity_console/modules/spec_editor_page_list/bloc/app_editor_pag
 import 'package:devity_console/modules/spec_editor_page_list/bloc/app_editor_page_list_state.dart';
 import 'package:devity_console/modules/spec_editor_page_list/models/page.dart'
     as models;
+import 'package:devity_console/services/error_handler_service.dart';
+import 'package:devity_console/services/network_service.dart';
+import 'package:devity_console/services/spec_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// [AppEditorPageListBloc] is a business logic component that manages the state of the
@@ -9,13 +12,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AppEditorPageListBloc
     extends Bloc<AppEditorPageListEvent, AppEditorPageListState> {
   /// Creates a new instance of [AppEditorPageListBloc].
-  AppEditorPageListBloc() : super(const AppEditorPageListInitialState()) {
+  AppEditorPageListBloc({
+    required String projectId,
+    SpecService? specService,
+  })  : _specService = specService ??
+            SpecService(
+              networkService: NetworkService(
+                errorHandler: ErrorHandlerService(),
+              ),
+              errorHandler: ErrorHandlerService(),
+            ),
+        _projectId = projectId,
+        super(const AppEditorPageListInitialState()) {
     on<AppEditorPageListStartedEvent>(_onStarted);
     on<AppEditorPageListAddPageEvent>(_onAddPage);
     on<AppEditorPageListUpdatePageEvent>(_onUpdatePage);
     on<AppEditorPageListDeletePageEvent>(_onDeletePage);
     on<AppEditorPageListSearchEvent>(_onSearch);
   }
+
+  final SpecService _specService;
+  final String _projectId;
 
   /// List of all pages
   List<models.Page> _allPages = [];
@@ -26,7 +43,8 @@ class AppEditorPageListBloc
   ) async {
     emit(const AppEditorPageListLoadingState());
     try {
-      // TODO: Implement API call to get pages
+      final pages = await _specService.getSpecSummaries(_projectId);
+      print(pages);
       _allPages = [
         const models.Page(
           id: '1',

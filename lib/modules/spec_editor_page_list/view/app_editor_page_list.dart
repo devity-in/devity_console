@@ -11,13 +11,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// the app editor page list.
 class AppEditorPageList extends StatelessWidget {
   /// Creates a new instance of [AppEditorPageList].
-  const AppEditorPageList({super.key});
+  const AppEditorPageList({
+    required this.projectId,
+    super.key,
+  });
+
+  final String projectId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          AppEditorPageListBloc()..add(const AppEditorPageListStartedEvent()),
+          AppEditorPageListBloc(projectId: projectId)
+            ..add(const AppEditorPageListStartedEvent()),
       child: const AppEditorPageListView(),
     );
   }

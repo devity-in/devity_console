@@ -8,7 +8,12 @@ import 'package:sizer/sizer.dart';
 /// the app editor navigation drawer.
 class SpecEditorNavigationDrawer extends StatelessWidget {
   /// Creates a [SpecEditorNavigationDrawer].
-  const SpecEditorNavigationDrawer({super.key});
+  const SpecEditorNavigationDrawer({
+    required this.projectId,
+    super.key,
+  });
+
+  final String projectId;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +26,7 @@ class SpecEditorNavigationDrawer extends StatelessWidget {
           ),
         ),
       ),
-      child: const DefaultTabController(
+      child: DefaultTabController(
         length: 2,
         child: Column(
           children: [
@@ -52,7 +57,7 @@ class SpecEditorNavigationDrawer extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  AppEditorPageList(),
+                  AppEditorPageList(projectId: projectId),
                   AppEditorWidgetList(),
                 ],
               ),

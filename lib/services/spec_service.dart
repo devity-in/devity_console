@@ -13,7 +13,7 @@ class SpecService {
   // Inject NetworkService
   final NetworkService _networkService;
 
-  SpecService({required NetworkService networkService})
+  SpecService({required NetworkService networkService, required errorHandler})
       : _networkService = networkService;
 
   // Remove hardcoded base URL
