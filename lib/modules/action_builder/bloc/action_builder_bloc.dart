@@ -106,8 +106,9 @@ class ActionBuilderBloc extends Bloc<ActionBuilderEvent, ActionBuilderState> {
 
   void _processSpecEditorState(SpecEditorState specState) {
     if (specState is SpecEditorLoadedState) {
-      final actionsMap =
-          specState.specData['actions'] as Map<String, dynamic>? ?? {};
+      final actionsMap = Map<String, dynamic>.from(
+        specState.specData['actions'] as Map<dynamic, dynamic>,
+      );
       emit(ActionBuilderLoaded(actions: actionsMap));
     } else if (specState is SpecEditorLoadingState) {
       emit(ActionBuilderLoading());

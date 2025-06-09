@@ -20,6 +20,13 @@ class ProjectNavigationBloc
   bool _isExpanded = false;
   static const _projectNavigationDrawerItems = [
     ProjectNavigationDrawerItem(
+      id: 'overview',
+      title: 'Overview',
+      route: '/overview',
+      icon: Icons.home_outlined,
+      projectId: '',
+    ),
+    ProjectNavigationDrawerItem(
       id: 'widget-builder',
       title: 'Widget Builder',
       route: '/widget-builder',

@@ -43,10 +43,13 @@ class SpecEditorPageEditorView extends StatelessWidget {
 
     if (specState is SpecEditorLoadedState) {
       try {
+        print('specState.specData: ${specState.specData}');
         // Parse the full spec
-        parsedSpec = DevitySpec.fromJson(specState.specData);
+        parsedSpec = DevitySpec.fromJson(
+          Map<String, dynamic>.from(specState.specData),
+        );
         final selectedPageId = specState.selectedPageId;
-
+        print('parsedSpec: $parsedSpec');
         if (selectedPageId != null &&
             parsedSpec.screens.containsKey(selectedPageId)) {
           currentScreenModel = parsedSpec.screens[selectedPageId];

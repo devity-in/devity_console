@@ -132,9 +132,9 @@ class SpecEditorAttributeEditorView extends StatelessWidget {
                 (editorBloc.state as AppEditorAttributeEditorLoaded)
                         .selectedElementAttributes ==
                     null) {
-              final globalActions =
-                  state.specData['actions'] as Map<String, dynamic>? ??
-                      const <String, dynamic>{};
+              final globalActions = Map<String, dynamic>.from(
+                state.specData['actions'] as Map<dynamic, dynamic>,
+              );
               editorBloc.add(
                 AppEditorAttributeEditorSelectionChanged(
                   selectedSectionType: state.selectedSectionType,
