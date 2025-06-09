@@ -47,11 +47,11 @@ class SpecEditorAttributeEditorView extends StatelessWidget {
     }
 
     for (final screen in spec.screens.values) {
-      var T = search(screen.appBar);
+      var T = search(screen.top);
       if (T != null) return T;
-      T = search(screen.body);
+      T = search(screen.main);
       if (T != null) return T;
-      T = search(screen.bottomNavBar);
+      T = search(screen.bottom);
       if (T != null) return T;
     }
     return null;

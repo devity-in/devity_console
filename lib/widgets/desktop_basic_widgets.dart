@@ -325,3 +325,26 @@ class DesktopElevatedButton extends StatelessWidget {
     );
   }
 }
+
+class DesktopDropdownButton extends StatelessWidget {
+  /// Desktop dropdown button constructor
+  const DesktopDropdownButton({
+    required this.items,
+    required this.onChanged,
+    super.key,
+  });
+
+  /// items - Items for the dropdown button
+  final List<DropdownMenuItem<dynamic>> items;
+
+  /// onChanged - Function to be called when the dropdown button is changed
+  final void Function(dynamic)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton(
+      items: items,
+      onChanged: onChanged,
+    );
+  }
+}

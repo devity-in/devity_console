@@ -52,9 +52,7 @@ class SpecEditorNavigationDrawer extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  // TODO: Rename AppEditorPageList?
                   AppEditorPageList(),
-                  // TODO: Rename AppEditorWidgetList?
                   AppEditorWidgetList(),
                 ],
               ),

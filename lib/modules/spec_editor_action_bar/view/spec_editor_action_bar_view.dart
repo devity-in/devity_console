@@ -73,17 +73,18 @@ class _AppEditorActionBarContent extends StatelessWidget {
               // Right side actions
               Row(
                 children: [
-                  DesktopElevatedButton(
+                  DesktopOutlinedButton(
                     title: 'Save Changes',
                     onPressed: () {
                       print(
-                          'Save Changes button pressed - Dispatching SaveSpecRequested');
-                      specEditorBloc.add( SpecEditorSaveSpecRequested());
+                        'Save Changes button pressed - Dispatching SaveSpecRequested',
+                      );
+                      specEditorBloc.add(SpecEditorSaveSpecRequested());
                     },
                   ),
                   const SizedBox(width: 12),
                   DesktopOutlinedButton(
-                    title: 'Settings',
+                    title: 'Publish',
                     onPressed: () {
                       // TODO: Handle settings action
                     },

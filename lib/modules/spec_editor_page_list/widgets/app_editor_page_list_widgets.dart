@@ -1,5 +1,6 @@
 import 'package:devity_console/modules/spec_editor_page_list/models/page.dart'
     as models;
+import 'package:devity_console/widgets/desktop_basic_widgets.dart';
 import 'package:flutter/material.dart';
 
 /// Widget for the page list search bar
@@ -116,66 +117,123 @@ class PageCard extends StatelessWidget {
           width: isSelected ? 2 : 1,
         ),
       ),
-      child: InkWell(
-        onTap: onSelected,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onSelected,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colorScheme.primary
-                          : colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.description,
-                      color: isSelected
-                          ? colorScheme.onPrimary
-                          : colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      page.name,
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: isSelected
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.description,
+                          color: isSelected
+                              ? colorScheme.onPrimary
+                              : colorScheme.primary,
+                        ),
                       ),
-                      maxLines: 1,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          page.name,
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      PopupMenuButton(
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            child: const Text('Edit'),
+                            onTap: () {
+                              print('Edit');
+                            },
+                          ),
+                          PopupMenuItem(
+                            onTap: onDelete,
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                        onSelected: (value) {
+                          print('value: $value');
+                        },
+                        child: const Icon(Icons.more_vert),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  if (page.description != null) ...[
+                    Text(
+                      page.description!,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: onDelete,
-                    color: colorScheme.error,
-                  ),
+                  ],
                 ],
               ),
-              const SizedBox(height: 16),
-              if (page.description != null) ...[
-                Text(
-                  page.description!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
+          // Expanded view of the page
+          if (isSelected) ...[
+            const SizedBox(height: 10),
+            ExpansionTile(
+              title: const Text('Top Renderer'),
+              children: [
+                const SizedBox(height: 10),
+
+                // Add a button to add a new widget
+                DesktopOutlinedButton(
+                  title: 'Add Widget',
+                  onPressed: () {
+                    print('Add Widget');
+                  },
+                ),
+                const SizedBox(height: 10),
+                // Add a button to add a new layout
+                DesktopOutlinedButton(
+                  title: 'Add Layout',
+                  onPressed: () {
+                    print('Add Layout');
+                  },
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+            const ExpansionTile(
+              title: Text('Main Renderer'),
+              children: [
+                Text('Main Renderer'),
+              ],
+            ),
+            const ExpansionTile(
+              title: Text('Bottom Renderer'),
+              children: [
+                Text('Bottom Renderer'),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
